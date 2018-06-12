@@ -16,7 +16,7 @@ It is based on [Dialogger](https://github.com/etodd/Lemma/tree/master/Dialogger)
  ## How to use it
  I think there is no need for a documentation on this subject, so i will just explain nodes.
  
- - **Plot**:  This node contains story parts and wont be in game exports, plot node can connect to one plot, note, Start-Conversation or end.
+ - **Plot**:  This node contains story parts and wont be in game exports, plot node can connect to one plot, note, Start-Conversation.
  - **Note**: Note contains notes for any node and can connect to many nodes.
  - **Start-Conversation**: Marks start of a conversation and can connect to one Node, Text, Choice, Branch or Set.
  - **End-Conversation**: Marks end of a conversation and can connect to one Plot.
