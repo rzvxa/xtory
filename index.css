@@ -177,6 +177,18 @@ Node styles
 	color: #ea6;
 }
 
+.conv-id
+{
+	/* enable interacting with this label */
+	pointer-events: auto;
+    display: block;
+}
+
+
+.conv-id:hover {
+	color: #2B627A;
+}
+
 button
 {
 	float: right;

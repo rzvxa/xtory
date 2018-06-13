@@ -22,6 +22,23 @@ defaultLink.set('smooth', true);
 
 var allowableConnections =
 [
+	['dialogue.Plot', 'dialogue.Plot'],
+	['dialogue.Plot', 'dialogue.StartConv'],
+	['dialogue.Note', 'dialogue.Plot'],
+	['dialogue.Note', 'dialogue.StartConv'],
+	['dialogue.Note', 'dialogue.EndConv'],
+	['dialogue.Note', 'dialogue.Text'],
+	['dialogue.Note', 'dialogue.Node'],
+	['dialogue.Note', 'dialogue.Choice'],
+	['dialogue.Note', 'dialogue.Set'],
+	['dialogue.Note', 'dialogue.Branch'],
+	['dialogue.StartConv', 'dialogue.Node'],
+	['dialogue.StartConv', 'dialogue.Text'],
+	['dialogue.StartConv', 'dialogue.Choice'],
+	['dialogue.StartConv', 'dialogue.Branch'],
+	['dialogue.StartConv', 'dialogue.Set'],
+	['dialogue.EndConv', 'dialogue.Plot'],
+	['dialogue.Text', 'dialogue.EndConv'],
 	['dialogue.Text', 'dialogue.Text'],
 	['dialogue.Text', 'dialogue.Node'],
 	['dialogue.Text', 'dialogue.Choice'],
@@ -32,10 +49,12 @@ var allowableConnections =
 	['dialogue.Node', 'dialogue.Choice'],
 	['dialogue.Node', 'dialogue.Set'],
 	['dialogue.Node', 'dialogue.Branch'],
+	['dialogue.Choice', 'dialogue.EndConv'],
 	['dialogue.Choice', 'dialogue.Text'],
 	['dialogue.Choice', 'dialogue.Node'],
 	['dialogue.Choice', 'dialogue.Set'],
 	['dialogue.Choice', 'dialogue.Branch'],
+	['dialogue.Set', 'dialogue.EndConv'],
 	['dialogue.Set', 'dialogue.Text'],
 	['dialogue.Set', 'dialogue.Node'],
 	['dialogue.Set', 'dialogue.Set'],
@@ -47,6 +66,8 @@ var allowableConnections =
 ];
 
 var textarea_max_h = 220;
+var click_to_copy = 'Click to copy';
+var start_conv_id_pre = 'ID :';
 
 function validateConnection(cellViewS, magnetS, cellViewT, magnetT, end, linkView)
 {
@@ -148,7 +169,6 @@ joint.shapes.dialogue.BaseView = joint.shapes.devs.ModelView.extend(
 		'<div class="node">',
 		'<span class="label"></span>',
 		'<button class="delete">x</button>',
-		'<textarea type="text" class="name" placeholder="Text" row="2"> </textarea>',
 		'</div>',
 	].join(''),
 
@@ -158,23 +178,6 @@ joint.shapes.dialogue.BaseView = joint.shapes.devs.ModelView.extend(
 		joint.shapes.devs.ModelView.prototype.initialize.apply(this, arguments);
 
 		this.$box = $(_.template(this.template)());
-		// Prevent paper from handling pointerdown.
-		var ta = this.$box.find('textarea');
-		ta.on('mousedown click', function(evt) { evt.stopPropagation(); });
-		
-		var resizeTextarea = function(el) {
-			jQuery(el).css('height', 'auto').css('height', Math.min(el.scrollHeight, textarea_max_h));
-		};
-		var update = this.updateBox;
-		ta.on('keyup input', function() {
-			resizeTextarea(ta[0]);
-			update();
-		});
-		// This is an example of reacting on the input change and storing the input data in the cell model.
-		this.$box.find('textarea.name').on('change', _.bind(function(evt)
-		{
-			this.model.set('name', $(evt.target).val());
-		}, this));
 
 		this.$box.find('.delete').on('click', _.bind(this.model.remove, this.model));
 		// Update the box position whenever the underlying model changes.
@@ -197,16 +200,12 @@ joint.shapes.dialogue.BaseView = joint.shapes.devs.ModelView.extend(
 	{
 		// Set the position and dimension of the box so that it covers the JointJS element.
 		var bbox = this.model.getBBox();
-		// Example of updating the HTML with a data stored in the cell model.
-		var nameField = this.$box.find('textarea.name');
-		if(!nameField.length) nameField = this.$box.find('input.name');
-		if (!nameField.is(':focus'))
-			nameField.val(this.model.get('name'));
 		var label = this.$box.find('.label');
 		var type = this.model.get('type').slice('dialogue.'.length);
-		label.text(type);
+		var displayname = this.model.get('displayname');
+		label.text((typeof displayname == 'undefined' ? type : displayname));
 		label.attr('class', 'label ' + type);
-		this.$box.css({ width: bbox.width, height: bbox.height + Math.min(nameField[0].scrollHeight, textarea_max_h), left: bbox.x, top: bbox.y, transform: 'rotate(' + (this.model.get('angle') || 0) + 'deg)' });
+		this.$box.css({ width: bbox.width, height: bbox.height , left: bbox.x, top: bbox.y, transform: 'rotate(' + (this.model.get('angle') || 0) + 'deg)' });
 	},
 
 	removeBox: function(evt)
@@ -214,6 +213,59 @@ joint.shapes.dialogue.BaseView = joint.shapes.devs.ModelView.extend(
 		this.$box.remove();
 	},
 });
+
+joint.shapes.dialogue.TextareaView = joint.shapes.dialogue.BaseView.extend(
+	{
+		template:
+			[
+				'<div class="node">',
+				'<span class="label"></span>',
+				'<button class="delete">x</button>',
+				'<textarea type="text" class="name" placeholder="Text" row="2"> </textarea>',
+				'</div>',
+			].join(''),
+
+		initialize: function()
+		{
+            joint.shapes.dialogue.BaseView.prototype.initialize.apply(this, arguments);
+			// Prevent paper from handling pointerdown.
+			var ta = this.$box.find('textarea');
+			ta.on('mousedown click', function(evt) { evt.stopPropagation(); });
+
+			var resizeTextarea = function(el) {
+				jQuery(el).css('height', 'auto').css('height', Math.min(el.scrollHeight, textarea_max_h));
+			};
+			var update = this.updateBox;
+			ta.on('keyup input', function() {
+				resizeTextarea(ta[0]);
+				update();
+			});
+			// This is an example of reacting on the input change and storing the input data in the cell model.
+			this.$box.find('textarea.name').on('change', _.bind(function(evt)
+			{
+				this.model.set('name', $(evt.target).val());
+			}, this));
+
+		},
+
+		updateBox: function()
+		{
+            joint.shapes.dialogue.BaseView.prototype.updateBox.apply(this, arguments);
+            // Set the position and dimension of the box so that it covers the JointJS element.
+            var bbox = this.model.getBBox();
+			// Example of updating the HTML with a data stored in the cell model.
+			var nameField = this.$box.find('textarea.name');
+			if(!nameField.length) nameField = this.$box.find('input.name');
+			if (!nameField.is(':focus'))
+				nameField.val(this.model.get('name'));
+			var label = this.$box.find('.label');
+			var type = this.model.get('type').slice('dialogue.'.length);
+			var displayname = this.model.get('displayname');
+			label.text((typeof displayname == 'undefined' ? type : displayname));
+			label.attr('class', 'label ' + type);
+			this.$box.css({ width: bbox.width, height: bbox.height + Math.min(nameField[0].scrollHeight, textarea_max_h), left: bbox.x, top: bbox.y, transform: 'rotate(' + (this.model.get('angle') || 0) + 'deg)' });
+		},
+	});
 
 joint.shapes.dialogue.Node = joint.shapes.devs.Model.extend(
 {
@@ -233,6 +285,108 @@ joint.shapes.dialogue.Node = joint.shapes.devs.Model.extend(
 });
 joint.shapes.dialogue.NodeView = joint.shapes.dialogue.BaseView;
 
+joint.shapes.dialogue.Plot = joint.shapes.devs.Model.extend(
+	{
+		defaults: joint.util.deepSupplement
+		(
+			{
+				type: 'dialogue.Plot',
+				inPorts: ['input'],
+				outPorts: ['output'],
+			},
+			joint.shapes.dialogue.Base.prototype.defaults
+		),
+	}
+);
+joint.shapes.dialogue.PlotView = joint.shapes.dialogue.TextareaView;
+
+joint.shapes.dialogue.Note = joint.shapes.devs.Model.extend(
+    {
+        defaults: joint.util.deepSupplement
+        (
+            {
+                type: 'dialogue.Note',
+                inPorts: ['input'],
+                outPorts: ['output'],
+                attrs:
+                {
+                    '.outPorts circle': { unlimitedConnections: ['dialogue.Plot', 'dialogue.Note', 'dialogue.StartConv',
+                        'dialogue.EndConv', 'dialogue.Text', 'dialogue.Node',
+                        'dialogue.Choice', 'dialogue.Set', 'dialogue.Branch'], }
+                },
+            },
+            joint.shapes.dialogue.Base.prototype.defaults
+        ),
+    }
+);
+joint.shapes.dialogue.NoteView = joint.shapes.dialogue.TextareaView;
+
+joint.shapes.dialogue.StartConv = joint.shapes.devs.Model.extend(
+	{
+		defaults: joint.util.deepSupplement
+		(
+			{
+				displayname: 'Start Conversation',
+				type: 'dialogue.StartConv',
+				inPorts: ['input'],
+				outPorts: ['output'],
+			},
+			joint.shapes.dialogue.Base.prototype.defaults
+		),
+	}
+);
+joint.shapes.dialogue.StartConvView = joint.shapes.dialogue.BaseView.extend(
+    {
+        template:
+            [
+                '<div class="node">',
+                '<span class="label"></span>',
+                '<button class="delete">x</button>',
+                '<span class="conv-id" data-balloon="' + click_to_copy + '" data-balloon-pos="up"></span>',
+                '</div>',
+            ].join(''),
+
+        initialize: function()
+        {
+            joint.shapes.dialogue.BaseView.prototype.initialize.apply(this, arguments);
+            this.$box.find('.conv-id').on('mousedown click', function(evt) {
+                    var ele = evt.currentTarget;
+                    var tooltipText = (copyToClipboard(ele.textContent.slice(start_conv_id_pre.length)) ? "Copied" : "Failed to copy");
+                    ele.setAttribute('data-balloon', tooltipText);
+                }
+            );
+            this.$box.find('.conv-id').on('mouseout', function(evt) {
+                    var ele = evt.currentTarget;
+                    ele.setAttribute('data-balloon', click_to_copy);
+                }
+            );
+        },
+
+        updateBox: function()
+        {
+            joint.shapes.dialogue.BaseView.prototype.updateBox.apply(this, arguments);
+            var label = this.$box.find('.conv-id');
+            var id = this.model.get('id');
+            label.text(start_conv_id_pre+id);
+        },
+});
+
+joint.shapes.dialogue.EndConv = joint.shapes.devs.Model.extend(
+	{
+		defaults: joint.util.deepSupplement
+		(
+			{
+				displayname: 'End Conversation',
+				type: 'dialogue.EndConv',
+				inPorts: ['input'],
+				outPorts: ['output'],
+			},
+			joint.shapes.dialogue.Base.prototype.defaults
+		),
+	}
+);
+joint.shapes.dialogue.EndConvView = joint.shapes.dialogue.BaseView;
+
 joint.shapes.dialogue.Text = joint.shapes.devs.Model.extend(
 {
 	defaults: joint.util.deepSupplement
@@ -249,7 +403,7 @@ joint.shapes.dialogue.Text = joint.shapes.devs.Model.extend(
 		joint.shapes.dialogue.Base.prototype.defaults
 	),
 });
-joint.shapes.dialogue.TextView = joint.shapes.dialogue.BaseView;
+joint.shapes.dialogue.TextView = joint.shapes.dialogue.TextareaView;
 
 joint.shapes.dialogue.Choice = joint.shapes.devs.Model.extend(
 {
@@ -263,7 +417,7 @@ joint.shapes.dialogue.Choice = joint.shapes.devs.Model.extend(
 		joint.shapes.dialogue.Base.prototype.defaults
 	),
 });
-joint.shapes.dialogue.ChoiceView = joint.shapes.dialogue.BaseView;
+joint.shapes.dialogue.ChoiceView = joint.shapes.dialogue.TextareaView;
 
 joint.shapes.dialogue.Branch = joint.shapes.devs.Model.extend(
 {
@@ -828,6 +982,56 @@ function addFileEntry(name)
 	});
 }
 
+function copyToClipboard(elem) {
+    // create hidden text element, if it doesn't already exist
+    var targetId = "_hiddenCopyText_";
+    var isInput = typeof elem != 'string' && elem.tagName === "INPUT" || elem.tagName === "TEXTAREA";
+    var origSelectionStart, origSelectionEnd;
+    if (isInput) {
+        // can just use the original source element for the selection and copy
+        target = elem;
+        origSelectionStart = elem.selectionStart;
+        origSelectionEnd = elem.selectionEnd;
+    } else {
+        // must use a temporary form element for the selection and copy
+        target = document.getElementById(targetId);
+        if (!target) {
+            var target = document.createElement("textarea");
+            target.style.position = "absolute";
+            target.style.left = "-9999px";
+            target.style.top = "0";
+            target.id = targetId;
+            document.body.appendChild(target);
+        }
+        target.textContent = (typeof elem != 'string'?elem.textContent:elem);
+    }
+    // select the content
+    var currentFocus = document.activeElement;
+    target.focus();
+    target.setSelectionRange(0, target.value.length);
+
+    // copy the selection
+    var succeed;
+    try {
+        succeed = document.execCommand("copy");
+    } catch(e) {
+        succeed = false;
+    }
+    // restore original focus
+    if (currentFocus && typeof currentFocus.focus === "function") {
+        currentFocus.focus();
+    }
+
+    if (isInput) {
+        // restore prior selection
+        elem.setSelectionRange(origSelectionStart, origSelectionEnd);
+    } else {
+        // clear temporary content
+        target.textContent = "";
+    }
+    return succeed;
+}
+
 (function()
 {
 	for (var i = 0; i < localStorage.length; i++)
@@ -846,17 +1050,22 @@ $('#paper').contextmenu(
 	width: 150,
 	items:
 	[
-		{ text: 'Text', alias: '1-1', action: add(joint.shapes.dialogue.Text) },
-		{ text: 'Choice', alias: '1-2', action: add(joint.shapes.dialogue.Choice) },
-		{ text: 'Branch', alias: '1-3', action: add(joint.shapes.dialogue.Branch) },
-		{ text: 'Set', alias: '1-4', action: add(joint.shapes.dialogue.Set) },
-		{ text: 'Node', alias: '1-5', action: add(joint.shapes.dialogue.Node) },
+		{ text: 'Plot', alias: '1-1', action: add(joint.shapes.dialogue.Plot) },
+		{ text: 'Note', alias: '1-2', action: add(joint.shapes.dialogue.Note) },
+		{ text: 'Start Conversation', alias: '1-3', action: add(joint.shapes.dialogue.StartConv) },
+		{ text: 'End Conversation', alias: '1-4', action: add(joint.shapes.dialogue.EndConv) },
 		{ type: 'splitLine' },
-		{ text: 'Save', alias: '2-1', action: save },
-		{ text: 'Load', alias: '2-2', action: load },
-		{ text: 'Import', id: 'import', alias: '2-3', action: importFile },
-		{ text: 'New', alias: '2-4', action: clear },
-		{ text: 'Export', id: 'export', alias: '2-5', action: exportFile },
-		{ text: 'Export game file', id: 'export-game', alias: '2-6', action: exportGameFile },
+		{ text: 'Text', alias: '2-1', action: add(joint.shapes.dialogue.Text) },
+		{ text: 'Choice', alias: '2-2', action: add(joint.shapes.dialogue.Choice) },
+		{ text: 'Branch', alias: '2-3', action: add(joint.shapes.dialogue.Branch) },
+		{ text: 'Set', alias: '2-4', action: add(joint.shapes.dialogue.Set) },
+		{ text: 'Node', alias: '2-5', action: add(joint.shapes.dialogue.Node) },
+		{ type: 'splitLine' },
+		{ text: 'Save', alias: '3-1', action: save },
+		{ text: 'Load', alias: '3-2', action: load },
+		{ text: 'Import', id: 'import', alias: '3-3', action: importFile },
+		{ text: 'New', alias: '3-4', action: clear },
+		{ text: 'Export', id: 'export', alias: '3-5', action: exportFile },
+		{ text: 'Export game file', id: 'export-game', alias: '3-6', action: exportGameFile },
 	]
 });
