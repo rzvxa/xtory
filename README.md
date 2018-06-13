@@ -2,7 +2,7 @@
 # Xtory
 
 A tool for writing branching nonlinear stories.
-It is based on [Dialogger](https://github.com/etodd/Lemma/tree/master/Dialogger) from [Evan Todd](https://github.com/etodd).
+It is based on [Dialogger](https://github.com/etodd/dialogger) from [Evan Todd](https://github.com/etodd).
 ## Features
 
  - Node base story editor
