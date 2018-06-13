@@ -221,7 +221,7 @@ joint.shapes.dialogue.TextareaView = joint.shapes.dialogue.BaseView.extend(
 				'<div class="node">',
 				'<span class="label"></span>',
 				'<button class="delete">x</button>',
-				'<textarea type="text" class="name" placeholder="Text" row="2"> </textarea>',
+				'<textarea dir="auto" type="text" class="name" placeholder="Text" row="2"> </textarea>',
 				'</div>',
 			].join(''),
 
@@ -442,8 +442,8 @@ joint.shapes.dialogue.BranchView = joint.shapes.dialogue.BaseView.extend(
 		'<button class="delete">x</button>',
 		'<button class="add">+</button>',
 		'<button class="remove">-</button>',
-		'<input type="text" class="name" placeholder="Variable" />',
-		'<input type="text" value="Default" readonly/>',
+		'<input dir="auto" type="text" class="name" placeholder="Variable" />',
+		'<input dir="auto" type="text" value="Default" readonly/>',
 		'</div>',
 	].join(''),
 
@@ -497,7 +497,7 @@ joint.shapes.dialogue.BranchView = joint.shapes.dialogue.BaseView.extend(
 		for (var i = valueFields.length; i < values.length; i++)
 		{
 			// Prevent paper from handling pointerdown.
-			var field = $('<input type="text" class="value" />');
+			var field = $('<input dir="auto" type="text" class="value" />');
 			field.attr('placeholder', 'Value ' + (i + 1).toString());
 			field.attr('index', i);
 			this.$box.append(field);
@@ -556,8 +556,8 @@ joint.shapes.dialogue.SetView = joint.shapes.dialogue.BaseView.extend(
 		'<div class="node">',
 		'<span class="label"></span>',
 		'<button class="delete">x</button>',
-		'<input type="text" class="name" placeholder="Variable" />',
-		'<input type="text" class="value" placeholder="Value" />',
+		'<input dir="auto" type="text" class="name" placeholder="Variable" />',
+		'<input dir="auto" type="text" class="value" placeholder="Value" />',
 		'</div>',
 	].join(''),
 
@@ -672,7 +672,7 @@ function gameData()
 // Menu actions
 
 var filename = null;
-var defaultFilename = 'dialogue.dl';
+var defaultFilename = 'story.xt';
 
 function flash(text)
 {
@@ -737,8 +737,6 @@ function save()
 
 function doSave()
 {
-	console.log(graph.toJSON());
-	console.log(JSON.stringify(graph));
 	if (filename)
 	{
 		if (fs)
@@ -789,7 +787,7 @@ function exportFile()
 
 function gameFilenameFromNormalFilename(f)
 {
-	return f.substring(0, f.length - 2) + 'dlz';
+	return f.substring(0, f.length - 2) + 'xtc';
 }
 
 function exportGameFile()
