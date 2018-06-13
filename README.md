@@ -1,10 +1,8 @@
 
 # Xtory
 
-### WIP
-
 A tool for writing branching nonlinear stories.
-It is based on [Dialogger](https://github.com/etodd/Lemma/tree/master/Dialogger) from [Evan Todd](https://github.com/etodd).
+It is based on [Dialogger](https://github.com/etodd/dialogger) from [Evan Todd](https://github.com/etodd).
 ## Features
 
  - Node base story editor
@@ -25,7 +23,5 @@ It is based on [Dialogger](https://github.com/etodd/Lemma/tree/master/Dialogger)
  - **Choice**:Presents a choice to the player. Can connect to one End-Conversation, Text, Node, Set, or Branch.
  - **Set**:Sets a variable to a value. Can connect to one End-Conversation, Text, Node, Set, or Branch.
  - **Branch**:Takes one of several paths based on the value of a variable. Each port can connect to one Text, Node, Set, or Branch.
-
-Project is working in progress so the nodes and conditions still can change, untill project get out of WIP state i wont care about backward compatibility after that all changes will be backward compatible.
 
 
