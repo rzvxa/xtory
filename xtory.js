@@ -32,11 +32,13 @@ var allowableConnections =
 	['dialogue.Note', 'dialogue.Choice'],
 	['dialogue.Note', 'dialogue.Set'],
 	['dialogue.Note', 'dialogue.Branch'],
+	['dialogue.Note', 'dialogue.Random'],
 	['dialogue.StartConv', 'dialogue.Node'],
 	['dialogue.StartConv', 'dialogue.Text'],
 	['dialogue.StartConv', 'dialogue.Choice'],
 	['dialogue.StartConv', 'dialogue.Branch'],
 	['dialogue.StartConv', 'dialogue.Set'],
+	['dialogue.StartConv', 'dialogue.Random'],
 	['dialogue.EndConv', 'dialogue.Plot'],
 	['dialogue.Text', 'dialogue.EndConv'],
 	['dialogue.Text', 'dialogue.Text'],
@@ -44,25 +46,32 @@ var allowableConnections =
 	['dialogue.Text', 'dialogue.Choice'],
 	['dialogue.Text', 'dialogue.Set'],
 	['dialogue.Text', 'dialogue.Branch'],
+	['dialogue.Text', 'dialogue.Random'],
 	['dialogue.Node', 'dialogue.Text'],
 	['dialogue.Node', 'dialogue.Node'],
 	['dialogue.Node', 'dialogue.Choice'],
 	['dialogue.Node', 'dialogue.Set'],
 	['dialogue.Node', 'dialogue.Branch'],
+	['dialogue.Node', 'dialogue.Random'],
 	['dialogue.Choice', 'dialogue.EndConv'],
 	['dialogue.Choice', 'dialogue.Text'],
 	['dialogue.Choice', 'dialogue.Node'],
 	['dialogue.Choice', 'dialogue.Set'],
 	['dialogue.Choice', 'dialogue.Branch'],
+	['dialogue.Choice', 'dialogue.Random'],
 	['dialogue.Set', 'dialogue.EndConv'],
 	['dialogue.Set', 'dialogue.Text'],
 	['dialogue.Set', 'dialogue.Node'],
 	['dialogue.Set', 'dialogue.Set'],
 	['dialogue.Set', 'dialogue.Branch'],
+	['dialogue.Set', 'dialogue.Random'],
 	['dialogue.Branch', 'dialogue.Text'],
 	['dialogue.Branch', 'dialogue.Node'],
 	['dialogue.Branch', 'dialogue.Set'],
 	['dialogue.Branch', 'dialogue.Branch'],
+	['dialogue.Branch', 'dialogue.Random'],
+	['dialogue.Random', 'dialogue.Text'],
+	['dialogue.Random', 'dialogue.Choice'],
 ];
 
 var textarea_max_h = 220;
@@ -286,6 +295,24 @@ joint.shapes.dialogue.Node = joint.shapes.devs.Model.extend(
 	),
 });
 joint.shapes.dialogue.NodeView = joint.shapes.dialogue.BaseView;
+
+joint.shapes.dialogue.Random = joint.shapes.devs.Model.extend(
+	{
+		defaults: joint.util.deepSupplement
+		(
+			{
+				type: 'dialogue.Random',
+				inPorts: ['input'],
+				outPorts: ['output'],
+				attrs:
+				{
+					'.outPorts circle': { unlimitedConnections: ['dialogue.Choice', 'dialogue.Text'], }
+				},
+			},
+			joint.shapes.dialogue.Base.prototype.defaults
+		),
+	});
+joint.shapes.dialogue.RandomView = joint.shapes.dialogue.BaseView;
 
 joint.shapes.dialogue.Plot = joint.shapes.devs.Model.extend(
 	{
@@ -606,7 +633,11 @@ function gameData()
 				type: cell.type.slice('dialogue.'.length),
 				id: cell.id,
 			};
-			if (node.type == 'Branch')
+			if (node.type == 'Random')
+			{
+				node.possibilities = [];
+			}
+			else if (node.type == 'Branch')
 			{
 				node.variable = cell.name;
 				node.branches = {};
@@ -641,7 +672,14 @@ function gameData()
 			var target = cell.target ? nodesByID[cell.target.id] : null;
 			if (source)
 			{
-				if (source.type == 'Branch')
+				if (source.type == 'Random')
+				{
+					var portNumber = parseInt(cell.source.port.slice('output'.length));
+					var sourceCell = cellsByID[source.id];
+
+					source.possibilities.push (target ? target.id : null);
+				}
+				else if (source.type == 'Branch')
 				{
 					var portNumber = parseInt(cell.source.port.slice('output'.length));
 					var value;
@@ -1083,6 +1121,7 @@ $('#paper').contextmenu(
 		{ text: 'Branch', alias: '2-3', action: add(joint.shapes.dialogue.Branch) },
 		{ text: 'Set', alias: '2-4', action: add(joint.shapes.dialogue.Set) },
 		{ text: 'Node', alias: '2-5', action: add(joint.shapes.dialogue.Node) },
+		{ text: 'Random', alias: '2-6', action: add(joint.shapes.dialogue.Random) },
 		{ type: 'splitLine' },
 		{ text: 'Save', alias: '3-1', action: save },
 		{ text: 'Load', alias: '3-2', action: load },
