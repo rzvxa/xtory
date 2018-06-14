@@ -103,7 +103,7 @@ function validateConnection(cellViewS, magnetS, cellViewT, magnetT, end, linkVie
 		if (link.attributes.source.id === cellViewS.model.id && link.attributes.source.port === magnetS.attributes.port.nodeValue && link.attributes.target.id)
 		{
 			var targetCell = graph.getCell(link.attributes.target.id);
-			if (targetCell.attributes.type !== targetType)
+			if (sourceType != 'dialogue.Note' && targetCell.attributes.type !== targetType)
 				return false; // We can only connect to multiple targets of the same type
 			if (targetCell == cellViewT.model)
 				return false; // Already connected
@@ -825,7 +825,7 @@ function add(constructor)
 
 function hasChanged(){
     if(filename === null)
-        return true;
+        return graph.get('cells').length;
 
     if(localStorage.getItem(filename) === null)
         return true;
@@ -833,8 +833,8 @@ function hasChanged(){
     var savedVersion = localStorage[filename];
     var currentVersion = JSON.stringify(graph);
 
-    if(savedVersion !== currentVersion) return true;
-    return false;
+    return savedVersion !== currentVersion;
+
 }
 
 function askIfNotSaved(){
@@ -855,8 +855,8 @@ function clear()
 var paper = new joint.dia.Paper(
 {
 	el: $('#paper'),
-	width: 16000,
-	height: 8000,
+	width: 160000,
+	height: 80000,
 	model: graph,
 	gridSize: 1,
 	defaultLink: defaultLink,
