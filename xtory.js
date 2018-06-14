@@ -758,6 +758,7 @@ function doSave()
 
 function load()
 {
+    askIfNotSaved();
 	if (fs)
 	{
 		window.frame.openDialog(
@@ -803,6 +804,7 @@ function exportGameFile()
 
 function importFile()
 {
+    askIfNotSaved();
 	if (!fs)
 		$('#file').click();
 }
@@ -821,9 +823,30 @@ function add(constructor)
 	};
 }
 
+function hasChanged(){
+    if(filename === null)
+        return true;
+
+    if(localStorage.getItem(filename) === null)
+        return true;
+
+    var savedVersion = localStorage[filename];
+    var currentVersion = JSON.stringify(graph);
+
+    if(savedVersion !== currentVersion) return true;
+    return false;
+}
+
+function askIfNotSaved(){
+    if(hasChanged() && confirm("You have unsaved changes, Are you want to save?")){
+        save();
+    }
+}
+
 function clear()
 {
-	graph.clear();
+    askIfNotSaved();
+    graph.clear();
 	filename = null;
 }
 
