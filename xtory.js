@@ -240,6 +240,8 @@ joint.shapes.dialogue.TextareaView = joint.shapes.dialogue.BaseView.extend(
 				resizeTextarea(ta[0]);
 				update();
 			});
+            ta.val(this.model.get('name'));
+            setTimeout(function(){ ta.keyup(); }, 0);
 			// This is an example of reacting on the input change and storing the input data in the cell model.
 			this.$box.find('textarea.name').on('change', _.bind(function(evt)
 			{
@@ -255,7 +257,7 @@ joint.shapes.dialogue.TextareaView = joint.shapes.dialogue.BaseView.extend(
             var bbox = this.model.getBBox();
 			// Example of updating the HTML with a data stored in the cell model.
 			var nameField = this.$box.find('textarea.name');
-			if(!nameField.length) nameField = this.$box.find('input.name');
+			//if(!nameField.length) nameField = this.$box.find('input.name');
 			if (!nameField.is(':focus'))
 				nameField.val(this.model.get('name'));
 			var label = this.$box.find('.label');
