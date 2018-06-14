@@ -33,12 +33,14 @@ var allowableConnections =
 	['dialogue.Note', 'dialogue.Set'],
 	['dialogue.Note', 'dialogue.Branch'],
 	['dialogue.Note', 'dialogue.Random'],
+	['dialogue.Note', 'dialogue.Function'],
 	['dialogue.StartConv', 'dialogue.Node'],
 	['dialogue.StartConv', 'dialogue.Text'],
 	['dialogue.StartConv', 'dialogue.Choice'],
 	['dialogue.StartConv', 'dialogue.Branch'],
 	['dialogue.StartConv', 'dialogue.Set'],
 	['dialogue.StartConv', 'dialogue.Random'],
+	['dialogue.StartConv', 'dialogue.Function'],
 	['dialogue.EndConv', 'dialogue.Plot'],
 	['dialogue.Text', 'dialogue.EndConv'],
 	['dialogue.Text', 'dialogue.Text'],
@@ -47,31 +49,44 @@ var allowableConnections =
 	['dialogue.Text', 'dialogue.Set'],
 	['dialogue.Text', 'dialogue.Branch'],
 	['dialogue.Text', 'dialogue.Random'],
+	['dialogue.Text', 'dialogue.Function'],
 	['dialogue.Node', 'dialogue.Text'],
 	['dialogue.Node', 'dialogue.Node'],
 	['dialogue.Node', 'dialogue.Choice'],
 	['dialogue.Node', 'dialogue.Set'],
 	['dialogue.Node', 'dialogue.Branch'],
 	['dialogue.Node', 'dialogue.Random'],
+	['dialogue.Node', 'dialogue.Function'],
 	['dialogue.Choice', 'dialogue.EndConv'],
 	['dialogue.Choice', 'dialogue.Text'],
 	['dialogue.Choice', 'dialogue.Node'],
 	['dialogue.Choice', 'dialogue.Set'],
 	['dialogue.Choice', 'dialogue.Branch'],
 	['dialogue.Choice', 'dialogue.Random'],
+	['dialogue.Choice', 'dialogue.Function'],
 	['dialogue.Set', 'dialogue.EndConv'],
 	['dialogue.Set', 'dialogue.Text'],
 	['dialogue.Set', 'dialogue.Node'],
 	['dialogue.Set', 'dialogue.Set'],
 	['dialogue.Set', 'dialogue.Branch'],
 	['dialogue.Set', 'dialogue.Random'],
+	['dialogue.Set', 'dialogue.Function'],
 	['dialogue.Branch', 'dialogue.Text'],
 	['dialogue.Branch', 'dialogue.Node'],
 	['dialogue.Branch', 'dialogue.Set'],
 	['dialogue.Branch', 'dialogue.Branch'],
 	['dialogue.Branch', 'dialogue.Random'],
+	['dialogue.Branch', 'dialogue.Function'],
 	['dialogue.Random', 'dialogue.Text'],
 	['dialogue.Random', 'dialogue.Choice'],
+	['dialogue.Function', 'dialogue.EndConv'],
+	['dialogue.Function', 'dialogue.Text'],
+	['dialogue.Function', 'dialogue.Choice'],
+	['dialogue.Function', 'dialogue.Node'],
+	['dialogue.Function', 'dialogue.Random'],
+	['dialogue.Function', 'dialogue.Set'],
+	['dialogue.Function', 'dialogue.Branch'],
+	['dialogue.Function', 'dialogue.Function'],
 ];
 
 var textarea_max_h = 220;
@@ -341,7 +356,8 @@ joint.shapes.dialogue.Note = joint.shapes.devs.Model.extend(
                 {
                     '.outPorts circle': { unlimitedConnections: ['dialogue.Plot', 'dialogue.Note', 'dialogue.StartConv',
                         'dialogue.EndConv', 'dialogue.Text', 'dialogue.Node',
-                        'dialogue.Choice', 'dialogue.Set', 'dialogue.Branch'], }
+                        'dialogue.Choice', 'dialogue.Set', 'dialogue.Branch',
+						'dialogue.Random', 'dialogue.Function'], }
                 },
             },
             joint.shapes.dialogue.Base.prototype.defaults
@@ -617,6 +633,60 @@ joint.shapes.dialogue.SetView = joint.shapes.dialogue.BaseView.extend(
 	},
 });
 
+joint.shapes.dialogue.Function = joint.shapes.devs.Model.extend(
+	{
+		defaults: joint.util.deepSupplement
+		(
+			{
+				type: 'dialogue.Function',
+				inPorts: ['input'],
+				outPorts: ['output'],
+				size: { width: 200, height: 100, },
+				value: '',
+			},
+			joint.shapes.dialogue.Base.prototype.defaults
+		),
+	});
+
+joint.shapes.dialogue.FunctionView = joint.shapes.dialogue.BaseView.extend(
+	{
+		template:
+			[
+				'<div class="node">',
+				'<span class="label"></span>',
+				'<button class="delete">x</button>',
+				'<input dir="auto" type="text" class="name" placeholder="Function Name" />',
+				'<input dir="auto" type="text" class="value" placeholder="Void" />',
+				'</div>',
+			].join(''),
+
+		initialize: function()
+		{
+			joint.shapes.dialogue.BaseView.prototype.initialize.apply(this, arguments);
+			this.$box.find('input.name').on('mousedown click', function(evt) { evt.stopPropagation(); });
+			this.$box.find('input.value').on('mousedown click', function(evt) { evt.stopPropagation(); });
+			this.$box.find('input.name').on('change', _.bind(function(evt)
+			{
+				this.model.set('name', $(evt.target).val());
+			}, this));
+			this.$box.find('input.value').on('change', _.bind(function(evt)
+			{
+				this.model.set('value', $(evt.target).val());
+			}, this));
+		},
+
+		updateBox: function()
+		{
+			joint.shapes.dialogue.BaseView.prototype.updateBox.apply(this, arguments);
+			var field = this.$box.find('input.name');
+			if (!field.is(':focus'))
+				field.val(this.model.get('name'));
+			field = this.$box.find('input.value');
+			if (!field.is(':focus'))
+				field.val(this.model.get('value'));
+		},
+	});
+
 function gameData()
 {
 	var cells = graph.toJSON().cells;
@@ -651,6 +721,12 @@ function gameData()
 			{
 				node.variable = cell.name;
 				node.value = cell.value;
+				node.next = null;
+			}
+			else if (node.type == 'Function')
+			{
+				node.function = cell.name;
+				node.param = cell.value;
 				node.next = null;
 			}
 			else
@@ -1122,6 +1198,7 @@ $('#paper').contextmenu(
 		{ text: 'Set', alias: '2-4', action: add(joint.shapes.dialogue.Set) },
 		{ text: 'Node', alias: '2-5', action: add(joint.shapes.dialogue.Node) },
 		{ text: 'Random', alias: '2-6', action: add(joint.shapes.dialogue.Random) },
+		{ text: 'Function', alias: '2-7', action: add(joint.shapes.dialogue.Function) },
 		{ type: 'splitLine' },
 		{ text: 'Save', alias: '3-1', action: save },
 		{ text: 'Load', alias: '3-2', action: load },
