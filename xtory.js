@@ -599,7 +599,7 @@ function gameData()
 	for (var i = 0; i < cells.length; i++)
 	{
 		var cell = cells[i];
-		if (cell.type != 'link')
+		if (cell.type != 'link' && cell.type != 'dialogue.Plot' && cell.type != 'dialogue.Note')
 		{
 			var node =
 			{
