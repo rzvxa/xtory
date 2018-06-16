@@ -964,6 +964,25 @@ function clear()
 	filename = null;
 }
 
+function guid() {
+	function s4() {
+		return Math.floor((1 + Math.random()) * 0x10000)
+			.toString(16)
+			.substring(1);
+	}
+	return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
+}
+
+function sendToLocalization(){
+	var tmpName = guid() + '.xtc';
+	var data = JSON.stringify(gameData());
+	if (!localStorage[tmpName])
+		addFileEntry(tmpName);
+	localStorage[tmpName] = data;
+	var localizationUrl = window.location.href.slice(0,-'index.html'.length) + 'localization.html';
+	window.open(localizationUrl + '?xtc=' + tmpName, '_blank');
+}
+
 // Browser stuff
 
 var paper = new joint.dia.Paper(
@@ -1206,5 +1225,7 @@ $('#paper').contextmenu(
 		{ text: 'New', alias: '3-4', action: clear },
 		{ text: 'Export', id: 'export', alias: '3-5', action: exportFile },
 		{ text: 'Export game file', id: 'export-game', alias: '3-6', action: exportGameFile },
+		{ type: 'splitLine' },
+		{ text: 'Open in localization', alias: '4-1', action: sendToLocalization },
 	]
 });
