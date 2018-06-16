@@ -8,9 +8,10 @@ It is based on [Dialogger](https://github.com/etodd/dialogger) from [Evan Todd](
  - Node base story editor
  -  Writing story and conversations all in one tool
  - Adding notes for specefic parts of story
+ - Can save variables, read them or call functions in engine
  - Exporting conversations for using in your game engine dialogue system
  - Highly customizable code
- - Later on all conversations will be ready for localization
+ - Built-in localization tool
  ## How to use it
  I think there is no need for a documentation on this subject, so i will just explain nodes.
  
