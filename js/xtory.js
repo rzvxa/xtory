@@ -1229,3 +1229,7 @@ $('#paper').contextmenu(
 		{ text: 'Open in localization', alias: '4-1', action: sendToLocalization },
 	]
 });
+
+window.onbeforeunload = function(){
+	return 'Are you sure you want to leave?';
+};

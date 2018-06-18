@@ -238,3 +238,7 @@ function handleFiles(files){
     };
     fileReader.readAsText(files[0]);
 }
+
+window.onbeforeunload = function(){
+    return 'Are you sure you want to leave?';
+};
