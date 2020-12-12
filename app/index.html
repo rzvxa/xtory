@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>Xtory</title>
+  <link rel="stylesheet" href="lib/joint.css" />
+  <link rel="stylesheet" href="lib/balloon.css" />
+  <link rel="stylesheet" href="css/index.css" />
+  <script>
+    SVGElement.prototype.getTransformToElement = SVGElement.prototype.getTransformToElement ||
+      function(toElement)
+      {
+        return toElement.getScreenCTM().inverse().multiply(this.getScreenCTM());
+      };
+  </script>
+  <script src="lib/joint.js"></script>
+  <script src="lib/jquery.contextmenu.js"></script>
+  <script src="lib/joint.shapes.devs.js"></script>
+	<script src="lib/svg-pan-zoom.min.js"></script>
+</head>
+
+<body>
+  <input type="file" id="file" accept=".xt" style="display: none;" />
+  <div id="flash"></div>
+  <div id="menu">
+    <button class="delete close">x</button>
+  </div>
+  <div id="container">
+    <div id="paper"></div>
+  </div>
+  <script src="js/xtory.js"></script>
+</body>
+
+</html>
