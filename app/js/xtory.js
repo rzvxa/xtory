@@ -1225,42 +1225,6 @@ $('#paper').contextmenu({
             type: 'splitLine'
         },
         {
-            text: 'Save',
-            alias: '3-1',
-            action: save
-        },
-        {
-            text: 'Load',
-            alias: '3-2',
-            action: load
-        },
-        {
-            text: 'Import',
-            id: 'import',
-            alias: '3-3',
-            action: importFile
-        },
-        {
-            text: 'New',
-            alias: '3-4',
-            action: clear
-        },
-        {
-            text: 'Export',
-            id: 'export',
-            alias: '3-5',
-            action: exportFile
-        },
-        {
-            text: 'Export game file',
-            id: 'export-game',
-            alias: '3-6',
-            action: exportGameFile
-        },
-        {
-            type: 'splitLine'
-        },
-        {
             text: 'Open in localization',
             alias: '4-1',
             action: sendToLocalization

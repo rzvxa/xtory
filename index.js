@@ -16,10 +16,9 @@ function createWindow() {
     })
 
     win.loadFile('app/index.html')
+    const menu = Menu.buildFromTemplate(menu_template(win))
+    Menu.setApplicationMenu(menu)
 }
-
-const menu = Menu.buildFromTemplate(menu_template)
-Menu.setApplicationMenu(menu)
 
 app.whenReady().then(createWindow)
 
