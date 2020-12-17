@@ -40,7 +40,7 @@ function setContextMenuSelected(i) {
                 item = tr[i];
                 break;
             }
-                
+
         }
     }
     if (item.style['display'] !== 'none') {
@@ -49,15 +49,22 @@ function setContextMenuSelected(i) {
     }
 }
 
+function contextMenuVisiblityCheck(menu) {}
+
 function contextMenuHideMenu() {
-    document.getElementById(
-        "contextMenu").style.display = "none"
+    var menu, input;
+    menu = document.getElementById('contextMenu');
+    input = menu.getElementsByTagName('input')[0];
+    input.value = '';
+    menu.style.display = "none"
+    contextMenuSearch();
 }
 
 function contextMenuKeyupListener(e) {
-    if (e.code === 'Space') {
+    if (e.code === 'Space' &&
+        document.getElementById('contextMenu').style['display'] === 'none') {
         contextMenuRightClick(e);
-    } else if (e.code == 'Escape') {
+    } else if (e.code === 'Escape') {
         contextMenuHideMenu();
     }
 }

@@ -1163,62 +1163,50 @@ $(window).trigger('resize');
 
 setContextMenuItems([{
         text: 'Plot',
-        alias: '1-1',
         action: add(joint.shapes.dialogue.Plot)
     },
     {
         text: 'Note',
-        alias: '1-2',
         action: add(joint.shapes.dialogue.Note)
     },
     {
         text: 'Start Conversation',
-        alias: '1-3',
         action: add(joint.shapes.dialogue.StartConv)
     },
     {
         text: 'End Conversation',
-        alias: '1-4',
         action: add(joint.shapes.dialogue.EndConv)
     },
     {
         text: 'Text',
-        alias: '2-1',
         action: add(joint.shapes.dialogue.Text)
     },
     {
         text: 'Choice',
-        alias: '2-2',
         action: add(joint.shapes.dialogue.Choice)
     },
     {
         text: 'Branch',
-        alias: '2-3',
         action: add(joint.shapes.dialogue.Branch)
     },
     {
         text: 'Set',
-        alias: '2-4',
         action: add(joint.shapes.dialogue.Set)
     },
     {
         text: 'Node',
-        alias: '2-5',
         action: add(joint.shapes.dialogue.Node)
     },
     {
         text: 'Random',
-        alias: '2-6',
         action: add(joint.shapes.dialogue.Random)
     },
     {
         text: 'Function',
-        alias: '2-7',
         action: add(joint.shapes.dialogue.Function)
     },
     {
         text: 'Open in localization',
-        alias: '4-1',
         action: sendToLocalization
     },
 ]);
