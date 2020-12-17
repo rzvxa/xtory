@@ -49,8 +49,6 @@ function setContextMenuSelected(i) {
     }
 }
 
-function contextMenuVisiblityCheck(menu) {}
-
 function contextMenuHideMenu() {
     var menu, input;
     menu = document.getElementById('contextMenu');
@@ -72,18 +70,22 @@ function contextMenuKeyupListener(e) {
 function contextMenuRightClick(e) {
     e.preventDefault();
 
-    if (document.getElementById(
-            "contextMenu").style.display == "block")
-        contextMenuHideMenu();
-    else {
-        var menu = document
-            .getElementById("contextMenu")
+    var menu, bounding, windowHeight;
+    menu = document.getElementById('contextMenu');
 
-        menu.style.display = 'block';
-        menu.style.left = e.pageX + "px";
-        menu.style.top = e.pageY + "px";
-        menu.getElementsByTagName("input")[0].focus();
+    if (menu.style.display == "block") {
+        contextMenuHideMenu();
+        return;
     }
+
+    menu.style.display = 'block';
+    menu.style.left = e.pageX + "px";
+    menu.style.top = e.pageY + "px";
+    bounding = menu.getBoundingClientRect();
+    windowHeight = (window.innerHeight || document.documentElement.clientHeight);
+    if (bounding.bottom > windowHeight && bounding.height <= windowHeight)
+        menu.style.top = windowHeight - bounding.height + "px";
+    menu.getElementsByTagName("input")[0].focus();
 }
 
 function contextMenuKeyup(e) {
