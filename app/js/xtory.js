@@ -7,6 +7,12 @@ addEventListener('app-ready', function(e) {
     $('#export-game').hide();
 });
 
+
+SVGElement.prototype.getTransformToElement = SVGElement.prototype.getTransformToElement ||
+    function(toElement) {
+        return toElement.getScreenCTM().inverse().multiply(this.getScreenCTM());
+    };
+
 var graph = new joint.dia.Graph();
 
 var defaultLink = new joint.dia.Link({

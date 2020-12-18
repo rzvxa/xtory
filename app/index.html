@@ -7,13 +7,6 @@
   <link rel="stylesheet" href="lib/balloon.css" />
   <link rel="stylesheet" href="css/context-menu.css" />
   <link rel="stylesheet" href="css/index.css" />
-  <script>
-    SVGElement.prototype.getTransformToElement = SVGElement.prototype.getTransformToElement ||
-      function(toElement)
-      {
-        return toElement.getScreenCTM().inverse().multiply(this.getScreenCTM());
-      };
-  </script>
   <script src="lib/joint.js"></script>
   <script src="lib/jquery.contextmenu.js"></script>
   <script src="lib/joint.shapes.devs.js"></script>
@@ -23,9 +16,9 @@
 <body>
   <input type="file" id="file" accept=".xt" style="display: none;" />
   <div id="flash"></div>
-  <div id="contextMenu" class="context-menu" style="display:block">
-    <input type="text" id="contextMenuSearchInput" onkeyup="contextMenuKeyup(event)" placeholder="Search for nodes.."
-      title="Type in a node">
+  <div id="contextMenu" class="context-menu" style="display:none">
+    <input type="text" id="contextMenuSearchInput" onkeyup="contextMenuKeyup(event)"
+      placeholder="Search for nodes.." title="Type in a node">
     <table></table>
   </div>
   <div id="menu">
