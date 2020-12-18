@@ -1,27 +1,37 @@
 {
-  "name": "xtory",
-  "version": "0.2.0",
-  "description": "A tool for writing branching nonlinear stories.",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "electron ."
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/rzvxa/xtory.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/rzvxa/xtory/issues"
-  },
-  "homepage": "https://github.com/rzvxa/xtory#readme",
-  "devDependencies": {
-    "electron": "^11.0.3"
-  },
-  "dependencies": {
-    "about-window": "^1.13.4"
-  }
+    "name": "xtory",
+    "version": "0.2.0",
+    "description": "A tool for writing branching nonlinear stories.",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "electron .",
+        "pack": "electron-builder --dir",
+        "dist": "electron-builder"
+    },
+    "postinstall": "electron-builder install-app-deps",
+    "build": {
+        "appId": "Xtory",
+        "mac": {
+            "category": "Productivity"
+        }
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/rzvxa/xtory.git"
+    },
+    "keywords": [],
+    "author": "rzvxa",
+    "license": "MIT",
+    "bugs": {
+        "url": "https://github.com/rzvxa/xtory/issues"
+    },
+    "homepage": "https://github.com/rzvxa/xtory#readme",
+    "devDependencies": {
+        "electron": "^11.0.3",
+        "electron-builder": "^22.9.1"
+    },
+    "dependencies": {
+        "about-window": "^1.13.4"
+    }
 }
