@@ -51,10 +51,16 @@
  border-top:1px solid var(--rs-border-primary)
 }
 
-.rs-sidenav-collapse-in .rs-dropdown .rs-dropdown-menu {
-  background-color: var(--rs-gray-600);
+.rs-sidenav-collapse-in .rs-dropdown .rs-dropdown-menu li ul li {
+  background-color: var(--rs-gray-800);
 }
 
-.rs-sidenav-collapse-in .rs-dropdown .rs-dropdown-menu .submenu .rs-dropdown-item {
-  background-color: var(--rs-gray-500);
+.rs-sidenav-default .rs-dropdown .rs-dropdown-menu li:hover {
+  background-color: var(--rs-sidenav-default-hover-bg);
+  color: var(--rs-sidenav-default-hover-text);
+}
+
+.rs-sidenav-default .rs-dropdown .rs-dropdown-menu li ul li:hover {
+  background-color: var(--rs-sidenav-default-hover-bg);
+  color: var(--rs-sidenav-default-hover-text);
 }

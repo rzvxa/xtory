@@ -7,8 +7,29 @@ import { BrowserRouter, Route } from "react-router-dom";
 import 'rsuite/dist/rsuite.min.css'
 import './index.css'
 
-import { CustomProvider, Sidenav, Sidebar, Nav, Navbar, Dropdown } from 'rsuite';
-import { Dashboard, Project, ArrowLeftLine, ArrowRightLine, ChangeList, Peoples, Message, Model } from '@rsuite/icons';
+import {
+  CustomProvider,
+  Sidenav,
+  Sidebar,
+  Nav,
+  Navbar,
+  Dropdown,
+  IconButton
+} from 'rsuite';
+
+import {
+  Dashboard,
+  Project,
+  ArrowLeftLine,
+  ArrowRightLine,
+  ChangeList,
+  Peoples,
+  Message,
+  Model,
+  Gear,
+  Branch
+} from '@rsuite/icons';
+
 import Container from 'rsuite/Container';
 import Header from 'rsuite/Header';
 import Content from 'rsuite/Content';
@@ -23,6 +44,12 @@ const headerStyles = {
   color: ' #fff',
   whiteSpace: 'nowrap',
   overflow: 'hidden'
+};
+
+const renderSettingsButton = (props, ref) => {
+  return (
+    <IconButton {...props} ref={ref} icon={<Gear />} circle appearance="subtle"/>
+  );
 };
 
 const Ggg = () => {
@@ -64,19 +91,22 @@ const Ggg = () => {
                       <Dropdown.Item eventKey="1-5-3">ZZZ</Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>
-                  <Nav.Item eventKey="2" icon={<Project />}>
+                  <Nav.Item eventKey="2" icon={<Branch />}>
+                    Flows
+                  </Nav.Item>
+                  <Nav.Item eventKey="3" icon={<Project />}>
                     Zones
                   </Nav.Item>
-                  <Nav.Item eventKey="3" icon={<Peoples />}>
+                  <Nav.Item eventKey="4" icon={<Peoples />}>
                     Characters
                   </Nav.Item>
-                  <Nav.Item eventKey="4" icon={<Message />}>
+                  <Nav.Item eventKey="5" icon={<Message />}>
                     Conversations
                   </Nav.Item>
-                  <Nav.Item eventKey="5" icon={<ChangeList />}>
+                  <Nav.Item eventKey="6" icon={<ChangeList />}>
                     Variables
                   </Nav.Item>
-                  <Nav.Item eventKey="6" icon={<Model />}>
+                  <Nav.Item eventKey="7" icon={<Model />}>
                     Objects
                   </Nav.Item>
                 </Nav>
@@ -88,10 +118,12 @@ const Ggg = () => {
                   <Dropdown
                     placement="topStart"
                     trigger="click"
+                    renderToggle={renderSettingsButton}
                   >
-                    <Dropdown.Item>Help</Dropdown.Item>
-                    <Dropdown.Item>Settings</Dropdown.Item>
-                    <Dropdown.Item>Sign out</Dropdown.Item>
+                    <Dropdown.Item>License</Dropdown.Item>
+                    <Dropdown.Item>GitHub</Dropdown.Item>
+                    <Dropdown.Item>Send Feedback</Dropdown.Item>
+                    <Dropdown.Item>Report a Bug</Dropdown.Item>
                   </Dropdown>
                 </Nav>
             
