@@ -1,8 +1,10 @@
-const { app, BrowserWindow } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const isDev = require('electron-is-dev');
 const path = require('path');
 
 let mainWindow;
+var nodeConsole = require('console');
+var myConsole = new nodeConsole.Console(process.stdout, process.stderr);
 
 function createWindow() {
     mainWindow = new BrowserWindow({
@@ -10,10 +12,14 @@ function createWindow() {
         height:600,
         show: false,
         autoHideMenuBar: true,
-        icon: __dirname + 'public/favicon.ico',
+        icon: path.join(__dirname, '../public/favicon.ico'),
+        webPreferences: {
+            preload: path.resolve(__dirname, 'preload.js'),
+        },
     });
     const startURL = isDev ? 'http://localhost:3000' : `file://${path.join(__dirname, '../build/index.html')}`;
 
+    myConsole.log(path.join(__dirname, 'preload.js'));
     mainWindow.loadURL(startURL);
     // mainWindow.setMenu(null);
 
@@ -23,3 +29,8 @@ function createWindow() {
     });
 }
 app.on('ready', createWindow);
+
+ipcMain.handle("showDialog", (e, message) => {
+    message = JSON.parse(message);
+    dialog.showOpenDialog(mainWindow, message);
+});
