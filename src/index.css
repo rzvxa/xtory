@@ -64,3 +64,16 @@
   background-color: var(--rs-sidenav-default-hover-bg);
   color: var(--rs-sidenav-default-hover-text);
 }
+
+.rs-dropdown-item a {
+  color: inherit;
+}
+
+.router-view,
+.router-view div {
+  height: 100%;
+}
+
+.router-view div .rs-content {
+  height: calc(100% - 90px);
+}
