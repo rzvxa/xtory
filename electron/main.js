@@ -32,5 +32,7 @@ app.on('ready', createWindow);
 
 ipcMain.handle("showDialog", (e, message) => {
     message = JSON.parse(message);
-    dialog.showOpenDialog(mainWindow, message);
+    var result = dialog.showOpenDialog(mainWindow, message);
+    myConsole.log(result);
+    e.returnValue = JSON.stringify(result);
 });

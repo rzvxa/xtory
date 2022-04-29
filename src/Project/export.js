@@ -4,28 +4,25 @@ import Input from 'rsuite/Input';
 import InputGroup from 'rsuite/InputGroup';
 import ButtonToolbar from 'rsuite/ButtonToolbar';
 import Button from 'rsuite/Button';
+import Toggle from 'rsuite/Toggle';
 import Header from 'rsuite/Header';
 import Content from 'rsuite/Content';
 import { FolderFill } from '@rsuite/icons'
 
-
+// TODO merge these in a library with other file who use these
 const Textarea = React.forwardRef((props, ref) => <Input {...props} as="textarea" ref={ref} />);
 const onFileBrowseClicked = () => {
   window.electron.showDialog({properties: ['openDirectory']});
 };
-export default class New extends React.Component {
+export default class Export extends React.Component {
   render() {
     return (
       <div>
         <Header>
-          <h2>New Project</h2>
+          <h2>Export Project</h2>
         </Header>
         <Content>
           <Form fluid>
-            <Form.Group controlId="project-name">
-              <Form.ControlLabel>Project Name</Form.ControlLabel>
-              <Form.Control name="name" />
-            </Form.Group>
             <Form.Group controlId="project-path">
               <Form.ControlLabel>Directory</Form.ControlLabel>
               <InputGroup style={{width: "100%"}} onClick={onFileBrowseClicked}>
@@ -35,13 +32,17 @@ export default class New extends React.Component {
                 </InputGroup.Button>
               </InputGroup>
             </Form.Group>
-            <Form.Group controlId="project-description">
-              <Form.ControlLabel>Description</Form.ControlLabel>
-              <Form.Control rows={5} name="textarea" accepter={Textarea} />
+            <Form.Group controlId="size-optimization">
+              <Form.ControlLabel>Size Optimization</Form.ControlLabel>
+              <Toggle />
+            </Form.Group>
+            <Form.Group controlId="include-metadata">
+              <Form.ControlLabel>Include metadata</Form.ControlLabel>
+              <Toggle defaultChecked/>
             </Form.Group>
             <Form.Group>
               <ButtonToolbar>
-                <Button appearance="primary">Create</Button>
+                <Button appearance="primary">Export</Button>
               </ButtonToolbar>
             </Form.Group>
           </Form>

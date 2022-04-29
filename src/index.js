@@ -3,6 +3,9 @@ import ReactDOM from 'react-dom';
 import Home from './home'
 import NewProject from './Project/new';
 import OpenProject from './Project/open';
+import ExportProject from './Project/export';
+import OverviewFlow from './Flow/overview';
+import Variables from './Variables/variables';
 import { BrowserRouter, Route, Link } from "react-router-dom";
 
 import 'rsuite/dist/rsuite.min.css'
@@ -32,20 +35,18 @@ import {
 } from '@rsuite/icons';
 
 import Container from 'rsuite/Container';
-import Header from 'rsuite/Header';
-import Content from 'rsuite/Content';
 
 import * as serviceWorker from './serviceWorker';
 
-const headerStyles = {
-  padding: 18,
-  fontSize: 16,
-  height: 56,
-  background: '#34c3ff',
-  color: ' #fff',
-  whiteSpace: 'nowrap',
-  overflow: 'hidden'
-};
+// const headerStyles = {
+//   padding: 18,
+//   fontSize: 16,
+//   height: 56,
+//   background: '#34c3ff',
+//   color: ' #fff',
+//   whiteSpace: 'nowrap',
+//   overflow: 'hidden'
+// };
 
 const renderSettingsButton = (props, ref) => {
   return (
@@ -77,8 +78,11 @@ const Ggg = () => {
 
             <Sidenav.Header>
               <Link to="/">
-              <div style={headerStyles}>
-                <Project />
+              <div className='sidenav-header' onClick={() => {
+                setExpanded(true);
+                setActiveKey('-1');
+              }}>
+                <div />
                 <span style={{ marginLeft: 18 }}> XTORY</span>
               </div>
               </Link>
@@ -88,24 +92,25 @@ const Ggg = () => {
               expanded={expanded}
               defaultOpenKeys={['3', '4']}
               activeKey={activeKey}
-              onSelect={setActiveKey}
+              onSelect={ (k) => { if (k === "IGNORE") return ;setActiveKey(k); }}
             >
               <Sidenav.Body>
                 <Nav>
                   <Dropdown placement="rightStart" eventKey="1" title="Project" icon={<Dashboard />}>
                     <Dropdown.Item eventKey="1-1" as={MenuLink} href="/Project/New">New</Dropdown.Item>
                     <Dropdown.Item eventKey="1-2" as={MenuLink} href="/Project/Open">Open</Dropdown.Item>
-                    <Dropdown.Item eventKey="1-3">Save</Dropdown.Item>
-                    <Dropdown.Item eventKey="1-4">Export</Dropdown.Item>
-                    <Dropdown.Menu eventKey="1-5" className="submenu" title="Open Recent Projecs">
-                      <Dropdown.Item eventKey="1-5-1">XXX</Dropdown.Item>
-                      <Dropdown.Item eventKey="1-5-2">YYY</Dropdown.Item>
-                      <Dropdown.Item eventKey="1-5-3">ZZZ</Dropdown.Item>
+                    <Dropdown.Item eventKey="IGNORE">Save</Dropdown.Item>
+                    <Dropdown.Item eventKey="1-3" as={MenuLink} href="/Project/Export">Export</Dropdown.Item>
+                    <Dropdown.Menu eventKey="1-4" className="submenu" title="Open Recent Projecs">
+                      <Dropdown.Item eventKey="1-4-1">XXX</Dropdown.Item>
+                      <Dropdown.Item eventKey="1-4-2">YYY</Dropdown.Item>
+                      <Dropdown.Item eventKey="1-4-3">ZZZ</Dropdown.Item>
                     </Dropdown.Menu>
                   </Dropdown>
-                  <Nav.Item eventKey="2" icon={<Branch />}>
-                    Flows
-                  </Nav.Item>
+                  <Dropdown placement="rightStart" eventKey="2" title="Flow" icon={<Branch />}>
+                    <Dropdown.Item eventKey="2-1" as={MenuLink} href="/Flow/Overview">Overview</Dropdown.Item>
+                    <Dropdown.Item eventKey="2-2" as={MenuLink} href="/Flow/SubFlows">Sub Flows</Dropdown.Item>
+                  </Dropdown>
                   <Nav.Item eventKey="3" icon={<Project />}>
                     Zones
                   </Nav.Item>
@@ -115,7 +120,7 @@ const Ggg = () => {
                   <Nav.Item eventKey="5" icon={<Message />}>
                     Conversations
                   </Nav.Item>
-                  <Nav.Item eventKey="6" icon={<ChangeList />}>
+                  <Nav.Item as={MenuLink} eventKey="6" icon={<ChangeList />} href="/Variables">
                     Variables
                   </Nav.Item>
                   <Nav.Item eventKey="7" icon={<Model />}>
@@ -153,6 +158,9 @@ const Ggg = () => {
                 <Route path="/" exact component={Home} />
                 <Route path="/Project/New" exact component={NewProject} />
                 <Route path="/Project/Open" exact component={OpenProject} />
+                <Route path="/Project/Export" exact component={ExportProject} />
+                <Route path="/Flow/Overview" exact component={OverviewFlow} />
+                <Route path="/Variables" exact component={Variables} />
               </div>
           {/* <Header> */}
           {/*   <h2>Page Title</h2> */}
