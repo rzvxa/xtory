@@ -1,7 +1,102 @@
 import { FlumeConfig, Colors, Controls } from 'flume';
 
-const config = new FlumeConfig()
-config
+class ConfigBuilder {
+  constructor() {
+    this.config = {
+      nodes: [],
+      ports: [],
+    }
+  }
+
+  addRootNodeType(obj) {
+    obj.root = true;
+    this.config.nodes.push(obj);
+    return this;
+  }
+
+  addNodeType(obj) {
+    this.config.nodes.push(obj);
+    return this;
+  }
+
+  addPortType(obj) {
+    this.config.ports.push(obj);
+    return this;
+  }
+
+  build() {
+    const flumeConfig = new FlumeConfig();
+    for (let port of this.config.ports) {
+      flumeConfig.addPortType(port);
+    }
+    const inputs = {};
+    for (let node of this.config.nodes)
+    {
+      const links = node.link;
+      if (links !== undefined) {
+        // adding output link
+        flumeConfig
+          .addPortType({
+            type: `olink_${node.type}`,
+            name: "link",
+            label: "Link",
+            color: Colors.red,
+          });
+        const outputs = node.outputs ? node.outputs : p => [];
+        node.outputs = ports => {
+        const ret = outputs(ports);
+        ret.push(ports[`olink_${node.type}`]());
+        return ret;
+      };
+        for (let link of links) {
+          if (inputs[link] === undefined) {
+            inputs[link] = [];
+          }
+          inputs[link].push(node.type);
+        }
+      }
+    }
+    const linked = [];
+    for (let ikey in inputs) {
+      console.log( `ikey => ilink_${ikey}`)
+      linked.push(ikey);
+      const aTypes = [];
+      for (let i of inputs[ikey]) {
+        const linkType = `olink_${i}`;
+        if (!aTypes.includes(linkType))
+          aTypes.push(linkType);
+      }
+      flumeConfig
+        .addPortType({
+          type: `ilink_${ikey}`,
+          name: `ilink_${ikey}`,
+          label: 'Link',
+          color: Colors.red,
+          acceptTypes: aTypes,
+        })
+    }
+    for (let node of this.config.nodes) {
+      console.log( `cnodes => ilink_${node.type}`)
+      if (linked.includes(node.type)) {
+        const inputs = node.inputs ? node.inputs : p => [];
+        node.inputs = ports => {
+          const ret = inputs(ports);
+          ret.push(ports[`ilink_${node.type}`]());
+          return ret;
+        };
+      }
+      if (node.root) {
+        flumeConfig.addRootNodeType(node);
+      } else {
+        flumeConfig.addNodeType(node);
+      }
+    }
+    return flumeConfig;
+  }
+};
+
+const defaultConfig = new ConfigBuilder()
+defaultConfig
   .addPortType({
     type: "string",
     name: "string",
@@ -56,15 +151,12 @@ config
     ]
   })
   .addNodeType({
-    type: "Plot",
+    type: "plot",
     label: "Plot",
     description: "Plot text goes here",
+    link: ['plot', 'startConversation', 'conversation'],
     inputs: ports => [
       ports.string(),
-      ports.link()
-    ],
-    outputs: ports => [
-      ports.link()
     ]
   })
   .addNodeType({
@@ -80,4 +172,4 @@ config
     ]
   });
 
-export default config;
+export default defaultConfig;

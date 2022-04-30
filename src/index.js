@@ -22,7 +22,9 @@ import {
   Nav,
   Navbar,
   Dropdown,
-  IconButton
+  IconButton,
+  Header,
+  Content,
 } from 'rsuite';
 
 import {
@@ -35,22 +37,14 @@ import {
   Message,
   Model,
   Gear,
-  Branch
+  Branch,
+  AbTest,
+  Tree,
 } from '@rsuite/icons';
 
 import Container from 'rsuite/Container';
 
 import * as serviceWorker from './serviceWorker';
-
-// const headerStyles = {
-//   padding: 18,
-//   fontSize: 16,
-//   height: 56,
-//   background: '#34c3ff',
-//   color: ' #fff',
-//   whiteSpace: 'nowrap',
-//   overflow: 'hidden'
-// };
 
 const renderSettingsButton = (props, ref) => {
   return (
@@ -65,7 +59,10 @@ const MenuLink = React.forwardRef((props, ref) => {
   );
 });
 
-const Ggg = () => {
+const App = () => {
+  const [pageTitle, setPageTitleInternal] = React.useState("Welcome");
+  const setPageTitle = (title) => () => setPageTitleInternal(title);
+
   const [expanded, setExpanded] = React.useState(true);
   const [activeKey, setActiveKey] = React.useState('1');
   return (
@@ -95,17 +92,17 @@ const Ggg = () => {
                   <Sidenav
                     className='scroll-enabled'
                     expanded={expanded}
-                    defaultOpenKeys={['3', '4']}
+                    defaultOpenKeys={['2', '2-2']}
                     activeKey={activeKey}
                     onSelect={ (k) => { if (k === "IGNORE") return ;setActiveKey(k); }}
                   >
                     <Sidenav.Body>
                       <Nav>
                         <Dropdown placement="rightStart" eventKey="1" title="Project" icon={<Dashboard />}>
-                      <Dropdown.Item eventKey="1-1" as={MenuLink} href="/Project/New">New</Dropdown.Item>
-                          <Dropdown.Item eventKey="1-2" as={MenuLink} href="/Project/Open">Open</Dropdown.Item>
+                          <Dropdown.Item eventKey="1-1" onClick={setPageTitle('New')} as={MenuLink} href="/Project/New">New</Dropdown.Item>
+                          <Dropdown.Item eventKey="1-2" onClick={setPageTitle('Open')} as={MenuLink} href="/Project/Open">Open</Dropdown.Item>
                           <Dropdown.Item eventKey="IGNORE">Save</Dropdown.Item>
-                          <Dropdown.Item eventKey="1-3" as={MenuLink} href="/Project/Export">Export</Dropdown.Item>
+                          <Dropdown.Item eventKey="1-3" onClick={setPageTitle('Export')} as={MenuLink} href="/Project/Export">Export</Dropdown.Item>
                           <Dropdown.Menu eventKey="1-4" className="submenu" title="Open Recent Projecs">
                             <Dropdown.Item eventKey="1-4-1">XXX</Dropdown.Item>
                             <Dropdown.Item eventKey="1-4-2">YYY</Dropdown.Item>
@@ -113,8 +110,12 @@ const Ggg = () => {
                           </Dropdown.Menu>
                         </Dropdown>
                         <Dropdown placement="rightStart" eventKey="2" title="Flow" icon={<Branch />}>
-                          <Dropdown.Item eventKey="2-1" as={MenuLink} href="/Flow/Overview">Overview</Dropdown.Item>
-                          <Dropdown.Item eventKey="2-2" as={MenuLink} href="/Flow/SubFlows">Sub Flows</Dropdown.Item>
+                          <Dropdown.Item eventKey="2-1" onClick={setPageTitle('Overview')} as={MenuLink} href="/Flow/Overview">Overview</Dropdown.Item>
+                          <Dropdown.Menu eventKey="2-2" className="submenu" title="Sub Flows">
+                            <Dropdown.Item eventKey="2-2-1" icon={<Message/>}>i've said not!</Dropdown.Item>
+                            <Dropdown.Item eventKey="2-2-2" icon={<AbTest/>}>Killing in the Name</Dropdown.Item>
+                            <Dropdown.Item eventKey="2-2-3" icon={<Tree/>}>Some Kind of Sub-Story</Dropdown.Item>
+                          </Dropdown.Menu>
                         </Dropdown>
                         <Nav.Item eventKey="3" icon={<Project />}>
                           Zones
@@ -125,7 +126,7 @@ const Ggg = () => {
                         <Nav.Item eventKey="5" icon={<Message />}>
                           Conversations
                         </Nav.Item>
-                        <Nav.Item as={MenuLink} eventKey="6" icon={<ChangeList />} href="/Variables">
+                        <Nav.Item onClick={setPageTitle('Variables')} as={MenuLink} eventKey="6" icon={<ChangeList />} href="/Variables">
                           Variables
                         </Nav.Item>
                         <Nav.Item eventKey="7" icon={<Model />}>
@@ -158,29 +159,34 @@ const Ggg = () => {
                   </Navbar>
                 </Sidebar>
               </div>
-              <Container>
-                <div className="router-view">
-                  <Route path="/" exact component={Home} />
-                  <Route path="/Project/New">
+              <Container className="page">
+                <Header>
+                  <h2>{pageTitle}</h2>
+                </Header>
+                <Content>
+                  <div className="router-view">
+                    <Route path="/" exact component={Home} />
+                    <Route path="/Project/New">
                       <NewProject/>
-                  </Route>
-                  <Route path="/Project/Open">
+                    </Route>
+                    <Route path="/Project/Open">
                       <OpenProject/>
-                  </Route>
-                  <Route path="/Project/Export">
+                    </Route>
+                    <Route path="/Project/Export">
                       <ExportProject/>
-                  </Route>
-                  <Route path="/Flow/Overview">
-                    <KeepAlive name="Overview">
-                      <OverviewFlow/>
-                    </KeepAlive>
-                  </Route>
-                  <Route path="/Variables">
-                    <KeepAlive name="Variables">
-                      <Variables/>
-                    </KeepAlive>
-                  </Route>
-                </div>
+                    </Route>
+                    <Route path="/Flow/Overview">
+                      <KeepAlive name="Overview">
+                        <OverviewFlow/>
+                      </KeepAlive>
+                    </Route>
+                    <Route path="/Variables">
+                      <KeepAlive name="Variables">
+                        <Variables/>
+                      </KeepAlive>
+                    </Route>
+                  </div>
+                </Content>
               </Container>
             </Container>
           </div>
@@ -191,7 +197,7 @@ const Ggg = () => {
 };
 ReactDOM.render(
   <CustomProvider theme="dark">
-    <Ggg />
+    <App />
   </CustomProvider>,
   document.getElementById('root')
 );
