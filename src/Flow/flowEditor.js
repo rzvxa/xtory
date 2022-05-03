@@ -65,8 +65,7 @@ ConfigBuilder()
 
 
 
-
-export default class Overview extends React.Component {
+export default class FlowEditor extends React.Component {
   onTrigger = (event) => {
     this.props.parentCallback(event.target.myname.value);
     event.preventDefault();
@@ -91,6 +90,7 @@ export default class Overview extends React.Component {
     );
   }
 }
+
 
 
 

@@ -95,8 +95,8 @@ class ConfigBuilder {
   }
 };
 
-const defaultConfig = new ConfigBuilder()
-defaultConfig
+const defaultConfig = () =>
+  new ConfigBuilder()
   .addPortType({
     type: "string",
     name: "string",
@@ -171,5 +171,6 @@ defaultConfig
       ports.boolean()
     ]
   });
+
 
 export default defaultConfig;

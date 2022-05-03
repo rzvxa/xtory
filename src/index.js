@@ -5,6 +5,7 @@ import NewProject from './Project/new';
 import OpenProject from './Project/open';
 import ExportProject from './Project/export';
 import OverviewFlow from './Flow/overview';
+import FlowEditor from './Flow/flowEditor';
 import Variables from './Variables/variables';
 import { BrowserRouter, Route, Link } from "react-router-dom";
 import {
@@ -59,9 +60,68 @@ const MenuLink = React.forwardRef((props, ref) => {
   );
 });
 
+const DynamicSubFlowRouting = (props) => {
+  const { openSubFlows } = props;
+  const createRoutes = (subFlow) => {
+    const { route } = subFlow;
+    return (
+      <Route path={`/Flow/${route}`}>
+        <KeepAlive name={`/Flow/${route}`}>
+          <FlowEditor />
+        </KeepAlive>
+      </Route>
+    )
+  };
+  return openSubFlows.map(createRoutes);
+};
+
+const CreateSubFlowMenuItems = (props) => {
+  const { items, setPageTitle } = props;
+  const getTypeIcon = (type) => {
+   switch (type) {
+     case 'conversation':
+       return <Message/>
+     case 'quest':
+       return <AbTest/>
+     case 'story':
+       return <Tree/>
+
+     default:
+       return <div/>
+
+   }
+  };
+  const createMenuItem = (item) => {
+    return (
+      <Dropdown.Item
+        eventKey="2-2-1"
+        onClick={setPageTitle(item.name)}
+        icon={getTypeIcon(item.type)}
+        as={MenuLink}
+        href={`/Flow/${item.route}`}>
+        {item.name}
+      </Dropdown.Item>
+    );
+  };
+  return items.map(createMenuItem);
+};
+
 const App = () => {
-  const [pageTitle, setPageTitleInternal] = React.useState("Welcome");
-  const setPageTitle = (title) => () => setPageTitleInternal(title);
+  const [projectPath, setProjectPath] = React.useState("C:\\Users\\ali\\Documents\\xtory_test");
+  const [pageTitle, setPageTitle_Internal] = React.useState("Welcome");
+  const setPageTitle = (title) => () => setPageTitle_Internal(title);
+  const default_state = [
+      {name: "I've Said NO!", type: 'conversation', route: 'conv/ive_said_no', path: `${projectPath}\\Conversations\\ive_said_no.conv`},
+      {name: "Killing in the Name", type: 'quest', route: 'quest/killing_in_the_name', path: `${projectPath}\\Conversations\\ive_said_no.conv`},
+      {name: "Some Kind of Sub-Story", type: 'story', route: 'story/some_kind_of_sub_story', path: `${projectPath}\\Stories\\some_kind_of_sub_story.story`},
+    ];
+
+  const [openSubFlows, setOpenSubFlows] = React.useState(default_state);
+
+  const ProjectTree = () => {
+    console.log(projectPath);
+  };
+
 
   const [expanded, setExpanded] = React.useState(true);
   const [activeKey, setActiveKey] = React.useState('1');
@@ -112,9 +172,7 @@ const App = () => {
                         <Dropdown placement="rightStart" eventKey="2" title="Flow" icon={<Branch />}>
                           <Dropdown.Item eventKey="2-1" onClick={setPageTitle('Overview')} as={MenuLink} href="/Flow/Overview">Overview</Dropdown.Item>
                           <Dropdown.Menu eventKey="2-2" className="submenu" title="Sub Flows">
-                            <Dropdown.Item eventKey="2-2-1" icon={<Message/>}>i've said not!</Dropdown.Item>
-                            <Dropdown.Item eventKey="2-2-2" icon={<AbTest/>}>Killing in the Name</Dropdown.Item>
-                            <Dropdown.Item eventKey="2-2-3" icon={<Tree/>}>Some Kind of Sub-Story</Dropdown.Item>
+                            <CreateSubFlowMenuItems items={openSubFlows} setPageTitle={setPageTitle}/>
                           </Dropdown.Menu>
                         </Dropdown>
                         <Nav.Item eventKey="3" icon={<Project />}>
@@ -180,6 +238,7 @@ const App = () => {
                         <OverviewFlow/>
                       </KeepAlive>
                     </Route>
+                    <DynamicSubFlowRouting openSubFlows={openSubFlows} />
                     <Route path="/Variables">
                       <KeepAlive name="Variables">
                         <Variables/>
