@@ -5,6 +5,7 @@ export default class Home extends React.Component {
     return (
       <div>
         <div>Welcome to Xtory 0.1.0</div>
+        <div>I would not advise using xtory until version 1.0.0 releases.</div>
       </div>
     );
   }

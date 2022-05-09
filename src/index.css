@@ -91,6 +91,13 @@ body {
   color: inherit;
 }
 
+.rs-sidenav-default .rs-dropdown .rs-dropdown-menu li ul li,
+.rs-dropdown-item-disabled {
+  color: #c5c6c7;
+  color: var(--rs-text-disabled);
+  cursor: not-allowed;
+  pointer-events: none;
+}
 .router-view,
 .router-view > div {
   height: 100%;

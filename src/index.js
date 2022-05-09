@@ -77,6 +77,13 @@ const DynamicSubFlowRouting = (props) => {
 
 const CreateSubFlowMenuItems = (props) => {
   const { items, setPageTitle } = props;
+  if (items.length === 0) {
+    return (
+      <Dropdown.Item disabled>
+        No Open Sub Flow
+      </Dropdown.Item>
+    );
+  }
   const getTypeIcon = (type) => {
    switch (type) {
      case 'conversation':
@@ -116,7 +123,7 @@ const App = () => {
       {name: "Some Kind of Sub-Story", type: 'story', route: 'story/some_kind_of_sub_story', path: `${projectPath}\\Stories\\some_kind_of_sub_story.story`},
     ];
 
-  const [openSubFlows, setOpenSubFlows] = React.useState(default_state);
+  const [openSubFlows, setOpenSubFlows] = React.useState([]);
 
   const ProjectTree = () => {
     console.log(projectPath);
