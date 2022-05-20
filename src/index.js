@@ -4,9 +4,9 @@ import Home from './home'
 import NewProject from './Project/new';
 import OpenProject from './Project/open';
 import ExportProject from './Project/export';
-import OverviewFlow from './Flow/overview';
-import FlowEditor from './Flow/flowEditor';
+import FlowEditor from './Flow/flow-editor';
 import Variables from './Variables/variables';
+import Settings from './Settings/settings';
 import { BrowserRouter, Route, Link } from "react-router-dom";
 import {
   Provider as KeepAliveProvider,
@@ -67,7 +67,7 @@ const DynamicSubFlowRouting = (props) => {
     return (
       <Route path={`/Flow/${route}`}>
         <KeepAlive name={`/Flow/${route}`}>
-          <FlowEditor />
+          <FlowEditor data={{type: "conversation"}} />
         </KeepAlive>
       </Route>
     )
@@ -123,7 +123,7 @@ const App = () => {
       {name: "Some Kind of Sub-Story", type: 'story', route: 'story/some_kind_of_sub_story', path: `${projectPath}\\Stories\\some_kind_of_sub_story.story`},
     ];
 
-  const [openSubFlows, setOpenSubFlows] = React.useState([]);
+  const [openSubFlows, setOpenSubFlows] = React.useState(default_state);
 
   const ProjectTree = () => {
     console.log(projectPath);
@@ -178,7 +178,7 @@ const App = () => {
                         </Dropdown>
                         <Dropdown placement="rightStart" eventKey="2" title="Flow" icon={<Branch />}>
                           <Dropdown.Item eventKey="2-1" onClick={setPageTitle('Overview')} as={MenuLink} href="/Flow/Overview">Overview</Dropdown.Item>
-                          <Dropdown.Menu eventKey="2-2" className="submenu" title="Sub Flows">
+                          <Dropdown.Menu eventKey="2-2" className="submenu" title="Open Sub Flows">
                             <CreateSubFlowMenuItems items={openSubFlows} setPageTitle={setPageTitle}/>
                           </Dropdown.Menu>
                         </Dropdown>
@@ -209,9 +209,9 @@ const App = () => {
                           renderToggle={renderSettingsButton}
                         >
                           <Dropdown.Item>License</Dropdown.Item>
-                          <Dropdown.Item>GitHub</Dropdown.Item>
                           <Dropdown.Item>Send Feedback</Dropdown.Item>
                           <Dropdown.Item>Report a Bug</Dropdown.Item>
+                          <Dropdown.Item onClick={setPageTitle('Settings')} as={MenuLink} href="/Settings">Settings</Dropdown.Item>
                         </Dropdown>
                       </Nav>
 
@@ -242,13 +242,18 @@ const App = () => {
                     </Route>
                     <Route path="/Flow/Overview">
                       <KeepAlive name="Overview">
-                        <OverviewFlow/>
+                        <FlowEditor data={{type: "story"}}/>
                       </KeepAlive>
                     </Route>
                     <DynamicSubFlowRouting openSubFlows={openSubFlows} />
                     <Route path="/Variables">
                       <KeepAlive name="Variables">
                         <Variables/>
+                      </KeepAlive>
+                    </Route>
+                    <Route path="/Settings">
+                      <KeepAlive name="Settings">
+                        <Settings/>
                       </KeepAlive>
                     </Route>
                   </div>

@@ -24,6 +24,10 @@ class ConfigBuilder {
     return this;
   }
 
+  applyPartialConfig(patch) {
+    return patch(this);
+  }
+
   build() {
     const flumeConfig = new FlumeConfig();
     for (let port of this.config.ports) {
@@ -32,7 +36,7 @@ class ConfigBuilder {
     const inputs = {};
     for (let node of this.config.nodes)
     {
-      const links = node.link;
+      const links = node.linkTo;
       if (links !== undefined) {
         // adding output link
         flumeConfig
@@ -54,11 +58,20 @@ class ConfigBuilder {
           }
           inputs[link].push(node.type);
         }
+        const linkFrom = node.linkFrom;
+        if (linkFrom !== undefined) {
+          if (inputs[node.type] === undefined) {
+            inputs[node.type] = [];
+          }
+          for (let link of linkFrom) {
+            inputs[node.type].push(link);
+          }
+        }
       }
     }
     const linked = [];
     for (let ikey in inputs) {
-      console.log( `ikey => ilink_${ikey}`)
+      // console.log( `ikey => ilink_${ikey}`)
       linked.push(ikey);
       const aTypes = [];
       for (let i of inputs[ikey]) {
@@ -76,7 +89,7 @@ class ConfigBuilder {
         })
     }
     for (let node of this.config.nodes) {
-      console.log( `cnodes => ilink_${node.type}`)
+      // console.log( `cnodes => ilink_${node.type}`)
       if (linked.includes(node.type)) {
         const inputs = node.inputs ? node.inputs : p => [];
         node.inputs = ports => {
@@ -154,7 +167,7 @@ const defaultConfig = () =>
     type: "plot",
     label: "Plot",
     description: "Plot text goes here",
-    link: ['plot', 'startConversation', 'conversation'],
+    linkTo: ['plot'],
     inputs: ports => [
       ports.string(),
     ]

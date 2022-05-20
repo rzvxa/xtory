@@ -33,26 +33,6 @@ export default class New extends React.Component {
             <Form.ControlLabel>Description</Form.ControlLabel>
             <Form.Control rows={5} name="textarea" accepter={Textarea} />
           </Form.Group>
-          <Form.Group controlId="project-description">
-            <Form.ControlLabel>Description</Form.ControlLabel>
-            <Form.Control rows={5} name="textarea" accepter={Textarea} />
-          </Form.Group>
-          <Form.Group controlId="project-description">
-            <Form.ControlLabel>Description</Form.ControlLabel>
-            <Form.Control rows={5} name="textarea" accepter={Textarea} />
-          </Form.Group>
-          <Form.Group controlId="project-description">
-            <Form.ControlLabel>Description</Form.ControlLabel>
-            <Form.Control rows={5} name="textarea" accepter={Textarea} />
-          </Form.Group>
-          <Form.Group controlId="project-description">
-            <Form.ControlLabel>Description</Form.ControlLabel>
-            <Form.Control rows={5} name="textarea" accepter={Textarea} />
-          </Form.Group>
-          <Form.Group controlId="project-description">
-            <Form.ControlLabel>Description</Form.ControlLabel>
-            <Form.Control rows={5} name="textarea" accepter={Textarea} />
-          </Form.Group>
           <Form.Group>
             <ButtonToolbar>
               <Button appearance="primary">Create</Button>

@@ -2,7 +2,7 @@ import React from "react";
 import Header from 'rsuite/Header';
 import { Content } from 'rsuite';
 import { NodeEditor, Colors, Controls } from 'flume';
-import ConfigBuilder from './essentialNodes';
+import ConfigBuilder from './flow-config-builder';
 
 import './flow.css'
 
