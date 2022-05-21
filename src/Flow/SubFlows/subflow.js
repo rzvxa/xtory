@@ -3,9 +3,12 @@ import { Button, TreePicker } from 'rsuite';
 import { Colors, Controls } from 'flume';
 
 const SubFlowTreePicker = (props) => {
-  const { filter, projectTree, defaultValue, onChange, ...rest } = props;
+  const { filter, projectTree, defaultValue, ...rest } = props;
   const FilterTree = (branch) => {
     const res = [];
+    if (branch === undefined) {
+      return undefined;
+    }
     for (let item of branch) {
       if (item.children !== undefined) {
         res.push(item.value);
@@ -16,44 +19,42 @@ const SubFlowTreePicker = (props) => {
     }
     return res;
   };
-  const FindValueFromLabel = (branch, label) => {
+  const checkLink = (branch, link) => {
+    if (branch === undefined || branch === null) {
+    console.log('falll');
+      return false;
+    }
     for (let item of branch) {
-      if (item.label === label) {
-        return item.value;
-      } else if (item.children !== undefined) {
-        const res = FindValueFromLabel(item.children, label);
-        if (res !== null) {
-          return res;
+      if (item.value === link) {
+    console.log('trueee');
+        return true;
+      }
+      if (item.children !== undefined) {
+        const res = checkLink(item.children, link);
+        if (res === true) {
+    console.log('ccture');
+          return true;
         }
       }
     }
-    return null;
+    console.log('end');
+    return false;
   }
-  const ValueFromPath = (path) => {
-    if (defaultValue === null) {
-      return -1;
-    } else {
-      const res = FindValueFromLabel(projectTree, path);
-      if (res === null) {
-        return -1;
-      } else {
-        return res;
-      }
+  const value = () => {
+    if (checkLink(defaultValue)) {
+      return defaultValue;
     }
-  };
-
-  const PathFromValue = (link) => {
-
-  };
-  const OnChange = (value) => {
-    console.log(value);
+    projectTree.push({
+      label: 'Broken Link',
+      value: -1,
+    });
+    return -1;
   }
   return (
     <TreePicker
       data={projectTree}
-      defaultValue={defaultValue}
+      defaultValue={value}
       disabledItemValues={FilterTree(projectTree)}
-      onChange={OnChange}
       {...rest}
     />
   );
@@ -71,7 +72,7 @@ const SubFlow = (data, onChange, context, redraw, portProps) => {
         onChange={onChange}
       />
       <br/>
-      <Button onClick={() => console.log(data)} appearance="primary">Open</Button>
+      <Button onClick={() => {onChange(data); console.log(data);}} appearance="primary">Open</Button>
     </div>
   );
 }

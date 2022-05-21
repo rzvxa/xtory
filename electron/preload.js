@@ -15,7 +15,8 @@ async function projectTree(path) {
 
 contextBridge.exposeInMainWorld('electron', {
     showDialog: showDialog,
+    setProjectPath: (path) => ipcRenderer.sent('setProjectPath', path),
     projectTree: projectTree,
-    onProjectUpdate: (callback) => ipcRenderer.on('projectUpdate', callback)
+    onProjectUpdate: (callback) => ipcRenderer.on('projectUpdate', (e, m) => callback(m)),
 });
 contextBridge.exposeInMainWorld('preloadWasRun', 'preload was run');

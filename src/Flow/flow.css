@@ -4,3 +4,20 @@
   justify-content: center;
   flex-direction: column;
 }
+
+[data-flume-component="stage"]{
+  background: var(--rs-bg-card);
+  color: var(--rs-text-primary);
+  font-family: inherit;
+}
+
+[data-flume-component="node"]{
+  background: var(--rs-gray-600);
+}
+
+[data-flume-component="node-header"]{
+  background: var(--rs-gray-700);
+  text-transform: none;
+  font-weight: 580;
+  font-size: 16px;
+}

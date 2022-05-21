@@ -24,6 +24,8 @@ const MakeConfig = (data) => {
     switch (type) {
       case 'story':
         return (conf) => StoryNode(ConversationNode(conf));
+      case 'conversation':
+        return (conf) => ConversationNode(conf);
       
       default:
     }
@@ -44,16 +46,34 @@ export default class FlowEditor extends React.Component {
   constructor(props) {
     super(props);
     this.config = MakeConfig(this.props.data);
+    this.state = {};
+    this.setNodes = this.setNodes.bind(this);
   }
   onTrigger = (event) => {
     this.props.parentCallback(event.target.myname.value);
     event.preventDefault();
   }
+  componentWillMount() {
+    this.props.instance.restore(this)
+  }
+  componentWillUnmount() {
+    var state = this.state
+    this.props.instance.save(function(ctx){
+      ctx.state = state;
+    })
+  }
+  setNodes(nodes) {
+    if (this.state.nodes !== nodes) {
+      this.setState({nodes: nodes});
+    }
+  }
   render() {
     return (
       <div>
-        <div style={{width: '100%', height: '100%'}}>
+        <div style={{width: '100%', height: '100%', margin: -20}}>
           <NodeEditor
+            nodes={this.state.nodes}
+            onChange={this.setNodes}
             portTypes={this.config.portTypes}
             nodeTypes={this.config.nodeTypes}
             context={{

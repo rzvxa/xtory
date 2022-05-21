@@ -8,10 +8,6 @@ import FlowEditor from './Flow/flow-editor';
 import Variables from './Variables/variables';
 import Settings from './Settings/settings';
 import { BrowserRouter, Route, Link } from "react-router-dom";
-import {
-  Provider as KeepAliveProvider,
-  KeepAlive,
-} from 'react-keep-alive';
 
 import 'rsuite/dist/rsuite.min.css'
 import './index.css'
@@ -60,15 +56,30 @@ const MenuLink = React.forwardRef((props, ref) => {
   );
 });
 
+const createInstance = () => {
+  return {
+    func: null,
+    save: function(f) {
+      this.func = f;
+    },
+    restore: function(context) {
+      this.func && this.func(context);
+    }
+  }
+}
+
 const DynamicSubFlowRouting = (props) => {
   const { openSubFlows, projectTree } = props;
+  const [ instances, setInstances ] = React.useState({});
   const createRoutes = (subFlow) => {
     const { route } = subFlow;
+    if (instances[route] === undefined) {
+      instances[route] = createInstance();
+      setInstances(instances);
+    }
     return (
       <Route path={`/Flow/${route}`}>
-        <KeepAlive name={`/Flow/${route}`}>
-          <FlowEditor data={{type: "conversation"}} projectTree={projectTree}/>
-        </KeepAlive>
+        <FlowEditor data={{type: "conversation"}} projectTree={projectTree} instance={instances[route]}/>
       </Route>
     )
   };
@@ -113,76 +124,85 @@ const CreateSubFlowMenuItems = (props) => {
   return items.map(createMenuItem);
 };
 
-const App = () => {
-  const [projectPath, setProjectPath] = React.useState("C:\\Users\\ali\\Documents\\xtory_test");
-  const [pageTitle, setPageTitle_Internal] = React.useState("Welcome");
-  const setPageTitle = (title) => () => setPageTitle_Internal(title);
-  const default_state = [
-      {name: "I've Said NO!", type: 'conversation', route: 'conv/ive_said_no', path: `${projectPath}\\Conversations\\ive_said_no.conv`},
-      {name: "Killing in the Name", type: 'quest', route: 'quest/killing_in_the_name', path: `${projectPath}\\Conversations\\ive_said_no.conv`},
-      {name: "Some Kind of Sub-Story", type: 'story', route: 'story/some_kind_of_sub_story', path: `${projectPath}\\Stories\\some_kind_of_sub_story.story`},
-    ];
-
-  const [openSubFlows, setOpenSubFlows] = React.useState(default_state);
-  const [projectTree, setProjectTree] = React.useState({});
-
-  const buildProjectTree = async () => {
-    const raw = await window.electron.projectTree(projectPath);
-    const Decorate = (input, path) => {
-      if (path === undefined) {
-        path = '';
-      }
-      const tree = [];
-      for (let i in input) {
-        let iPath = path;
-        if (iPath !== '') {
-          iPath += '/';
-        }
-        iPath += i;
-        // console.log(`raw[i] => ${input[i]} and i => ${i}`);
-        const branch = {
-          label: i,
-          value: iPath,
-        }
-        if (input[i] !== null) {
-          branch['children'] = Decorate(input[i], iPath);
-        }
-        tree.push(branch);
-      }
-      return tree;
+class App extends React.Component {
+  constructor(props) {
+    super(props);
+    const default_path = "C:\\Users\\ali\\Documents\\xtory_test";
+    const default_state = [
+        {name: "I've Said NO!", type: 'conversation', route: 'conv/ive_said_no', path: `${default_path}\\Conversations\\ive_said_no.conv`},
+        {name: "Killing in the Name", type: 'quest', route: 'quest/killing_in_the_name', path: `${default_path}\\Conversations\\ive_said_no.conv`},
+        {name: "Some Kind of Sub-Story", type: 'story', route: 'story/some_kind_of_sub_story', path: `${default_path}\\Stories\\some_kind_of_sub_story.story`},
+      ];
+    this.state = {
+      projectPath: default_path,
+      pageTitle: "Welcome",
+      openSubFlows: default_state,
+      projectTree: undefined,
+      expanded: true,
+      activeKey: '1',
     };
-    return Decorate(raw);
+    this.setPageTitle = this.setPageTitle.bind(this);
+    this.updateProjectTree = this.updateProjectTree.bind(this);
+    window.electron.onProjectUpdate(this.updateProjectTree);
+    this.updateProjectTree();
+  
   }
-
-  const updateProjectTree = async () => {
+  setPageTitle(title) {
+    return () => {
+      this.setState({pageTitle: title});
+    };
+  }
+  async updateProjectTree() {
+    const buildProjectTree = async () => {
+      const raw = await window.electron.projectTree(this.state.projectPath);
+      const Decorate = (input, path) => {
+        if (path === undefined) {
+          path = '';
+        }
+        const tree = [];
+        for (let i in input) {
+          let iPath = path;
+          if (iPath !== '') {
+            iPath += '/';
+          }
+          iPath += i;
+          // console.log(`raw[i] => ${input[i]} and i => ${i}`);
+          const branch = {
+            label: i,
+            value: iPath,
+          }
+          if (input[i] !== null) {
+            branch['children'] = Decorate(input[i], iPath);
+          }
+          tree.push(branch);
+        }
+        return tree;
+      };
+      return Decorate(raw);
+    }
     const tree = await buildProjectTree();
-    console.log('update');
-    setProjectTree(tree);
+    this.setState({projectTree: tree});
   };
-  window.electron.onProjectUpdate(updateProjectTree);
-  updateProjectTree();
-
-
-  const [expanded, setExpanded] = React.useState(true);
-  const [activeKey, setActiveKey] = React.useState('1');
-  return (
-    <React.StrictMode>
-      <BrowserRouter>
-        <KeepAliveProvider>
+  render() {
+  
+  
+    return (
+      <React.StrictMode>
+        <BrowserRouter>
           <div className="main-container sidebar-page">
             <Container>
               <div>
                 <Sidebar
                   className='main-sidebar'
-                  width={expanded ? 260 : 56}
+                  width={this.state.expanded ? 260 : 56}
                   collapsible
                 >
 
                   <Sidenav.Header>
                     <Link to="/">
                       <div className='sidenav-header' onClick={() => {
-                        setExpanded(true);
-                        setActiveKey('-1');
+                        this.setState({expanded: true});
+                        this.setState({activeKey: '-1'});
                       }}>
                         <div />
                         <span style={{ marginLeft: 18 }}> XTORY</span>
@@ -191,18 +211,18 @@ const App = () => {
                   </Sidenav.Header>
                   <Sidenav
                     className='scroll-enabled'
-                    expanded={expanded}
+                    expanded={this.state.expanded}
                     defaultOpenKeys={['2', '2-2']}
-                    activeKey={activeKey}
-                    onSelect={ (k) => { if (k === "IGNORE") return ;setActiveKey(k); }}
+                    activeKey={this.state.activeKey}
+                    onSelect={ (k) => { if (k === "IGNORE") return ;this.setState({activeKey: k}); }}
                   >
                     <Sidenav.Body>
                       <Nav>
                         <Dropdown placement="rightStart" eventKey="1" title="Project" icon={<Dashboard />}>
-                          <Dropdown.Item eventKey="1-1" onClick={setPageTitle('New')} as={MenuLink} href="/Project/New">New</Dropdown.Item>
-                          <Dropdown.Item eventKey="1-2" onClick={setPageTitle('Open')} as={MenuLink} href="/Project/Open">Open</Dropdown.Item>
+                          <Dropdown.Item eventKey="1-1" onClick={this.setPageTitle('New')} as={MenuLink} href="/Project/New">New</Dropdown.Item>
+                          <Dropdown.Item eventKey="1-2" onClick={this.setPageTitle('Open')} as={MenuLink} href="/Project/Open">Open</Dropdown.Item>
                           <Dropdown.Item eventKey="IGNORE">Save</Dropdown.Item>
-                          <Dropdown.Item eventKey="1-3" onClick={setPageTitle('Export')} as={MenuLink} href="/Project/Export">Export</Dropdown.Item>
+                          <Dropdown.Item eventKey="1-3" onClick={this.setPageTitle('Export')} as={MenuLink} href="/Project/Export">Export</Dropdown.Item>
                           <Dropdown.Menu eventKey="1-4" className="submenu" title="Open Recent Projecs">
                             <Dropdown.Item eventKey="1-4-1">XXX</Dropdown.Item>
                             <Dropdown.Item eventKey="1-4-2">YYY</Dropdown.Item>
@@ -210,9 +230,9 @@ const App = () => {
                           </Dropdown.Menu>
                         </Dropdown>
                         <Dropdown placement="rightStart" eventKey="2" title="Flow" icon={<Branch />}>
-                          <Dropdown.Item eventKey="2-1" onClick={setPageTitle('Overview')} as={MenuLink} href="/Flow/Overview">Overview</Dropdown.Item>
+                          <Dropdown.Item eventKey="2-1" onClick={this.setPageTitle('Overview')} as={MenuLink} href="/Flow/Overview">Overview</Dropdown.Item>
                           <Dropdown.Menu eventKey="2-2" className="submenu" title="Open Sub Flows">
-                            <CreateSubFlowMenuItems items={openSubFlows} setPageTitle={setPageTitle}/>
+                            <CreateSubFlowMenuItems items={this.state.openSubFlows} setPageTitle={this.setPageTitle}/>
                           </Dropdown.Menu>
                         </Dropdown>
                         <Nav.Item eventKey="3" icon={<Project />}>
@@ -224,7 +244,7 @@ const App = () => {
                         <Nav.Item eventKey="5" icon={<Message />}>
                           Conversations
                         </Nav.Item>
-                        <Nav.Item onClick={setPageTitle('Variables')} as={MenuLink} eventKey="6" icon={<ChangeList />} href="/Variables">
+                        <Nav.Item onClick={this.setPageTitle('Variables')} as={MenuLink} eventKey="6" icon={<ChangeList />} href="/Variables">
                           Variables
                         </Nav.Item>
                         <Nav.Item eventKey="7" icon={<Model />}>
@@ -244,13 +264,13 @@ const App = () => {
                           <Dropdown.Item>License</Dropdown.Item>
                           <Dropdown.Item>Send Feedback</Dropdown.Item>
                           <Dropdown.Item>Report a Bug</Dropdown.Item>
-                          <Dropdown.Item onClick={setPageTitle('Settings')} as={MenuLink} href="/Settings">Settings</Dropdown.Item>
+                          <Dropdown.Item onClick={this.setPageTitle('Settings')} as={MenuLink} href="/Settings">Settings</Dropdown.Item>
                         </Dropdown>
                       </Nav>
 
                       <Nav pullRight>
-                        <Nav.Item onClick={() => setExpanded(!expanded)} style={{ width: 56, textAlign: 'center' }}>
-                          {expanded ? <ArrowLeftLine /> : <ArrowRightLine />}
+                        <Nav.Item onClick={() => this.setState({expanded: !this.state.expanded})} style={{ width: 56, textAlign: 'center' }}>
+                          {this.state.expanded ? <ArrowLeftLine /> : <ArrowRightLine />}
                         </Nav.Item>
                       </Nav>
                     </Navbar.Body>
@@ -259,7 +279,7 @@ const App = () => {
               </div>
               <Container className="page">
                 <Header>
-                  <h2>{pageTitle}</h2>
+                  <h2>{this.state.pageTitle}</h2>
                 </Header>
                 <Content>
                   <div className="router-view">
@@ -274,31 +294,25 @@ const App = () => {
                       <ExportProject/>
                     </Route>
                     <Route path="/Flow/Overview">
-                      <KeepAlive name="Overview">
-                        <FlowEditor data={{type: "story"}} projectTree={projectTree}/>
-                      </KeepAlive>
+                      <FlowEditor data={{type: "story"}} projectTree={this.state.projectTree} instance={createInstance()}/>
                     </Route>
-                    <DynamicSubFlowRouting openSubFlows={openSubFlows} projectTree={projectTree} />
+                    <DynamicSubFlowRouting openSubFlows={this.state.openSubFlows} projectTree={this.state.projectTree} />
                     <Route path="/Variables">
-                      <KeepAlive name="Variables">
-                        <Variables/>
-                      </KeepAlive>
+                      <Variables/>
                     </Route>
                     <Route path="/Settings">
-                      <KeepAlive name="Settings">
-                        <Settings/>
-                      </KeepAlive>
+                      <Settings/>
                     </Route>
                   </div>
                 </Content>
               </Container>
             </Container>
           </div>
-        </KeepAliveProvider>
-      </BrowserRouter>
-    </React.StrictMode>
-  );
-};
+        </BrowserRouter>
+      </React.StrictMode>
+    );
+  };
+}
 ReactDOM.render(
   <CustomProvider theme="dark">
     <App />
