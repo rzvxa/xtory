@@ -61,13 +61,13 @@ const MenuLink = React.forwardRef((props, ref) => {
 });
 
 const DynamicSubFlowRouting = (props) => {
-  const { openSubFlows } = props;
+  const { openSubFlows, projectTree } = props;
   const createRoutes = (subFlow) => {
     const { route } = subFlow;
     return (
       <Route path={`/Flow/${route}`}>
         <KeepAlive name={`/Flow/${route}`}>
-          <FlowEditor data={{type: "conversation"}} />
+          <FlowEditor data={{type: "conversation"}} projectTree={projectTree}/>
         </KeepAlive>
       </Route>
     )
@@ -124,10 +124,43 @@ const App = () => {
     ];
 
   const [openSubFlows, setOpenSubFlows] = React.useState(default_state);
+  const [projectTree, setProjectTree] = React.useState({});
 
-  const ProjectTree = () => {
-    console.log(projectPath);
+  const buildProjectTree = async () => {
+    const raw = await window.electron.projectTree(projectPath);
+    const Decorate = (input, path) => {
+      if (path === undefined) {
+        path = '';
+      }
+      const tree = [];
+      for (let i in input) {
+        let iPath = path;
+        if (iPath !== '') {
+          iPath += '/';
+        }
+        iPath += i;
+        // console.log(`raw[i] => ${input[i]} and i => ${i}`);
+        const branch = {
+          label: i,
+          value: iPath,
+        }
+        if (input[i] !== null) {
+          branch['children'] = Decorate(input[i], iPath);
+        }
+        tree.push(branch);
+      }
+      return tree;
+    };
+    return Decorate(raw);
+  }
+
+  const updateProjectTree = async () => {
+    const tree = await buildProjectTree();
+    console.log('update');
+    setProjectTree(tree);
   };
+  window.electron.onProjectUpdate(updateProjectTree);
+  updateProjectTree();
 
 
   const [expanded, setExpanded] = React.useState(true);
@@ -242,10 +275,10 @@ const App = () => {
                     </Route>
                     <Route path="/Flow/Overview">
                       <KeepAlive name="Overview">
-                        <FlowEditor data={{type: "story"}}/>
+                        <FlowEditor data={{type: "story"}} projectTree={projectTree}/>
                       </KeepAlive>
                     </Route>
-                    <DynamicSubFlowRouting openSubFlows={openSubFlows} />
+                    <DynamicSubFlowRouting openSubFlows={openSubFlows} projectTree={projectTree} />
                     <Route path="/Variables">
                       <KeepAlive name="Variables">
                         <Variables/>

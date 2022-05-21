@@ -7,7 +7,7 @@ const Node = (conf) => {
       linkTo: ['plot', 'substory'],
       linkFrom: ['plot'],
       inputs: ports => [
-        ports.subflow()
+        ports.subflow({name: 'story'})
       ]
     });
 }

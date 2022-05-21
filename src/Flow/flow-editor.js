@@ -1,7 +1,7 @@
 import React from "react";
 import { NodeEditor } from 'flume';
 import ConfigBuilder from './flow-config-builder';
-import SubFlowConfig from './SubFlows/subflow-config'
+import SubFlowConfig from './SubFlows/subflow'
 import { StoryNode, StoryView } from './SubFlows/story'
 import { ConversationNode, ConversationView } from './SubFlows/conversation'
 
@@ -44,7 +44,6 @@ export default class FlowEditor extends React.Component {
   constructor(props) {
     super(props);
     this.config = MakeConfig(this.props.data);
-    console.log(this.config);
   }
   onTrigger = (event) => {
     this.props.parentCallback(event.target.myname.value);
@@ -57,6 +56,9 @@ export default class FlowEditor extends React.Component {
           <NodeEditor
             portTypes={this.config.portTypes}
             nodeTypes={this.config.nodeTypes}
+            context={{
+              projectTree: this.props.projectTree
+            }}
             defaultNodes={[
               {
                 type: "start",

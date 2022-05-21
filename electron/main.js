@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const isDev = require('electron-is-dev');
 const path = require('path');
+const { readdirRecursive } = require('./async-fs');
 
 let mainWindow;
 var nodeConsole = require('console');
@@ -27,8 +28,11 @@ function createWindow() {
     mainWindow.on('closed', () => {
         mainWindow = null;
     });
+
 }
 app.on('ready', createWindow);
+
+ipcMain.handle("projectTree", async (e, path) => readdirRecursive(path));
 
 ipcMain.handle("showDialog", (e, message) => {
     message = JSON.parse(message);
