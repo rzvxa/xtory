@@ -21,7 +21,7 @@ body {
 }
 
 .sidenav-header > div {
-  background-image: url(/logo512.png);
+  background-image: url(../public/logo512.png);
   background-size: contain;
   height: 16px;
   width: 16px;
