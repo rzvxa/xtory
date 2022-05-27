@@ -48,6 +48,24 @@ const renderSettingsButton = (props, ref) => {
   );
 };
 
+const AliveRoute = (props, ref) => {
+  const { path, children, ...rest } = props;
+  console.log(children);
+  return (
+    <Route 
+      path={path}
+      children={({ match, ...rest }) => {
+        console.log(match ===null)
+        return(
+          <div style={{display: match ? 'block' : 'none'}}>
+            {children}
+          </div>
+        );
+      }}
+    />
+  );
+};
+
 const MenuLink = React.forwardRef((props, ref) => {
   const { href, as, ...rest } = props;
   return (
@@ -77,9 +95,9 @@ const DynamicSubFlowRouting = (props) => {
       setInstances(instances);
     }
     return (
-      <Route path={`/Flow/${route}`}>
+      <AliveRoute path={`/Flow/${route}`}>
         <FlowEditor data={{type: "conversation"}} projectTree={projectTree} instance={instances[route]}/>
-      </Route>
+      </AliveRoute>
     )
   };
   return openSubFlows.map(createRoutes);
@@ -139,6 +157,7 @@ class App extends React.Component {
       projectTree: undefined,
       expanded: true,
       activeKey: '1',
+      overviewState: createInstance(),
     };
     this.setPageTitle = this.setPageTitle.bind(this);
     this.updateProjectTree = this.updateProjectTree.bind(this);
@@ -292,9 +311,13 @@ class App extends React.Component {
                     <Route path="/Project/Export">
                       <ExportProject/>
                     </Route>
-                    <Route path="/Flow/Overview">
-                      <FlowEditor data={{type: "story"}} projectTree={this.state.projectTree} instance={createInstance()}/>
-                    </Route>
+                    <AliveRoute path="/Flow/Overview">
+                      <FlowEditor
+                        data={{type: "story"}}
+                        projectTree={this.state.projectTree}
+                        instance={this.state.overviewState}
+                      />
+                    </AliveRoute>
                     <DynamicSubFlowRouting openSubFlows={this.state.openSubFlows} projectTree={this.state.projectTree} />
                     <Route path="/Variables">
                       <Variables/>
