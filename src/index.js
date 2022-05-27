@@ -9,8 +9,7 @@ import Variables from './Variables/variables';
 import Settings from './Settings/settings';
 import { BrowserRouter, Route, Link } from "react-router-dom";
 
-import 'rsuite/dist/rsuite.min.css'
-import './index.css'
+import './index.less'
 
 import {
   CustomProvider,

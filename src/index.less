@@ -1,0 +1,141 @@
+@import '~rsuite/styles/index.less';
+
+
+@primary-color-dark: #3498FF;
+
+
+body {
+	height: 100vh;
+}
+#root {
+	height: 100vh;
+}
+.sidenav-header {
+	padding: 18px;
+	font-size: 16px;
+	height: 56px;
+	color: #fff;
+	background: var(--rs-bg-active);
+	white-space: nowrap;
+	overflow: hidden;
+	>div {
+		background-image: url(../public/logo512.png);
+		background-size: contain;
+		height: 16px;
+		width: 16px;
+		display: inline-flex;
+	}
+}
+.router-view {
+	header {
+		padding: 18px;
+		font-size: 16px;
+		height: 56px;
+		color: #fff;
+	}
+	height: 100%;
+	>div {
+		height: 100%;
+	}
+}
+.main-sidebar {
+	top: 0;
+	position: sticky;
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+	background-color: var(--rs-sidenav-default-bg);
+}
+.main-container {
+	height: 100vh;
+	.rs-container {
+		min-height: 100%;
+	}
+}
+.main-container.sidebar-page {
+	.rs-sidebar {
+		-webkit-box-shadow: 0 4px 4px rgba(0,0,0,.12),0 0 10px rgba(0,0,0,.06);
+		box-shadow: 0 4px 4px rgba(0,0,0,.12),0 0 10px rgba(0,0,0,.06);
+	}
+	.rs-sidenav {
+		overflow-x: 0;
+		-webkit-box-flex: 1;
+		-ms-flex: 1 1 auto;
+		flex: 1 1 auto;
+		width: 100%;
+	}
+	.rs-sidenav-collapse-in {
+		overflow-y: auto;
+	}
+	.rs-header {
+		padding: 0 20px;
+	}
+	.rs-content {
+		background-color: #fff;
+		background-color: var(--rs-bg-card);
+		margin: 20px;
+		padding: 20px;
+	}
+	.nav-toggle {
+		border-top: 1px solid #e5e5ea;
+		border-top: 1px solid var(--rs-border-primary);
+	}
+}
+.rs-sidenav-collapse-in {
+	.rs-dropdown {
+		.rs-dropdown-menu {
+			li {
+				ul {
+					li {
+						background-color: var(--rs-gray-800);
+					}
+				}
+			}
+		}
+	}
+}
+.rs-sidenav-default {
+	.rs-dropdown {
+		.rs-dropdown-menu {
+			li {
+				&:hover {
+					background-color: var(--rs-sidenav-default-hover-bg);
+					color: var(--rs-sidenav-default-hover-text);
+				}
+				ul {
+					li {
+						&:hover {
+							background-color: var(--rs-sidenav-default-hover-bg);
+							color: var(--rs-sidenav-default-hover-text);
+						}
+						.rs-dropdown-item-disabled {
+							color: #c5c6c7;
+							color: var(--rs-text-disabled);
+							cursor: not-allowed;
+							pointer-events: none;
+						}
+					}
+				}
+			}
+		}
+	}
+}
+.rs-dropdown-item {
+	a {
+		color: inherit;
+	}
+}
+.page {
+	.rs-content {
+		height: calc(100% - 90px);
+	}
+	header {
+		height: 56px;
+		background: var(--rs-gray-700);
+		white-space: nowrap;
+		overflow: hidden;
+		top: 0;
+		position: sticky;
+		z-index: 15;
+	}
+}
