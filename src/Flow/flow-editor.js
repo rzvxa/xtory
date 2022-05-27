@@ -69,8 +69,8 @@ export default class FlowEditor extends React.Component {
   }
   render() {
     return (
-      <div>
-        <div style={{width: '100%', height: '100%', margin: -20}}>
+      <div className="flow-editor-view">
+        <div className="flow-editor-area">
           <NodeEditor
             nodes={this.state.nodes}
             onChange={this.setNodes}

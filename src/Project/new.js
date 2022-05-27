@@ -14,7 +14,7 @@ const onFileBrowseClicked = () => {
 export default class New extends React.Component {
   render() {
     return (
-      <div>
+      <div className="page-view">
         <Form fluid>
           <Form.Group controlId="project-name">
             <Form.ControlLabel>Project Name</Form.ControlLabel>

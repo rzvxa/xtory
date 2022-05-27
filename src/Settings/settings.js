@@ -6,7 +6,7 @@ import Button from 'rsuite/Button';
 export default class Settings extends React.Component {
   render() {
     return (
-      <div>
+      <div className="page-view">
         <Form fluid>
           <Form.Group>
             <ButtonToolbar>

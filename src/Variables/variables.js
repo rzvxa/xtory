@@ -57,7 +57,7 @@ const Fun = () => {
   const CustomCell = compact ? CompactCell : Table.Cell;
   const CustomHeaderCell = compact ? CompactHeaderCell : Table.HeaderCell;
     return (
-      <div>
+      <div className="page-view">
         <div>
           <div>
             <span>
