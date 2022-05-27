@@ -55,8 +55,7 @@ const SubFlowTreePicker = (props) => {
     if (value !== 'Broken' && projectTree[0].value === -1) {
       projectTree.shift();
     }
-    onChange();
-    console.log()
+    onChange(value);
   }
   return (
     <TreePicker
@@ -68,6 +67,10 @@ const SubFlowTreePicker = (props) => {
     />
   );
 };
+
+const onOpenSubFlow = (path) => {
+  console.log(path)
+}
 
 const SubFlow = (data, onChange, context, redraw, portProps) => {
   return (
@@ -81,7 +84,7 @@ const SubFlow = (data, onChange, context, redraw, portProps) => {
         onChange={onChange}
       />
       <br/>
-      <Button onClick={() => {onChange(data); console.log(data);}} appearance="primary">Open</Button>
+      <Button onClick={() => onOpenSubFlow(data)} appearance="primary" disabled={(data === -1 || data === null)}>Open</Button>
     </div>
   );
 }
