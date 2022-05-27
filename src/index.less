@@ -119,6 +119,14 @@ body {
 .rs-sidenav-default {
 	.rs-dropdown {
 		.rs-dropdown-menu {
+			li {
+				cursor: not-allowed;
+				.rs-dropdown-item-disabled {
+					color: var(--rs-text-disabled);
+					cursor: not-allowed;
+					pointer-events: none;
+				}
+			}
 			div {
 				transition: color 0.3s linear, background-color 0.3s linear;
 				&:hover {
@@ -131,12 +139,6 @@ body {
 						&:hover {
 							background-color: var(--rs-sidenav-default-hover-bg);
 							color: var(--rs-sidenav-default-hover-text);
-						}
-						.rs-dropdown-item-disabled {
-							color: #c5c6c7;
-							color: var(--rs-text-disabled);
-							cursor: not-allowed;
-							pointer-events: none;
 						}
 					}
 				}

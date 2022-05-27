@@ -166,6 +166,7 @@ class App extends React.Component {
     };
     this.setPageTitle = this.setPageTitle.bind(this);
     this.updateProjectTree = this.updateProjectTree.bind(this);
+    this.closeSubFlow = this.closeSubFlow.bind(this);
     window.electron.onProjectUpdate(this.updateProjectTree);
     this.updateProjectTree();
   
@@ -205,7 +206,15 @@ class App extends React.Component {
     }
     const tree = await buildProjectTree();
     this.setState({projectTree: tree});
-  };
+  }
+  closeSubFlow(flow) {
+    for (let i = 0; i < this.state.openSubFlows.length; ++i) {
+      if (this.state.openSubFlows[i] === flow) {
+        this.state.openSubFlows.splice(i, 1);
+        this.setState({openSubFlows: this.state.openSubFlows})
+      }
+    }
+  }
   render() {
   
   
@@ -255,7 +264,7 @@ class App extends React.Component {
                         <Dropdown placement="rightStart" eventKey="2" title="Flow" icon={<Branch />}>
                           <Dropdown.Item eventKey="2-1" onClick={this.setPageTitle('Overview')} as={MenuLink} href="/Flow/Overview">Overview</Dropdown.Item>
                           <Dropdown.Menu eventKey="2-2" className="submenu" title="Open Sub Flows">
-                            <CreateSubFlowMenuItems items={this.state.openSubFlows} setPageTitle={this.setPageTitle} onClose={(g)=>console.log(g)}/>
+                            <CreateSubFlowMenuItems items={this.state.openSubFlows} setPageTitle={this.setPageTitle} onClose={this.closeSubFlow}/>
                           </Dropdown.Menu>
                         </Dropdown>
                         <Nav.Item eventKey="3" icon={<Project />}>
