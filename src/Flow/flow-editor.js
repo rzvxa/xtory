@@ -25,7 +25,7 @@ const MakeConfig = (data) => {
       case 'story':
         return (conf) => StoryNode(ConversationNode(conf));
       case 'conversation':
-        return (conf) => ConversationNode(conf);
+        return (conf) => conf;
       
       default:
     }

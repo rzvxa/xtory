@@ -36,9 +36,6 @@ const View = (conf) => {
       label: "End Conversation",
       description: "End a Conversation",
       initialWidth: 170,
-      inputs: ports => [
-        ports.string()
-      ]
     });
 }
 

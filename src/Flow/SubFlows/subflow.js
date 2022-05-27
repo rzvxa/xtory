@@ -3,7 +3,7 @@ import { Button, TreePicker } from 'rsuite';
 import { Colors, Controls } from 'flume';
 
 const SubFlowTreePicker = (props) => {
-  const { filter, projectTree, defaultValue, ...rest } = props;
+  const { filter, projectTree, defaultValue, onChange, ...rest } = props;
   const FilterTree = (branch) => {
     const res = [];
     if (branch === undefined) {
@@ -21,40 +21,49 @@ const SubFlowTreePicker = (props) => {
   };
   const checkLink = (branch, link) => {
     if (branch === undefined || branch === null) {
-    console.log('falll');
       return false;
     }
     for (let item of branch) {
       if (item.value === link) {
-    console.log('trueee');
         return true;
       }
       if (item.children !== undefined) {
         const res = checkLink(item.children, link);
         if (res === true) {
-    console.log('ccture');
           return true;
         }
       }
     }
-    console.log('end');
     return false;
   }
   const value = () => {
-    if (checkLink(defaultValue)) {
+    if (checkLink(projectTree, defaultValue)) {
+      if (projectTree[0].value === -1) {
+        projectTree.shift();
+      }
       return defaultValue;
     }
-    projectTree.push({
-      label: 'Broken Link',
-      value: -1,
-    });
+    if (defaultValue !== null && projectTree[0].value !== -1) {
+      projectTree.unshift({
+        label: 'Broken Link',
+        value: -1,
+      });
+    }
     return -1;
+  }
+  const OnChange = (value) => {
+    if (value !== 'Broken' && projectTree[0].value === -1) {
+      projectTree.shift();
+    }
+    onChange();
+    console.log()
   }
   return (
     <TreePicker
       data={projectTree}
       defaultValue={value}
       disabledItemValues={FilterTree(projectTree)}
+      onChange={OnChange}
       {...rest}
     />
   );
