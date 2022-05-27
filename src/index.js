@@ -36,6 +36,7 @@ import {
   Branch,
   AbTest,
   Tree,
+  Close,
 } from '@rsuite/icons';
 
 import Container from 'rsuite/Container';
@@ -50,12 +51,10 @@ const renderSettingsButton = (props, ref) => {
 
 const AliveRoute = (props, ref) => {
   const { path, children, ...rest } = props;
-  console.log(children);
   return (
     <Route 
       path={path}
       children={({ match, ...rest }) => {
-        console.log(match ===null)
         return(
           <div style={{display: match ? 'block' : 'none'}}>
             {children}
@@ -104,7 +103,7 @@ const DynamicSubFlowRouting = (props) => {
 };
 
 const CreateSubFlowMenuItems = (props) => {
-  const { items, setPageTitle } = props;
+  const { items, setPageTitle, onClose } = props;
   if (items.length === 0) {
     return (
       <Dropdown.Item disabled>
@@ -128,14 +127,20 @@ const CreateSubFlowMenuItems = (props) => {
   };
   const createMenuItem = (item) => {
     return (
-      <Dropdown.Item
-        eventKey="2-2-1"
-        onClick={setPageTitle(item.name)}
-        icon={getTypeIcon(item.type)}
-        as={MenuLink}
-        href={`/Flow/${item.route}`}>
-        {item.name}
-      </Dropdown.Item>
+      <div>
+        <Dropdown.Item
+          eventKey="2-2-1"
+          onClick={setPageTitle(item.name)}
+          icon={getTypeIcon(item.type)}
+          as={MenuLink}
+          href={`/Flow/${item.route}`}>
+          {item.name}
+        </Dropdown.Item>
+          <IconButton
+            size="xs"
+            icon={<Close/>}
+            onClick={() => onClose(item)}/>
+      </div>
     );
   };
   return items.map(createMenuItem);
@@ -250,7 +255,7 @@ class App extends React.Component {
                         <Dropdown placement="rightStart" eventKey="2" title="Flow" icon={<Branch />}>
                           <Dropdown.Item eventKey="2-1" onClick={this.setPageTitle('Overview')} as={MenuLink} href="/Flow/Overview">Overview</Dropdown.Item>
                           <Dropdown.Menu eventKey="2-2" className="submenu" title="Open Sub Flows">
-                            <CreateSubFlowMenuItems items={this.state.openSubFlows} setPageTitle={this.setPageTitle}/>
+                            <CreateSubFlowMenuItems items={this.state.openSubFlows} setPageTitle={this.setPageTitle} onClose={(g)=>console.log(g)}/>
                           </Dropdown.Menu>
                         </Dropdown>
                         <Nav.Item eventKey="3" icon={<Project />}>

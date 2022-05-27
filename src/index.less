@@ -46,6 +46,7 @@ body {
 	flex-direction: column;
 	height: 100vh;
 	background-color: var(--rs-sidenav-default-bg);
+	z-index: 100;
 }
 .main-container {
 	height: 100vh;
@@ -89,8 +90,27 @@ body {
 		.rs-dropdown-menu {
 			li {
 				ul {
-					li {
+					div {
 						background-color: var(--rs-gray-800);
+						display: flex;
+						width: 100%;
+						li {
+							width: 90%;
+							a {
+								white-space: nowrap;
+								overflow: hidden;
+								text-overflow: ellipsis;
+							}
+						}
+								.rs-btn-icon {
+									background: unset;
+									height: 24px;
+									align-self: center;
+									&:hover {
+										transition: color 0s linear, background-color 0.3s linear;
+										background-color: var(--rs-red-900);
+									}
+								}
 					}
 				}
 			}
@@ -100,13 +120,15 @@ body {
 .rs-sidenav-default {
 	.rs-dropdown {
 		.rs-dropdown-menu {
-			li {
+			div {
+				transition: color 0.3s linear, background-color 0.3s linear;
 				&:hover {
 					background-color: var(--rs-sidenav-default-hover-bg);
 					color: var(--rs-sidenav-default-hover-text);
 				}
 				ul {
-					li {
+					div {
+						transition: color 0.3s linear, background-color 0.3s linear;
 						&:hover {
 							background-color: var(--rs-sidenav-default-hover-bg);
 							color: var(--rs-sidenav-default-hover-text);
