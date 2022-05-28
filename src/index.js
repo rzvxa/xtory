@@ -222,7 +222,7 @@ class App extends React.Component {
         }
         this.setState({
           openSubFlows: this.state.openSubFlows,
-          pageTitle: this.stae.pageTitle,
+          pageTitle: this.state.pageTitle,
         });
       }
     }
