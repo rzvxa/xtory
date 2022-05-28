@@ -7,7 +7,7 @@ import ExportProject from './Project/export';
 import FlowEditor from './Flow/flow-editor';
 import Variables from './Variables/variables';
 import Settings from './Settings/settings';
-import { BrowserRouter, Route, Link } from "react-router-dom";
+import { BrowserRouter, Route, Link, useHistory } from "react-router-dom";
 
 import './index.less'
 
@@ -147,7 +147,6 @@ const CreateSubFlowMenuItems = (props) => {
       </div>
     );
   };
-  console.log(items)
   return items.map(createMenuItem);
 };
 
@@ -163,7 +162,7 @@ class App extends React.Component {
     this.state = {
       projectPath: default_path,
       pageTitle: "Welcome",
-      openSubFlows: [],
+      openSubFlows: default_state,
       projectTree: undefined,
       expanded: true,
       activeKey: '1',
@@ -227,159 +226,171 @@ class App extends React.Component {
       }
     }
   }
-  openSubFlow(path) {
-    const type = path.split('.').pop()
-    this.state.openSubFlows.push({
-      name: 'unnamed',
-      type: type,
-      route: path,
-      path: path
-    });
-    this.setState({openSubFlows: this.state.openSubFlows})
+  openSubFlow(path, focus = false) {
+    if (!this.state.openSubFlows.some(s => s.path === path)) {
+      const type = path.split('.').pop();
+      this.state.openSubFlows.push({
+        name: 'unnamed',
+        type: type,
+        route: path,
+        path: path
+      });
+      this.setState({openSubFlows: this.state.openSubFlows});
+    }
+    if (focus) {
+      this.setPageTitle('unnamed')();
+      const route = `/Flow/${path}`;
+      this.props.history.push(route);
+    }
   }
   render() {
     return (
-      <React.StrictMode>
-        <BrowserRouter>
-          <div className="main-container sidebar-page">
-            <Container>
-              <div>
-                <Sidebar
-                  className='main-sidebar'
-                  width={this.state.expanded ? 260 : 56}
-                  collapsible
-                >
+      <div className="main-container sidebar-page">
+        <Container>
+          <div>
+            <Sidebar
+              className='main-sidebar'
+              width={this.state.expanded ? 260 : 56}
+              collapsible
+            >
 
-                  <Sidenav.Header>
-                    <Link to="/">
-                      <div className='sidenav-header' onClick={() => {
-                        this.setState({expanded: true});
-                        this.setState({activeKey: '-1'});
-                      }}>
-                        <div />
-                        <span style={{ marginLeft: 18 }}> XTORY</span>
-                      </div>
-                    </Link>
-                  </Sidenav.Header>
-                  <Sidenav
-                    className='scroll-enabled'
-                    expanded={this.state.expanded}
-                    defaultOpenKeys={['2', '2-2']}
-                    activeKey={this.state.activeKey}
-                    onSelect={ (k) => { if (k === "IGNORE") return ;this.setState({activeKey: k}); }}
-                  >
-                    <Sidenav.Body>
-                      <Nav>
-                        <Dropdown placement="rightStart" eventKey="1" title="Project" icon={<Dashboard />}>
-                          <Dropdown.Item eventKey="1-1" onClick={this.setPageTitle('New')} as={MenuLink} href="/Project/New">New</Dropdown.Item>
-                          <Dropdown.Item eventKey="1-2" onClick={this.setPageTitle('Open')} as={MenuLink} href="/Project/Open">Open</Dropdown.Item>
-                          <Dropdown.Item eventKey="IGNORE">Save</Dropdown.Item>
-                          <Dropdown.Item eventKey="1-3" onClick={this.setPageTitle('Export')} as={MenuLink} href="/Project/Export">Export</Dropdown.Item>
-                          <Dropdown.Menu eventKey="1-4" className="submenu" title="Open Recent Projecs">
-                            <Dropdown.Item eventKey="1-4-1">XXX</Dropdown.Item>
-                            <Dropdown.Item eventKey="1-4-2">YYY</Dropdown.Item>
-                            <Dropdown.Item eventKey="1-4-3">ZZZ</Dropdown.Item>
-                          </Dropdown.Menu>
-                        </Dropdown>
-                        <Dropdown placement="rightStart" eventKey="2" title="Flow" icon={<Branch />}>
-                          <Dropdown.Item eventKey="2-1" onClick={this.setPageTitle('Overview')} as={MenuLink} href="/Flow/Overview">Overview</Dropdown.Item>
-                          <Dropdown.Menu eventKey="2-2" className="submenu" title="Open Sub Flows">
-                            <CreateSubFlowMenuItems items={this.state.openSubFlows} setPageTitle={this.setPageTitle} onClose={this.closeSubFlow}/>
-                          </Dropdown.Menu>
-                        </Dropdown>
-                        <Nav.Item eventKey="3" icon={<Project />}>
-                          Zones
-                        </Nav.Item>
-                        <Nav.Item eventKey="4" icon={<Peoples />}>
-                          Characters
-                        </Nav.Item>
-                        <Nav.Item eventKey="5" icon={<Message />}>
-                          Conversations
-                        </Nav.Item>
-                        <Nav.Item onClick={this.setPageTitle('Variables')} as={MenuLink} eventKey="6" icon={<ChangeList />} href="/Variables">
-                          Variables
-                        </Nav.Item>
-                        <Nav.Item eventKey="7" icon={<Model />}>
-                          Objects
-                        </Nav.Item>
-                      </Nav>
-                    </Sidenav.Body>
-                  </Sidenav>
-                  <Navbar appearance="subtle">
-                    <Navbar.Body>
-                      <Nav>
-                        <Dropdown
-                          placement="topStart"
-                          trigger="click"
-                          renderToggle={renderSettingsButton}
-                        >
-                          <Dropdown.Item>License</Dropdown.Item>
-                          <Dropdown.Item>Send Feedback</Dropdown.Item>
-                          <Dropdown.Item>Report a Bug</Dropdown.Item>
-                          <Dropdown.Item onClick={this.setPageTitle('Settings')} as={MenuLink} href="/Settings">Settings</Dropdown.Item>
-                        </Dropdown>
-                      </Nav>
-
-                      <Nav pullRight>
-                        <Nav.Item onClick={() => this.setState({expanded: !this.state.expanded})} style={{ width: 56, textAlign: 'center' }}>
-                          {this.state.expanded ? <ArrowLeftLine /> : <ArrowRightLine />}
-                        </Nav.Item>
-                      </Nav>
-                    </Navbar.Body>
-                  </Navbar>
-                </Sidebar>
-              </div>
-              <Container className="page">
-                <Header>
-                  <h2>{this.state.pageTitle}</h2>
-                </Header>
-                <Content>
-                  <div className="router-view">
-                    <Route path="/" exact component={Home} />
-                    <Route path="/Project/New">
-                      <NewProject/>
-                    </Route>
-                    <Route path="/Project/Open">
-                      <OpenProject/>
-                    </Route>
-                    <Route path="/Project/Export">
-                      <ExportProject/>
-                    </Route>
-                    <AliveRoute path="/Flow/Overview">
-                      <FlowEditor
-                        data={{type: "story"}}
-                        projectTree={this.state.projectTree}
-                        openSubFlow={this.openSubFlow}
-                        instance={this.state.overviewState}
-                      />
-                    </AliveRoute>
-                    <DynamicSubFlowRouting
-                      openSubFlows={this.state.openSubFlows}
-                      openSubFlow={this.openSubFlow}
-                      projectTree={this.state.projectTree}
-                    />
-                    <Route path="/Variables">
-                      <Variables/>
-                    </Route>
-                    <Route path="/Settings">
-                      <Settings/>
-                    </Route>
+              <Sidenav.Header>
+                <Link to="/">
+                  <div className='sidenav-header' onClick={() => {
+                    this.setState({expanded: true});
+                    this.setState({activeKey: '-1'});
+                  }}>
+                    <div />
+                    <span style={{ marginLeft: 18 }}> XTORY</span>
                   </div>
-                </Content>
-              </Container>
-            </Container>
+                </Link>
+              </Sidenav.Header>
+              <Sidenav
+                className='scroll-enabled'
+                expanded={this.state.expanded}
+                defaultOpenKeys={['2', '2-2']}
+                activeKey={this.state.activeKey}
+                onSelect={ (k) => { if (k === "IGNORE") return ;this.setState({activeKey: k}); }}
+              >
+                <Sidenav.Body>
+                  <Nav>
+                    <Dropdown placement="rightStart" eventKey="1" title="Project" icon={<Dashboard />}>
+                      <Dropdown.Item eventKey="1-1" onClick={this.setPageTitle('New')} as={MenuLink} href="/Project/New">New</Dropdown.Item>
+                      <Dropdown.Item eventKey="1-2" onClick={this.setPageTitle('Open')} as={MenuLink} href="/Project/Open">Open</Dropdown.Item>
+                      <Dropdown.Item eventKey="IGNORE">Save</Dropdown.Item>
+                      <Dropdown.Item eventKey="1-3" onClick={this.setPageTitle('Export')} as={MenuLink} href="/Project/Export">Export</Dropdown.Item>
+                      <Dropdown.Menu eventKey="1-4" className="submenu" title="Open Recent Projecs">
+                        <Dropdown.Item eventKey="1-4-1">XXX</Dropdown.Item>
+                        <Dropdown.Item eventKey="1-4-2">YYY</Dropdown.Item>
+                        <Dropdown.Item eventKey="1-4-3">ZZZ</Dropdown.Item>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                    <Dropdown placement="rightStart" eventKey="2" title="Flow" icon={<Branch />}>
+                      <Dropdown.Item eventKey="2-1" onClick={this.setPageTitle('Overview')} as={MenuLink} href="/Flow/Overview">Overview</Dropdown.Item>
+                      <Dropdown.Menu eventKey="2-2" className="submenu" title="Open Sub Flows">
+                        <CreateSubFlowMenuItems items={this.state.openSubFlows} setPageTitle={this.setPageTitle} onClose={this.closeSubFlow}/>
+                      </Dropdown.Menu>
+                    </Dropdown>
+                    <Nav.Item eventKey="3" icon={<Project />}>
+                      Zones
+                    </Nav.Item>
+                    <Nav.Item eventKey="4" icon={<Peoples />}>
+                      Characters
+                    </Nav.Item>
+                    <Nav.Item eventKey="5" icon={<Message />}>
+                      Conversations
+                    </Nav.Item>
+                    <Nav.Item onClick={this.setPageTitle('Variables')} as={MenuLink} eventKey="6" icon={<ChangeList />} href="/Variables">
+                      Variables
+                    </Nav.Item>
+                    <Nav.Item eventKey="7" icon={<Model />}>
+                      Objects
+                    </Nav.Item>
+                  </Nav>
+                </Sidenav.Body>
+              </Sidenav>
+              <Navbar appearance="subtle">
+                <Navbar.Body>
+                  <Nav>
+                    <Dropdown
+                      placement="topStart"
+                      trigger="click"
+                      renderToggle={renderSettingsButton}
+                    >
+                      <Dropdown.Item>License</Dropdown.Item>
+                      <Dropdown.Item>Send Feedback</Dropdown.Item>
+                      <Dropdown.Item>Report a Bug</Dropdown.Item>
+                      <Dropdown.Item onClick={this.setPageTitle('Settings')} as={MenuLink} href="/Settings">Settings</Dropdown.Item>
+                    </Dropdown>
+                  </Nav>
+
+                  <Nav pullRight>
+                    <Nav.Item onClick={() => this.setState({expanded: !this.state.expanded})} style={{ width: 56, textAlign: 'center' }}>
+                      {this.state.expanded ? <ArrowLeftLine /> : <ArrowRightLine />}
+                    </Nav.Item>
+                  </Nav>
+                </Navbar.Body>
+              </Navbar>
+            </Sidebar>
           </div>
-        </BrowserRouter>
-      </React.StrictMode>
+            <Container className="page">
+              <Header>
+                <h2>{this.state.pageTitle}</h2>
+              </Header>
+              <Content>
+                <div className="router-view">
+                  <Route path="/" exact component={Home} />
+                  <Route path="/Project/New">
+                    <NewProject/>
+                  </Route>
+                  <Route path="/Project/Open">
+                    <OpenProject/>
+                  </Route>
+                  <Route path="/Project/Export">
+                    <ExportProject/>
+                  </Route>
+                  <AliveRoute path="/Flow/Overview">
+                    <FlowEditor
+                      data={{type: "story"}}
+                      projectTree={this.state.projectTree}
+                      openSubFlow={this.openSubFlow}
+                      instance={this.state.overviewState}
+                    />
+                  </AliveRoute>
+                  <DynamicSubFlowRouting
+                    openSubFlows={this.state.openSubFlows}
+                    openSubFlow={this.openSubFlow}
+                    projectTree={this.state.projectTree}
+                  />
+                  <Route path="/Variables">
+                    <Variables/>
+                  </Route>
+                  <Route path="/Settings">
+                    <Settings/>
+                  </Route>
+                </div>
+              </Content>
+            </Container>
+        </Container>
+      </div>
     );
   };
 }
+const Main = () => {
+  const history = useHistory();
+  return (
+    <CustomProvider theme="dark">
+      <App history={history}/>
+    </CustomProvider>
+  );
+}
 ReactDOM.render(
-  <CustomProvider theme="dark">
-    <App />
-  </CustomProvider>,
-  document.getElementById('root')
-);
+  <React.StrictMode>
+    <BrowserRouter>
+      <Main/>
+    </BrowserRouter>
+  </React.StrictMode>,
+  document.getElementById('root'));
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

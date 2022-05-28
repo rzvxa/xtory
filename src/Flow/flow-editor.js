@@ -9,7 +9,6 @@ import './flow.css'
 
 const MakeConfig = (data) => {
   const GetTypeView = (type) => {
-    console.log(type);
     switch (type) {
       case 'story':
         return StoryView;

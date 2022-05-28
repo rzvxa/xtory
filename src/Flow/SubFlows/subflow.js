@@ -70,7 +70,7 @@ const SubFlowTreePicker = (props) => {
 
 const SubFlow = (data, onChange, context, redraw, portProps) => {
   const onOpenSubFlow = () => {
-    context.openSubFlow(data);
+    context.openSubFlow(data, true);
   }
 
   return (
