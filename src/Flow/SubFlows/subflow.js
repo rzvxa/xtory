@@ -68,11 +68,11 @@ const SubFlowTreePicker = (props) => {
   );
 };
 
-const onOpenSubFlow = (path) => {
-  console.log(path)
-}
-
 const SubFlow = (data, onChange, context, redraw, portProps) => {
+  const onOpenSubFlow = () => {
+    context.openSubFlow(data);
+  }
+
   return (
     <div className="center-port-control">
       <SubFlowTreePicker
@@ -84,7 +84,7 @@ const SubFlow = (data, onChange, context, redraw, portProps) => {
         onChange={onChange}
       />
       <br/>
-      <Button onClick={() => onOpenSubFlow(data)} appearance="primary" disabled={(data === -1 || data === null)}>Open</Button>
+      <Button onClick={onOpenSubFlow} appearance="primary" disabled={(data === -1 || data === null)}>Open</Button>
     </div>
   );
 }
