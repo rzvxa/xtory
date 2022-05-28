@@ -129,12 +129,11 @@ const CreateSubFlowMenuItems = (props) => {
 
    }
   };
-  const createMenuItem = (item) => {
+  const createMenuItem = (item, index) => {
     return (
       <div>
         <Dropdown.Item
-          eventKey="2-2-1"
-          onClick={setPageTitle(item.name)}
+          eventKey={item.name}
           icon={getTypeIcon(item.type)}
           as={MenuLink}
           href={`/Flow/${item.route}`}>
@@ -172,6 +171,7 @@ class App extends React.Component {
     this.updateProjectTree = this.updateProjectTree.bind(this);
     this.closeSubFlow = this.closeSubFlow.bind(this);
     this.openSubFlow = this.openSubFlow.bind(this);
+    this.onPageChange = this.onPageChange.bind(this);
     window.electron.onProjectUpdate(this.updateProjectTree);
     this.updateProjectTree();
   
@@ -238,10 +238,16 @@ class App extends React.Component {
       this.setState({openSubFlows: this.state.openSubFlows});
     }
     if (focus) {
-      this.setPageTitle('unnamed')();
+      this.onPageChange('unnamed');
       const route = `/Flow/${path}`;
       this.props.history.push(route);
     }
+  }
+  onPageChange(page) {
+    if (page === undefined) return;
+    if (page === "IGNORE") return ;
+    if (page === "subflows") return;
+    this.setState({activeKey: page, pageTitle: page});
   }
   render() {
     return (
@@ -270,40 +276,40 @@ class App extends React.Component {
                 expanded={this.state.expanded}
                 defaultOpenKeys={['2', '2-2']}
                 activeKey={this.state.activeKey}
-                onSelect={ (k) => { if (k === "IGNORE") return ;this.setState({activeKey: k}); }}
+                onSelect={this.onPageChange}
               >
                 <Sidenav.Body>
                   <Nav>
                     <Dropdown placement="rightStart" eventKey="1" title="Project" icon={<Dashboard />}>
-                      <Dropdown.Item eventKey="1-1" onClick={this.setPageTitle('New')} as={MenuLink} href="/Project/New">New</Dropdown.Item>
-                      <Dropdown.Item eventKey="1-2" onClick={this.setPageTitle('Open')} as={MenuLink} href="/Project/Open">Open</Dropdown.Item>
+                      <Dropdown.Item eventKey="New" as={MenuLink} href="/Project/New">New</Dropdown.Item>
+                      <Dropdown.Item eventKey="Open" as={MenuLink} href="/Project/Open">Open</Dropdown.Item>
                       <Dropdown.Item eventKey="IGNORE">Save</Dropdown.Item>
-                      <Dropdown.Item eventKey="1-3" onClick={this.setPageTitle('Export')} as={MenuLink} href="/Project/Export">Export</Dropdown.Item>
-                      <Dropdown.Menu eventKey="1-4" className="submenu" title="Open Recent Projecs">
-                        <Dropdown.Item eventKey="1-4-1">XXX</Dropdown.Item>
-                        <Dropdown.Item eventKey="1-4-2">YYY</Dropdown.Item>
-                        <Dropdown.Item eventKey="1-4-3">ZZZ</Dropdown.Item>
+                      <Dropdown.Item eventKey="Export" as={MenuLink} href="/Project/Export">Export</Dropdown.Item>
+                      <Dropdown.Menu eventKey="IGNORE" className="submenu" title="Open Recent Projecs">
+                        <Dropdown.Item eventKey="IGNORE">XXX</Dropdown.Item>
+                        <Dropdown.Item eventKey="IGNORE">YYY</Dropdown.Item>
+                        <Dropdown.Item eventKey="IGNORE">ZZZ</Dropdown.Item>
                       </Dropdown.Menu>
                     </Dropdown>
                     <Dropdown placement="rightStart" eventKey="2" title="Flow" icon={<Branch />}>
-                      <Dropdown.Item eventKey="2-1" onClick={this.setPageTitle('Overview')} as={MenuLink} href="/Flow/Overview">Overview</Dropdown.Item>
-                      <Dropdown.Menu eventKey="2-2" className="submenu" title="Open Sub Flows">
+                      <Dropdown.Item eventKey="Overview" as={MenuLink} href="/Flow/Overview">Overview</Dropdown.Item>
+                      <Dropdown.Menu eventKey="subflows" className="submenu" title="Open Sub Flows">
                         <CreateSubFlowMenuItems items={this.state.openSubFlows} setPageTitle={this.setPageTitle} onClose={this.closeSubFlow}/>
                       </Dropdown.Menu>
                     </Dropdown>
-                    <Nav.Item eventKey="3" icon={<Project />}>
+                    <Nav.Item eventKey="IGNORE" icon={<Project />}>
                       Zones
                     </Nav.Item>
-                    <Nav.Item eventKey="4" icon={<Peoples />}>
+                    <Nav.Item eventKey="IGNORE" icon={<Peoples />}>
                       Characters
                     </Nav.Item>
-                    <Nav.Item eventKey="5" icon={<Message />}>
+                    <Nav.Item eventKey="IGNORE" icon={<Message />}>
                       Conversations
                     </Nav.Item>
-                    <Nav.Item onClick={this.setPageTitle('Variables')} as={MenuLink} eventKey="6" icon={<ChangeList />} href="/Variables">
+                    <Nav.Item as={MenuLink} eventKey="Variables" icon={<ChangeList />} href="/Variables">
                       Variables
                     </Nav.Item>
-                    <Nav.Item eventKey="7" icon={<Model />}>
+                    <Nav.Item eventKey="IGNORE" icon={<Model />}>
                       Objects
                     </Nav.Item>
                   </Nav>
