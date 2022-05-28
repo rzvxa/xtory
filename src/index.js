@@ -326,7 +326,7 @@ class App extends React.Component {
                       <Dropdown.Item>License</Dropdown.Item>
                       <Dropdown.Item>Send Feedback</Dropdown.Item>
                       <Dropdown.Item>Report a Bug</Dropdown.Item>
-                      <Dropdown.Item onClick={this.setPageTitle('Settings')} as={MenuLink} href="/Settings">Settings</Dropdown.Item>
+                      <Dropdown.Item onClick={() => this.onPageChange("Settings")} as={MenuLink} href="/Settings">Settings</Dropdown.Item>
                     </Dropdown>
                   </Nav>
 
