@@ -85,7 +85,7 @@ const createInstance = () => {
 }
 
 const DynamicSubFlowRouting = (props) => {
-  const { openSubFlows, projectTree } = props;
+  const { openSubFlows, projectTree, openSubFlow } = props;
   const [ instances, setInstances ] = React.useState({});
   const createRoutes = (subFlow) => {
     const { route } = subFlow;
@@ -95,7 +95,11 @@ const DynamicSubFlowRouting = (props) => {
     }
     return (
       <AliveRoute path={`/Flow/${route}`}>
-        <FlowEditor data={{type: "conversation"}} projectTree={projectTree} instance={instances[route]}/>
+        <FlowEditor
+          data={{type: "conv"}}
+          projectTree={projectTree}
+          openSubFlow={openSubFlow}
+          instance={instances[route]}/>
       </AliveRoute>
     )
   };
@@ -113,7 +117,7 @@ const CreateSubFlowMenuItems = (props) => {
   }
   const getTypeIcon = (type) => {
    switch (type) {
-     case 'conversation':
+     case 'conv':
        return <Message/>
      case 'quest':
        return <AbTest/>
@@ -143,6 +147,7 @@ const CreateSubFlowMenuItems = (props) => {
       </div>
     );
   };
+  console.log(items)
   return items.map(createMenuItem);
 };
 
@@ -151,14 +156,14 @@ class App extends React.Component {
     super(props);
     const default_path = "C:\\Users\\ali\\Documents\\xtory_test";
     const default_state = [
-        {name: "I've Said NO!", type: 'conversation', route: 'conv/ive_said_no', path: `${default_path}\\Conversations\\ive_said_no.conv`},
+        {name: "I've Said NO!", type: 'conv', route: 'conv/ive_said_no', path: `${default_path}\\Conversations\\ive_said_no.conv`},
         {name: "Killing in the Name", type: 'quest', route: 'quest/killing_in_the_name', path: `${default_path}\\Conversations\\ive_said_no.conv`},
         {name: "Some Kind of Sub-Story", type: 'story', route: 'story/some_kind_of_sub_story', path: `${default_path}\\Stories\\some_kind_of_sub_story.story`},
       ];
     this.state = {
       projectPath: default_path,
       pageTitle: "Welcome",
-      openSubFlows: default_state,
+      openSubFlows: [],
       projectTree: undefined,
       expanded: true,
       activeKey: '1',
@@ -167,6 +172,7 @@ class App extends React.Component {
     this.setPageTitle = this.setPageTitle.bind(this);
     this.updateProjectTree = this.updateProjectTree.bind(this);
     this.closeSubFlow = this.closeSubFlow.bind(this);
+    this.openSubFlow = this.openSubFlow.bind(this);
     window.electron.onProjectUpdate(this.updateProjectTree);
     this.updateProjectTree();
   
@@ -211,13 +217,27 @@ class App extends React.Component {
     for (let i = 0; i < this.state.openSubFlows.length; ++i) {
       if (this.state.openSubFlows[i] === flow) {
         this.state.openSubFlows.splice(i, 1);
-        this.setState({openSubFlows: this.state.openSubFlows})
+        if (flow.name === this.state.pageTitle) {
+          this.state.pageTitle = '';
+        }
+        this.setState({
+          openSubFlows: this.state.openSubFlows,
+          pageTitle: this.stae.pageTitle,
+        });
       }
     }
   }
+  openSubFlow(path) {
+    const type = path.split('.').pop()
+    this.state.openSubFlows.push({
+      name: 'unnamed',
+      type: type,
+      route: path,
+      path: path
+    });
+    this.setState({openSubFlows: this.state.openSubFlows})
+  }
   render() {
-  
-  
     return (
       <React.StrictMode>
         <BrowserRouter>
@@ -329,10 +349,15 @@ class App extends React.Component {
                       <FlowEditor
                         data={{type: "story"}}
                         projectTree={this.state.projectTree}
+                        openSubFlow={this.openSubFlow}
                         instance={this.state.overviewState}
                       />
                     </AliveRoute>
-                    <DynamicSubFlowRouting openSubFlows={this.state.openSubFlows} projectTree={this.state.projectTree} />
+                    <DynamicSubFlowRouting
+                      openSubFlows={this.state.openSubFlows}
+                      openSubFlow={this.openSubFlow}
+                      projectTree={this.state.projectTree}
+                    />
                     <Route path="/Variables">
                       <Variables/>
                     </Route>

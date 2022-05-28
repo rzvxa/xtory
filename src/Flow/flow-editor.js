@@ -9,10 +9,13 @@ import './flow.css'
 
 const MakeConfig = (data) => {
   const GetTypeView = (type) => {
+    console.log(type);
     switch (type) {
       case 'story':
         return StoryView;
-      case 'conversation':
+      case 'conv':
+        return ConversationView;
+      case 'quest':
         return ConversationView;
       
       default:
@@ -24,7 +27,7 @@ const MakeConfig = (data) => {
     switch (type) {
       case 'story':
         return (conf) => StoryNode(ConversationNode(conf));
-      case 'conversation':
+      case 'conv':
         return (conf) => conf;
       
       default:
@@ -77,7 +80,8 @@ export default class FlowEditor extends React.Component {
             portTypes={this.config.portTypes}
             nodeTypes={this.config.nodeTypes}
             context={{
-              projectTree: this.props.projectTree
+              projectTree: this.props.projectTree,
+              openSubFlow: this.props.openSubFlow,
             }}
             defaultNodes={[
               {
