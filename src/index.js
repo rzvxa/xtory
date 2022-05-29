@@ -4,7 +4,7 @@ import Home from './home'
 import NewProject from './Project/new';
 import OpenProject from './Project/open';
 import ExportProject from './Project/export';
-import FlowEditor from './Flow/flow-editor';
+import { FlowEditor, FlowEditorPageTitle } from './Flow/flow-editor';
 import Variables from './Variables/variables';
 import Settings from './Settings/settings';
 import { BrowserRouter, Route, Link, useHistory } from "react-router-dom";
@@ -216,13 +216,13 @@ class App extends React.Component {
     for (let i = 0; i < this.state.openSubFlows.length; ++i) {
       if (this.state.openSubFlows[i] === flow) {
         this.state.openSubFlows.splice(i, 1);
-        if (flow.name === this.state.pageTitle) {
-          this.state.pageTitle = '';
-        }
         this.setState({
           openSubFlows: this.state.openSubFlows,
-          pageTitle: this.state.pageTitle,
         });
+        if (flow.name === this.state.pageTitle) {
+          this.props.history.push('/');
+          this.onPageChange('Welcome');
+        }
       }
     }
   }
@@ -264,7 +264,7 @@ class App extends React.Component {
                 <Link to="/">
                   <div className='sidenav-header' onClick={() => {
                     this.setState({expanded: true});
-                    this.setState({activeKey: '-1'});
+                    this.onPageChange('Welcome');
                   }}>
                     <div />
                     <span style={{ marginLeft: 18 }}> XTORY</span>
@@ -342,6 +342,16 @@ class App extends React.Component {
             <Container className="page">
               <Header>
                 <h2>{this.state.pageTitle}</h2>
+                {
+                  (
+                    () => {
+                      const pathname = this.props.history.location.pathname;
+                      if (pathname.startsWith('/Flow') && !pathname.startsWith('/Flow/Overview')) {
+                        return (<FlowEditorPageTitle/>)
+                      }
+                    }
+                  )()
+                }
               </Header>
               <Content>
                 <div className="router-view">

@@ -8,6 +8,16 @@
   height: 100%;
 }
 
+.edit-name-btn {
+  margin-top: -45px;
+}
+
+.title-right-box {
+  float: right;
+  position: relative;
+  top: 10px;
+}
+
 .center-port-control {
   display: flex;
   align-content: center;
