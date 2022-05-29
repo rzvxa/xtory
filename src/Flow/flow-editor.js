@@ -36,6 +36,8 @@ const MakeConfig = (data) => {
         return (conf) => StoryNode(ConversationNode(conf));
       case 'conv':
         return (conf) => conf;
+      case 'quest':
+        return (conf) => conf;
       
       default:
     }

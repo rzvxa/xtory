@@ -87,7 +87,7 @@ const createInstance = () => {
 const DynamicSubFlowRouting = (props) => {
   const { openSubFlows, projectTree, openSubFlow, instances, setInstances } = props;
   const createRoutes = (subFlow) => {
-    const { route } = subFlow;
+    const { route, type } = subFlow;
     if (instances[route] === undefined) {
       instances[route] = createInstance();
       setInstances(instances);
@@ -95,7 +95,7 @@ const DynamicSubFlowRouting = (props) => {
     return (
       <AliveRoute path={`/Flow/${route}`}>
         <FlowEditor
-          data={{type: "conv"}}
+          data={{type: type}}
           projectTree={projectTree}
           openSubFlow={openSubFlow}
           instance={instances[route]}/>
