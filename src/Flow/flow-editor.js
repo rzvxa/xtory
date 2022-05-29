@@ -53,9 +53,12 @@ class FlowEditorPageTitle extends React.Component {
   render() {
     return (
       <>
-        <IconButton className="edit-name-btn" size="xs" icon={<Edit />} />
+        {
+          this.props.renamable &&
+          <IconButton className="edit-name-btn" size="xs" icon={<Edit />} />
+        }
         <div className="title-right-box">
-          <IconButton color="green" appearance="primary" icon={<SaveIcon/>}>Save</IconButton>
+          <IconButton color="green" appearance="primary" icon={<SaveIcon/>} onClick={this.props.onSave}>Save</IconButton>
         </div>
       </>
     );
@@ -88,6 +91,10 @@ class FlowEditor extends React.Component {
   setNodes(nodes) {
     if (this.state.nodes !== nodes) {
       this.setState({nodes: nodes});
+      var state = this.state
+      this.props.instance.save(function(ctx){
+        ctx.state = state;
+      })
     }
   }
   render() {

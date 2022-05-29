@@ -85,8 +85,7 @@ const createInstance = () => {
 }
 
 const DynamicSubFlowRouting = (props) => {
-  const { openSubFlows, projectTree, openSubFlow } = props;
-  const [ instances, setInstances ] = React.useState({});
+  const { openSubFlows, projectTree, openSubFlow, instances, setInstances } = props;
   const createRoutes = (subFlow) => {
     const { route } = subFlow;
     if (instances[route] === undefined) {
@@ -165,12 +164,13 @@ class App extends React.Component {
       projectTree: undefined,
       expanded: true,
       activeKey: '1',
-      overviewState: createInstance(),
+      openFlowInstances: {"/Flow/Overview": createInstance()},
     };
     this.setPageTitle = this.setPageTitle.bind(this);
     this.updateProjectTree = this.updateProjectTree.bind(this);
     this.closeSubFlow = this.closeSubFlow.bind(this);
     this.openSubFlow = this.openSubFlow.bind(this);
+    this.onSaveFlow = this.onSaveFlow.bind(this);
     this.onPageChange = this.onPageChange.bind(this);
     window.electron.onProjectUpdate(this.updateProjectTree);
     this.updateProjectTree();
@@ -235,6 +235,11 @@ class App extends React.Component {
         route: path,
         path: path
       });
+      console.log("LOAD HERE");
+      console.log("LOAD HERE");
+      console.log("LOAD HERE");
+      console.log("LOAD HERE");
+      console.log("LOAD HERE");
       this.setState({openSubFlows: this.state.openSubFlows});
     }
     if (focus) {
@@ -242,6 +247,17 @@ class App extends React.Component {
       const route = `/Flow/${path}`;
       this.props.history.push(route);
     }
+  }
+  onSaveFlow(file, instance) {
+    console.log('saving '+ instance+' at ' + file)
+    const mock = { state: null }
+    instance.restore(mock);
+    console.log(mock);
+    console.log("SAVE HERE");
+    console.log("SAVE HERE");
+    console.log("SAVE HERE");
+    console.log("SAVE HERE");
+    console.log("SAVE HERE");
   }
   onPageChange(page) {
     if (page === undefined) return;
@@ -274,7 +290,7 @@ class App extends React.Component {
               <Sidenav
                 className='scroll-enabled'
                 expanded={this.state.expanded}
-                defaultOpenKeys={['2', '2-2']}
+                defaultOpenKeys={['2', 'subflows']}
                 activeKey={this.state.activeKey}
                 onSelect={this.onPageChange}
               >
@@ -346,8 +362,12 @@ class App extends React.Component {
                   (
                     () => {
                       const pathname = this.props.history.location.pathname;
-                      if (pathname.startsWith('/Flow') && !pathname.startsWith('/Flow/Overview')) {
-                        return (<FlowEditorPageTitle/>)
+                      const route = pathname.slice('/Flow/'.length)
+                      const flow = this.state.openSubFlows.find(x => x.route === route);
+                      const filepath = flow?.path;
+                      const instance = this.state.openFlowInstances[route];
+                      if (pathname.startsWith('/Flow')) {
+                        return (<FlowEditorPageTitle renamable={!pathname.startsWith('/Flow/Overview')} onSave={() => this.onSaveFlow(filepath, instance)}/>)
                       }
                     }
                   )()
@@ -370,13 +390,15 @@ class App extends React.Component {
                       data={{type: "story"}}
                       projectTree={this.state.projectTree}
                       openSubFlow={this.openSubFlow}
-                      instance={this.state.overviewState}
+                      instance={this.state.openFlowInstances['/Flow/Overview']}
                     />
                   </AliveRoute>
                   <DynamicSubFlowRouting
                     openSubFlows={this.state.openSubFlows}
                     openSubFlow={this.openSubFlow}
                     projectTree={this.state.projectTree}
+                    instances={this.state.openFlowInstances}
+                    setInstances={ins => this.setState({openFlowInstances: ins})}
                   />
                   <Route path="/Variables">
                     <Variables/>
