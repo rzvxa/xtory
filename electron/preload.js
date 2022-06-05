@@ -16,6 +16,8 @@ async function projectTree(path) {
 contextBridge.exposeInMainWorld('electron', {
     showDialog: showDialog,
     setProjectPath: (path) => ipcRenderer.sent('setProjectPath', path),
+    readFromFile: (path) => ipcRenderer.invoke('readFromFile', path),
+    writeToFile: (file) => ipcRenderer.send('writeToFile', file),
     projectTree: projectTree,
     onProjectUpdate: (callback) => ipcRenderer.on('projectUpdate', (e, m) => callback(m)),
 });

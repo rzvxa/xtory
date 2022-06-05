@@ -22,14 +22,14 @@ function stat(path) {
 }
 
 function readdir(path) {
-  return new Promise(function (resolve, reject) {
-    fs.readdir(path, function (error, result) {
-      if (error) {
-        reject(error);
-      } else {
-        resolve(result);
-      }
-    });
+    return new Promise((resolve, reject) => {
+        fs.readdir(path, (error, result) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(result);
+            }
+        });
   });
 }
 
@@ -49,4 +49,28 @@ async function readdirRecursive(path) {
     return result;
 }
 
-module.exports = { readdir, readdirRecursive };
+function readFile(path, encoding) {
+    return new Promise((resolve, reject) => {
+        fs.readFile(path, encoding, (error, result) => {
+            if (error) {
+                reject(error);
+            } else {
+                resolve(result);
+            }
+        });
+    });
+}
+
+function writeFile(path, content) {
+    return new Promise((resolve, reject) => {
+        fs.writeFile(path, content, (error, result) => {
+          if (error) {
+              reject(error);
+          } else {
+              resolve(result);
+          }
+        });
+    });
+}
+
+module.exports = { readdir, readdirRecursive, readFile, writeFile };

@@ -153,9 +153,9 @@ class App extends React.Component {
     super(props);
     const default_path = "C:\\Users\\ali\\Documents\\xtory_test";
     const default_state = [
-        {name: "I've Said NO!", type: 'conv', route: 'conv/ive_said_no', path: `${default_path}\\Conversations\\ive_said_no.conv`},
-        {name: "Killing in the Name", type: 'quest', route: 'quest/killing_in_the_name', path: `${default_path}\\Conversations\\ive_said_no.conv`},
-        {name: "Some Kind of Sub-Story", type: 'story', route: 'story/some_kind_of_sub_story', path: `${default_path}\\Stories\\some_kind_of_sub_story.story`},
+        {name: "I've Said NO!", type: 'conv', route: 'conv/ive_said_no', path: `Conversations\\ive_said_no.conv`},
+        {name: "Killing in the Name", type: 'quest', route: 'quest/killing_in_the_name', path: `Conversations\\ive_said_no.conv`},
+        {name: "Some Kind of Sub-Story", type: 'story', route: 'story/some_kind_of_sub_story', path: `Stories\\some_kind_of_sub_story.story`},
       ];
     this.state = {
       projectPath: default_path,
@@ -164,7 +164,7 @@ class App extends React.Component {
       projectTree: undefined,
       expanded: true,
       activeKey: '1',
-      openFlowInstances: {"/Flow/Overview": createInstance()},
+      openFlowInstances: {"Overview": createInstance()},
     };
     this.setPageTitle = this.setPageTitle.bind(this);
     this.updateProjectTree = this.updateProjectTree.bind(this);
@@ -226,9 +226,12 @@ class App extends React.Component {
       }
     }
   }
-  openSubFlow(path, focus = false) {
+  async openSubFlow(path, focus = false) {
     if (!this.state.openSubFlows.some(s => s.path === path)) {
       const type = path.split('.').pop();
+      console.log(path)
+      const content = await window.electron.readFromFile(path);
+      console.log(content)
       this.state.openSubFlows.push({
         name: 'unnamed',
         type: type,
@@ -252,12 +255,14 @@ class App extends React.Component {
     console.log('saving '+ instance+' at ' + file)
     const mock = { state: null }
     instance.restore(mock);
-    console.log(mock);
-    console.log("SAVE HERE");
-    console.log("SAVE HERE");
-    console.log("SAVE HERE");
-    console.log("SAVE HERE");
-    console.log("SAVE HERE");
+    const nodes = mock.state.nodes;
+    const jObject = {
+      ver: '0.0.1',
+      name: this.state.pageTitle,
+      nodes: nodes,
+    };
+    const json = JSON.stringify(jObject);
+    window.electron.writeToFile({ content: json, path: file })
   }
   onPageChange(page) {
     if (page === undefined) return;
@@ -364,7 +369,7 @@ class App extends React.Component {
                       const pathname = this.props.history.location.pathname;
                       const route = pathname.slice('/Flow/'.length)
                       const flow = this.state.openSubFlows.find(x => x.route === route);
-                      const filepath = flow?.path;
+                      const filepath = pathname.startsWith('/Flow/Overview') ? 'main.story' : flow?.path;
                       const instance = this.state.openFlowInstances[route];
                       if (pathname.startsWith('/Flow')) {
                         return (<FlowEditorPageTitle renamable={!pathname.startsWith('/Flow/Overview')} onSave={() => this.onSaveFlow(filepath, instance)}/>)
@@ -390,7 +395,7 @@ class App extends React.Component {
                       data={{type: "story"}}
                       projectTree={this.state.projectTree}
                       openSubFlow={this.openSubFlow}
-                      instance={this.state.openFlowInstances['/Flow/Overview']}
+                      instance={this.state.openFlowInstances['Overview']}
                     />
                   </AliveRoute>
                   <DynamicSubFlowRouting

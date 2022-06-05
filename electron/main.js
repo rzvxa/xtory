@@ -2,7 +2,7 @@ const { app, BrowserWindow, ipcMain, dialog } = require('electron');
 const isDev = require('electron-is-dev');
 const path = require('path');
 const chokidar = require('chokidar');
-const { readdirRecursive } = require('./async-fs');
+const { readdirRecursive, readFile, writeFile } = require('./async-fs');
 
 let mainWindow;
 var nodeConsole = require('console');
@@ -60,13 +60,29 @@ function setProjectPath(e, path) {
     }
 }
 
+async function writeToFile(e, data) {
+    const path = projectPath + '/' + data.path;
+    try {
+        await writeFile(path, data.content);
+    } catch (e) {
+        myConsole.log(e)
+    }
+}
+
 app.on('ready', createWindow);
 
 ipcMain.on('setProjectPath', setProjectPath);
 
+ipcMain.on('writeToFile', writeToFile);
+
 ipcMain.handle("projectTree", async (e, path) => {
     setProjectPath(e, path);
     return readdirRecursive(path)
+});
+
+ipcMain.handle("readFromFile", (e, path) => {
+    const absPath = projectPath + '/' + path;
+    return readFile(absPath, 'utf8');
 });
 
 ipcMain.handle("showDialog", (e, message) => {
