@@ -83,6 +83,7 @@ class FlowEditor extends React.Component {
   }
   componentWillMount() {
     this.props.instance.restore(this)
+    this.setState({key:Math.random()});
   }
   componentWillUnmount() {
     var state = this.state
@@ -104,6 +105,7 @@ class FlowEditor extends React.Component {
       <div className="flow-editor-view">
         <div className="flow-editor-area">
           <NodeEditor
+            key={this.state.key}
             nodes={this.state.nodes}
             onChange={this.setNodes}
             portTypes={this.config.portTypes}

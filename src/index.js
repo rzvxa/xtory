@@ -106,7 +106,8 @@ const DynamicSubFlowRouting = (props) => {
 };
 
 const CreateSubFlowMenuItems = (props) => {
-  const { items, setPageTitle, onClose } = props;
+  const { openSubFlows, setPageTitle, onClose } = props;
+  const items = openSubFlows.filter(s => s.route !== 'main.story');
   if (items.length === 0) {
     return (
       <Dropdown.Item disabled>
@@ -160,11 +161,11 @@ class App extends React.Component {
     this.state = {
       projectPath: default_path,
       pageTitle: "Welcome",
-      openSubFlows: default_state,
+      openSubFlows: [],
       projectTree: undefined,
       expanded: true,
       activeKey: '1',
-      openFlowInstances: {"Overview": createInstance()},
+      openFlowInstances: {"main.story": createInstance()},
     };
     this.setPageTitle = this.setPageTitle.bind(this);
     this.updateProjectTree = this.updateProjectTree.bind(this);
@@ -175,6 +176,7 @@ class App extends React.Component {
     window.electron.onProjectUpdate(this.updateProjectTree);
     this.updateProjectTree();
   
+    this.openSubFlow('main.story');
   }
   setPageTitle(title) {
     return () => {
@@ -229,16 +231,28 @@ class App extends React.Component {
   async openSubFlow(path, focus = false) {
     if (!this.state.openSubFlows.some(s => s.path === path)) {
       const type = path.split('.').pop();
-      console.log(path)
+      console.log('path = ' + path)
       const content = await window.electron.readFromFile(path);
-      console.log(content)
+      console.log('content' + content)
+      console.log(this.state.openFlowInstances)
       this.state.openSubFlows.push({
-        name: 'unnamed',
+        name: content.name,
         type: type,
         route: path,
         path: path
       });
-      console.log("LOAD HERE");
+      const instance = createInstance();
+      const state = JSON.parse(content);
+      const nodes = state.nodes;
+      instance.save(ctx => {
+        console.log(nodes)
+        console.log(ctx)
+        ctx.state = { nodes: nodes };
+      })
+      console.log(state);
+      this.state.openFlowInstances[path] = instance;
+      console.log(this.state.openFlowInstances)
+      console.log(instance);
       console.log("LOAD HERE");
       console.log("LOAD HERE");
       console.log("LOAD HERE");
@@ -313,9 +327,9 @@ class App extends React.Component {
                       </Dropdown.Menu>
                     </Dropdown>
                     <Dropdown placement="rightStart" eventKey="2" title="Flow" icon={<Branch />}>
-                      <Dropdown.Item eventKey="Overview" as={MenuLink} href="/Flow/Overview">Overview</Dropdown.Item>
+                      <Dropdown.Item eventKey="main.story" as={MenuLink} href="/Flow/main.story">Main Story</Dropdown.Item>
                       <Dropdown.Menu eventKey="subflows" className="submenu" title="Open Sub Flows">
-                        <CreateSubFlowMenuItems items={this.state.openSubFlows} setPageTitle={this.setPageTitle} onClose={this.closeSubFlow}/>
+                        <CreateSubFlowMenuItems openSubFlows={this.state.openSubFlows} setPageTitle={this.setPageTitle} onClose={this.closeSubFlow}/>
                       </Dropdown.Menu>
                     </Dropdown>
                     <Nav.Item eventKey="IGNORE" icon={<Project />}>
@@ -369,10 +383,10 @@ class App extends React.Component {
                       const pathname = this.props.history.location.pathname;
                       const route = pathname.slice('/Flow/'.length)
                       const flow = this.state.openSubFlows.find(x => x.route === route);
-                      const filepath = pathname.startsWith('/Flow/Overview') ? 'main.story' : flow?.path;
+                      const filepath = pathname.startsWith('/Flow/main.story') ? 'main.story' : flow?.path;
                       const instance = this.state.openFlowInstances[route];
                       if (pathname.startsWith('/Flow')) {
-                        return (<FlowEditorPageTitle renamable={!pathname.startsWith('/Flow/Overview')} onSave={() => this.onSaveFlow(filepath, instance)}/>)
+                        return (<FlowEditorPageTitle renamable={!pathname.startsWith('/Flow/main.story')} onSave={() => this.onSaveFlow(filepath, instance)}/>)
                       }
                     }
                   )()
@@ -390,14 +404,6 @@ class App extends React.Component {
                   <Route path="/Project/Export">
                     <ExportProject/>
                   </Route>
-                  <AliveRoute path="/Flow/Overview">
-                    <FlowEditor
-                      data={{type: "story"}}
-                      projectTree={this.state.projectTree}
-                      openSubFlow={this.openSubFlow}
-                      instance={this.state.openFlowInstances['Overview']}
-                    />
-                  </AliveRoute>
                   <DynamicSubFlowRouting
                     openSubFlows={this.state.openSubFlows}
                     openSubFlow={this.openSubFlow}

@@ -4,6 +4,8 @@ import { Colors, Controls } from 'flume';
 
 const SubFlowTreePicker = (props) => {
   const { filter, projectTree, defaultValue, onChange, ...rest } = props;
+  if (projectTree === undefined)
+    return (<div/>)
   const FilterTree = (branch) => {
     const res = [];
     if (branch === undefined) {
