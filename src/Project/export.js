@@ -1,30 +1,38 @@
 import React from "react";
 import Form from 'rsuite/Form';
 import Input from 'rsuite/Input';
-import InputGroup from 'rsuite/InputGroup';
 import ButtonToolbar from 'rsuite/ButtonToolbar';
 import Button from 'rsuite/Button';
 import Toggle from 'rsuite/Toggle';
-import { FolderFill } from '@rsuite/icons'
+import { BrowseInput } from '../UI/kit';
 
-// TODO merge these in a library with other file who use these
-const Textarea = React.forwardRef((props, ref) => <Input {...props} as="textarea" ref={ref} />);
-const onFileBrowseClicked = () => {
-  window.electron.showDialog({properties: ['openDirectory']});
-};
 export default class Export extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { directory: null };
+    this.setDirectory = this.setDirectory.bind(this);
+    this.onBrowseClicked = this.onBrowseClicked.bind(this);
+  }
+  setDirectory(path) {
+    this.setState({directory: path});
+  }
+  async onBrowseClicked() {
+    const result = await window.electron.showDialog({properties: ['openDirectory']});
+    if (!result.canceled) {
+      this.setDirectory(result.filePaths[0]);
+    }
+  }
   render() {
     return (
       <div className="page-view">
         <Form fluid>
           <Form.Group controlId="project-path">
             <Form.ControlLabel>Directory</Form.ControlLabel>
-            <InputGroup style={{width: "100%"}} onClick={onFileBrowseClicked}>
-              <Input />
-              <InputGroup.Button>
-                <FolderFill />
-              </InputGroup.Button>
-            </InputGroup>
+            <BrowseInput
+              style={{width: "100%"}}
+              onClick={this.onBrowseClicked}
+              value={this.state.directory}
+            />
           </Form.Group>
           <Form.Group controlId="size-optimization">
             <Form.ControlLabel>Size Optimization</Form.ControlLabel>

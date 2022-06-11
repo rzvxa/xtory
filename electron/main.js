@@ -85,9 +85,8 @@ ipcMain.handle("readFromFile", (e, path) => {
     return readFile(absPath, 'utf8');
 });
 
-ipcMain.handle("showDialog", (e, message) => {
+ipcMain.handle("showDialog", async (e, message) => {
     message = JSON.parse(message);
-    var result = dialog.showOpenDialog(mainWindow, message);
-    myConsole.log(result);
-    e.returnValue = JSON.stringify(result);
+    var result = await dialog.showOpenDialog(mainWindow, message);
+    return JSON.stringify(result);
 });

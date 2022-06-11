@@ -4,14 +4,24 @@ import Input from 'rsuite/Input';
 import InputGroup from 'rsuite/InputGroup';
 import ButtonToolbar from 'rsuite/ButtonToolbar';
 import Button from 'rsuite/Button';
-import { FolderFill } from '@rsuite/icons'
+import { BrowseInput, TextAreaAccepter } from '../UI/kit';
 
-
-const Textarea = React.forwardRef((props, ref) => <Input {...props} as="textarea" ref={ref} />);
-const onFileBrowseClicked = () => {
-  window.electron.showDialog({properties: ['openDirectory']});
-};
 export default class New extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { directory: null };
+    this.setDirectory = this.setDirectory.bind(this);
+    this.onBrowseClicked = this.onBrowseClicked.bind(this);
+  }
+  setDirectory(path) {
+    this.setState({directory: path});
+  }
+  async onBrowseClicked() {
+    const result = await window.electron.showDialog({properties: ['openDirectory']});
+    if (!result.canceled) {
+      this.setDirectory(result.filePaths[0]);
+    }
+  }
   render() {
     return (
       <div className="page-view">
@@ -22,16 +32,15 @@ export default class New extends React.Component {
           </Form.Group>
           <Form.Group controlId="project-path">
             <Form.ControlLabel>Directory</Form.ControlLabel>
-            <InputGroup style={{width: "100%"}} onClick={onFileBrowseClicked}>
-              <Input />
-              <InputGroup.Button>
-                <FolderFill />
-              </InputGroup.Button>
-            </InputGroup>
+            <BrowseInput
+              style={{width: "100%"}}
+              onClick={this.onBrowseClicked}
+              value={this.state.directory}
+            />
           </Form.Group>
           <Form.Group controlId="project-description">
             <Form.ControlLabel>Description</Form.ControlLabel>
-            <Form.Control rows={5} name="textarea" accepter={Textarea} />
+            <Form.Control rows={5} name="textarea" accepter={TextAreaAccepter} />
           </Form.Group>
           <Form.Group>
             <ButtonToolbar>
