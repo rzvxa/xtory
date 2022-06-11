@@ -57,6 +57,7 @@ const AliveRoute = (props, ref) => {
       children={({ match, ...rest }) => {
         return(
           <div style={{display: match ? 'block' : 'none'}}>
+            {children.ref?.current?.setDirty()}
             {children}
           </div>
         );
@@ -86,7 +87,9 @@ const createInstance = () => {
 
 const DynamicSubFlowRouting = (props) => {
   const { openSubFlows, projectTree, openSubFlow, instances, setInstances } = props;
-  const createRoutes = (subFlow) => {
+  const refs = React.useRef([]);
+  refs.current = openSubFlows.map((_, i) => refs.current[i] ?? React.createRef());
+  const createRoutes = (subFlow, i) => {
     const { route, type } = subFlow;
     if (instances[route] === undefined) {
       instances[route] = createInstance();
@@ -95,6 +98,7 @@ const DynamicSubFlowRouting = (props) => {
     return (
       <AliveRoute path={`/Flow/${route}`}>
         <FlowEditor
+          ref={refs.current[i]}
           data={{type: type}}
           projectTree={projectTree}
           openSubFlow={openSubFlow}
@@ -197,7 +201,6 @@ class App extends React.Component {
             iPath += '/';
           }
           iPath += i;
-          // console.log(`raw[i] => ${input[i]} and i => ${i}`);
           const branch = {
             label: i,
             value: iPath,
@@ -231,38 +234,27 @@ class App extends React.Component {
   async openSubFlow(path, focus = false) {
     if (!this.state.openSubFlows.some(s => s.path === path)) {
       const type = path.split('.').pop();
-      console.log('path = ' + path)
       const content = await window.electron.readFromFile(path);
-      console.log('content' + content)
-      console.log(this.state.openFlowInstances)
+      const state = JSON.parse(content);
       this.state.openSubFlows.push({
-        name: content.name,
+        name: state.name,
         type: type,
         route: path,
         path: path
       });
       const instance = createInstance();
-      const state = JSON.parse(content);
       const nodes = state.nodes;
       instance.save(ctx => {
-        console.log(nodes)
-        console.log(ctx)
-        ctx.state = { nodes: nodes };
+        ctx.setNodes(nodes);
       })
-      console.log(state);
       this.state.openFlowInstances[path] = instance;
-      console.log(this.state.openFlowInstances)
-      console.log(instance);
-      console.log("LOAD HERE");
-      console.log("LOAD HERE");
-      console.log("LOAD HERE");
-      console.log("LOAD HERE");
       this.setState({openSubFlows: this.state.openSubFlows});
     }
     if (focus) {
-      this.onPageChange('unnamed');
+      const flow = this.state.openSubFlows.find(s => s.path === path);
       const route = `/Flow/${path}`;
       this.props.history.push(route);
+      this.onPageChange(flow.name);
     }
   }
   onSaveFlow(file, instance) {

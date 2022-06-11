@@ -75,6 +75,7 @@ class FlowEditor extends React.Component {
     super(props);
     this.config = MakeConfig(this.props.data);
     this.state = {};
+    this.setDirty = this.setDirty.bind(this);
     this.setNodes = this.setNodes.bind(this);
   }
   onTrigger = (event) => {
@@ -83,13 +84,26 @@ class FlowEditor extends React.Component {
   }
   componentWillMount() {
     this.props.instance.restore(this)
-    this.setState({key:Math.random()});
   }
   componentWillUnmount() {
     var state = this.state
     this.props.instance.save(function(ctx){
       ctx.state = state;
     })
+  }
+  componentDidUpdate() {
+    if (this.state.dirty) {
+      this.setState({ dirty: false });
+      setTimeout(() => {
+          this.setState({ key: Math.random() });
+      }, 1)
+    }
+  }
+  testMethod() {
+    return "completed"
+  }
+  setDirty() {
+    this.setState({dirty: true});
   }
   setNodes(nodes) {
     if (this.state.nodes !== nodes) {
