@@ -44,8 +44,9 @@ import Container from 'rsuite/Container';
 import * as serviceWorker from './serviceWorker';
 
 const renderSettingsButton = (props, ref) => {
+  const {placement, ...rest} = props;
   return (
-    <IconButton {...props} ref={ref} icon={<Gear />} circle appearance="subtle"/>
+    <IconButton placement="right" {...rest} ref={ref} icon={<Gear />} circle appearance="subtle"/>
   );
 };
 

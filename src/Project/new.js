@@ -9,9 +9,14 @@ import { BrowseInput, TextAreaAccepter } from '../UI/kit';
 export default class New extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { directory: null };
+    this.state = { projectName: '', directory: null };
+    this.onProjectNameChanged = this.onProjectNameChanged.bind(this);
     this.setDirectory = this.setDirectory.bind(this);
     this.onBrowseClicked = this.onBrowseClicked.bind(this);
+    this.onCreateProjectClicked = this.onCreateProjectClicked.bind(this);
+  }
+  onProjectNameChanged(value) {
+    this.setState({ projectName: value });
   }
   setDirectory(path) {
     this.setState({directory: path});
@@ -19,7 +24,16 @@ export default class New extends React.Component {
   async onBrowseClicked() {
     const result = await window.electron.showDialog({properties: ['openDirectory']});
     if (!result.canceled) {
-      this.setDirectory(result.filePaths[0]);
+      const dir = result.filePaths[0];
+      this.setDirectory(dir);
+    }
+  }
+  onCreateProjectClicked() {
+    const name = this.state.projectName;
+    const dir = this.state.directory;
+    let path = dir;
+    if (!dir.endsWith(name)) {
+      path += '/' + name;
     }
   }
   render() {
@@ -28,7 +42,11 @@ export default class New extends React.Component {
         <Form fluid>
           <Form.Group controlId="project-name">
             <Form.ControlLabel>Project Name</Form.ControlLabel>
-            <Form.Control name="name" />
+            <Form.Control
+              name="name"
+              onChange={this.onProjectNameChanged}
+              value={this.state.projectName}
+            />
           </Form.Group>
           <Form.Group controlId="project-path">
             <Form.ControlLabel>Directory</Form.ControlLabel>
@@ -44,7 +62,7 @@ export default class New extends React.Component {
           </Form.Group>
           <Form.Group>
             <ButtonToolbar>
-              <Button appearance="primary">Create</Button>
+              <Button appearance="primary" onClick={this.onCreateProjectClicked}>Create</Button>
             </ButtonToolbar>
           </Form.Group>
         </Form>
