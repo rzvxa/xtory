@@ -5,6 +5,10 @@ import InputGroup from 'rsuite/InputGroup';
 import ButtonToolbar from 'rsuite/ButtonToolbar';
 import Button from 'rsuite/Button';
 import { BrowseInput, TextAreaAccepter } from '../UI/kit';
+import Toaster from '../Core/toaster'
+
+import { SelectPicker } from 'rsuite';
+
 
 export default class New extends React.Component {
   constructor(props) {
@@ -28,13 +32,25 @@ export default class New extends React.Component {
       this.setDirectory(dir);
     }
   }
+  async createNewProject() {
+    
+  }
   onCreateProjectClicked() {
     const name = this.state.projectName;
     const dir = this.state.directory;
     let path = dir;
+    if (!name) {
+      Toaster.error('Project name can not be empty.');
+      return;
+    }
+    if (!dir) {
+      Toaster.error('Project path can not be empty.');
+      return;
+    }
     if (!dir.endsWith(name)) {
       path += '/' + name;
     }
+    this.createNewProject(path);
   }
   render() {
     return (

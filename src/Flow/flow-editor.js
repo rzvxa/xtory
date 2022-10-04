@@ -102,6 +102,11 @@ class FlowEditor extends React.Component {
   testMethod() {
     return "completed"
   }
+  visit() {
+    if (!this.state.visited) {
+      this.setState({dirty: true, visited: true})
+    }
+  }
   setDirty() {
     this.setState({dirty: true});
   }

@@ -58,7 +58,12 @@ const AliveRoute = (props, ref) => {
       children={({ match, ...rest }) => {
         return(
           <div style={{display: match ? 'block' : 'none'}}>
-            {children.ref?.current?.setDirty()}
+            {(() => {
+              if (match) {
+                children.ref?.current?.visit()
+              }
+            })()
+            }
             {children}
           </div>
         );
@@ -422,7 +427,9 @@ const Main = () => {
   const history = useHistory();
   return (
     <CustomProvider theme="dark">
-      <App history={history}/>
+      <App
+        history={history}
+      />
     </CustomProvider>
   );
 }
