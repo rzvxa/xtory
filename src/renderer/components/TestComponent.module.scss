@@ -1,0 +1,13 @@
+$header-background: linear-gradient(rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.09));
+
+.tabStyle {
+    button {
+        background-color: #121212;
+        background-image: $header-background;
+    }
+}
+
+.tab-container {
+    background-color: #121212;
+    background-image: $header-background;
+}
