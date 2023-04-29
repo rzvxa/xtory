@@ -9,6 +9,8 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Tooltip from '@mui/material/Tooltip';
 
+import Tabs from './Tabs';
+
 import SnippetFolderIcon from '@mui/icons-material/SnippetFolder';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import GroupIcon from '@mui/icons-material/Group';
@@ -48,7 +50,7 @@ function ToolBox({
     <Box
       sx={{
         display: visible ? 'block' : 'none',
-        width: `${width}px`,
+        minWidth: `${width}px`,
         height: '100vh',
         div: { display: 'none' },
         [`&>*:nth-child(${activeIndex + 1})`]: { display: 'block' },
@@ -62,7 +64,11 @@ function ToolBox({
 
 function MainBox({ quickAccessWidth, toolBoxWidth, children }: MainBoxProps) {
   const ml: number = toolBoxWidth <= 0 ? quickAccessWidth : 0;
-  return <Box sx={{ ml: `${ml}px` }}>{children}</Box>;
+  return (
+    <Box sx={{ overflow: 'auto', width: '100%', ml: `${ml}px` }}>
+      {children}
+    </Box>
+  );
 }
 
 function QuickAccessItem({ icon, text, onClick }: QuickAccessItemProps) {
@@ -108,7 +114,7 @@ export default function Layout({ children = null! }: LayoutProps) {
   };
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex', overflow: 'hidden' }}>
       <MuiDrawer variant="permanent">
         <List sx={{ width: quickAccessWidth }}>
           {[
@@ -136,10 +142,7 @@ export default function Layout({ children = null! }: LayoutProps) {
         <Paper sx={{ height: '100%' }}>Locations</Paper>
       </ToolBox>
       <MainBox quickAccessWidth={quickAccessWidth} toolBoxWidth={toolBoxWidth}>
-        <>
-          <div>BODY</div>
-          {children}
-        </>
+        <Tabs />
       </MainBox>
     </Box>
   );

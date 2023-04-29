@@ -1,3 +1,15 @@
-body {
-	background-color: red;
+/* ===== Scrollbar CSS ===== */
+*::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+*::-webkit-scrollbar-track {
+  background: #282828;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: #928374;
+  border-radius: 10px;
+  border: 1px solid #282828;
 }
