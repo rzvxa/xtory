@@ -1,0 +1,10 @@
+.drawer {
+	transition: 2s;
+	&.open {
+		width: max-content;
+	}
+
+	&.close {
+		width: 50px;
+	}
+}

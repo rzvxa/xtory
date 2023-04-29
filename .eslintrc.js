@@ -8,6 +8,8 @@ module.exports = {
     'import/extensions': 'off',
     'import/no-unresolved': 'off',
     'import/no-import-module-exports': 'off',
+    'react/require-default-props': ['error', { functions: 'defaultArguments' }],
+    'prettier/prettier': ['error', { endOfLine: 'auto' }],
   },
   parserOptions: {
     ecmaVersion: 2020,
