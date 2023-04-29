@@ -10,6 +10,9 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import Tooltip from '@mui/material/Tooltip';
 
 import SnippetFolderIcon from '@mui/icons-material/SnippetFolder';
+import AccountTreeIcon from '@mui/icons-material/AccountTree';
+import GroupIcon from '@mui/icons-material/Group';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 
 interface LayoutProps {
   children?: React.ReactNode;
@@ -95,9 +98,9 @@ export default function Layout({ children = null! }: LayoutProps) {
   const [toolBoxWidth, setToolBoxWidth] = React.useState<number>(300);
   const [activeToolIndex, setActiveToolIndex] = React.useState(0);
 
-  const handleClick = (index: number) => {
+  const handleQuickAccessClick = (index: number) => {
     if (index === activeToolIndex) {
-      setToolBoxWidth(0);
+      setToolBoxWidth(toolBoxWidth > 0 ? 0 : 300);
       return;
     }
     setActiveToolIndex(index);
@@ -108,11 +111,16 @@ export default function Layout({ children = null! }: LayoutProps) {
     <Box sx={{ display: 'flex' }}>
       <MuiDrawer variant="permanent">
         <List sx={{ width: quickAccessWidth }}>
-          {['Files', 'Flow', 'NPCs', 'Locations'].map((text, index) => (
+          {[
+            { text: 'Files', icon: <SnippetFolderIcon /> },
+            { text: 'Flow', icon: <AccountTreeIcon /> },
+            { text: 'NPCs', icon: <GroupIcon /> },
+            { text: 'Locations', icon: <LocationOnIcon /> },
+          ].map((item, index) => (
             <QuickAccessItem
-              icon={<SnippetFolderIcon />}
-              text={text}
-              onClick={() => handleClick(index)}
+              text={item.text}
+              icon={item.icon}
+              onClick={() => handleQuickAccessClick(index)}
             />
           ))}
         </List>
