@@ -1,9 +1,12 @@
 /* eslint-disable react/jsx-props-no-spreading */
 import React from 'react';
 
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
+import Paper from '@mui/material/Paper';
+import Divider from '@mui/material/Divider';
+import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
+
+import { Theme, useTheme } from '@mui/material/styles';
 
 import {
   DragDropContext,
@@ -13,6 +16,7 @@ import {
 } from 'react-beautiful-dnd';
 
 import ForumIcon from '@mui/icons-material/Forum';
+import CloseIcon from '@mui/icons-material/Close';
 
 interface Tab {
   id: string;
@@ -35,18 +39,23 @@ const reorder = (list: Tab[], startIndex: any, endIndex: any): Tab[] => {
   return result;
 };
 
-const grid = 1;
-
-const getItemStyle = (isDragging: any, draggableStyle: any) => ({
+const getItemStyle = (
+  index: number,
+  theme: Theme,
+  isDragging: any,
+  draggableStyle: any
+) => ({
   // some basic styles to make the items look a bit nicer
   userSelect: 'none',
-  padding: `${grid * 2}px`,
-  margin: `0 ${grid}px 0 0`,
+  padding: '10px',
 
   cursor: 'pointer',
 
   // change background colour if dragging
-  background: isDragging ? 'lightgreen' : 'grey',
+  background:
+    isDragging || index === 0
+      ? theme.palette.background.paper
+      : theme.palette.background.default,
 
   display: 'flex',
   alignItems: 'center',
@@ -55,14 +64,16 @@ const getItemStyle = (isDragging: any, draggableStyle: any) => ({
   ...draggableStyle,
 });
 
-const getListStyle = (isDraggingOver: any) => ({
-  background: isDraggingOver ? 'lightblue' : 'lightgrey',
+const getListStyle = (theme: Theme, isDraggingOver: boolean) => ({
+  background: isDraggingOver
+    ? theme.palette.background.paper
+    : theme.palette.background.default,
   display: 'flex',
-  padding: grid,
   overflow: 'auto',
 });
 
 export default function Tabs() {
+  const theme: Theme = useTheme();
   const [items, setItems] = React.useState<Tab[]>(getItems(6));
 
   const onDragEnd = (result: DropResult) => {
@@ -81,40 +92,54 @@ export default function Tabs() {
   };
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <Droppable droppableId="droppable" direction="horizontal">
-        {(provided: any, snapshot: any) => (
-          <div
-            ref={provided.innerRef}
-            style={getListStyle(snapshot.isDraggingOver)}
-            {...provided.droppableProps}
-          >
-            {items.map((item: any, index: number) => (
-              <Draggable key={item.id} draggableId={item.id} index={index}>
-                {(provided: any, snapshot: any) => (
-                  <Box
-                    onClick={() => console.log("CLCIK")}
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    {...provided.dragHandleProps}
-                    style={getItemStyle(
-                      snapshot.isDragging,
-                      provided.draggableProps.style
-                    )}
-                  >
-                    <ForumIcon />
-                    <Typography sx={{ width: 'max-content' }}>
-                      {item.title}
-                    </Typography>
-                    <Button>X</Button>
-                  </Box>
-                )}
-              </Draggable>
-            ))}
-            {provided.placeholder}
-          </div>
-        )}
-      </Droppable>
-    </DragDropContext>
+    <>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="droppable" direction="horizontal">
+          {(provided: any, snapshot: any) => (
+            <div
+              ref={provided.innerRef}
+              style={getListStyle(theme, snapshot.isDraggingOver)}
+              {...provided.droppableProps}
+            >
+              {items.map((item: any, index: number) => (
+                <Draggable key={item.id} draggableId={item.id} index={index}>
+                  {(provided: any, snapshot: any) => (
+                    <Paper
+                      onClick={() => console.log('CLCIK')}
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      style={getItemStyle(
+                        index,
+                        theme,
+                        snapshot.isDragging,
+                        provided.draggableProps.style
+                      )}
+                    >
+                      <ForumIcon sx={{ fontSize: 15, mr: 1 }} />
+                      <Typography sx={{ width: 'max-content' }}>
+                        {item.title}
+                      </Typography>
+                      <IconButton
+                        sx={{
+                          borderRadius: '5px',
+                          width: '24px',
+                          height: '24px',
+                        }}
+                        aria-label="Close"
+                      >
+                        <CloseIcon sx={{ fontSize: 15 }} />
+                      </IconButton>
+                    </Paper>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+      <Divider />
+    </>
   );
 }
