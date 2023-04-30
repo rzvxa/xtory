@@ -40,9 +40,9 @@ const reorder = (list: Tab[], startIndex: any, endIndex: any): Tab[] => {
 };
 
 const getItemStyle = (
-  index: number,
   theme: Theme,
-  isDragging: any,
+  isActive: boolean,
+  isDragging: boolean,
   draggableStyle: any
 ) => ({
   // some basic styles to make the items look a bit nicer
@@ -53,7 +53,7 @@ const getItemStyle = (
 
   // change background colour if dragging
   background:
-    isDragging || index === 0
+    isDragging || isActive
       ? theme.palette.background.paper
       : theme.palette.background.default,
 
@@ -75,6 +75,7 @@ const getListStyle = (theme: Theme, isDraggingOver: boolean) => ({
 export default function Tabs() {
   const theme: Theme = useTheme();
   const [items, setItems] = React.useState<Tab[]>(getItems(6));
+  const [selectedTab, setSelectedTab] = React.useState<Tab>(items[0]);
 
   const onDragEnd = (result: DropResult) => {
     // dropped outside the list
@@ -91,6 +92,10 @@ export default function Tabs() {
     setItems(newItems);
   };
 
+  const handleTabClick = (index: number) => {
+    setSelectedTab(items[index]);
+  };
+
   return (
     <>
       <DragDropContext onDragEnd={onDragEnd}>
@@ -105,13 +110,13 @@ export default function Tabs() {
                 <Draggable key={item.id} draggableId={item.id} index={index}>
                   {(provided: any, snapshot: any) => (
                     <Paper
-                      onClick={() => console.log('CLCIK')}
+                      onMouseDown={() => handleTabClick(index)}
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
                       style={getItemStyle(
-                        index,
                         theme,
+                        selectedTab === item,
                         snapshot.isDragging,
                         provided.draggableProps.style
                       )}
