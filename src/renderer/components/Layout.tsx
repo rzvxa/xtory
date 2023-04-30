@@ -37,6 +37,7 @@ interface QuickAccessItemProps {
   icon: React.ReactNode;
   text: string;
   onClick: React.MouseEventHandler<HTMLDivElement>;
+  isActive: boolean;
 }
 
 function ToolBox({
@@ -71,16 +72,31 @@ function MainBox({ quickAccessWidth, toolBoxWidth, children }: MainBoxProps) {
   );
 }
 
-function QuickAccessItem({ icon, text, onClick }: QuickAccessItemProps) {
+function QuickAccessItem({
+  icon,
+  text,
+  onClick,
+  isActive,
+}: QuickAccessItemProps) {
   return (
     <ListItem key={text} disablePadding sx={{ display: 'block' }}>
       <Tooltip title={text} placement="right" arrow>
         <ListItemButton
+          color="secondary"
           onClick={onClick}
           sx={{
+            bgcolor: (theme) =>
+              isActive ? theme.palette.background.paper : null!,
+            '> div': {
+              color: (theme) => (isActive ? theme.palette.primary.main : null!),
+            },
             minHeight: 48,
             justifyContent: 'center',
             px: 2.5,
+            '&:hover': {
+              bgcolor: (theme) => theme.palette.background.paper,
+              '> div': { color: (theme) => theme.palette.primary.main },
+            },
           }}
         >
           <ListItemIcon
@@ -115,7 +131,14 @@ export default function Layout({ children = null! }: LayoutProps) {
 
   return (
     <Box sx={{ display: 'flex', overflow: 'hidden' }}>
-      <MuiDrawer variant="permanent">
+      <MuiDrawer
+        variant="permanent"
+        sx={{
+          '& .MuiDrawer-paper': {
+            bgcolor: (theme) => theme.palette.background.default,
+          },
+        }}
+      >
         <List sx={{ width: quickAccessWidth }}>
           {[
             { text: 'Files', icon: <SnippetFolderIcon /> },
@@ -127,6 +150,7 @@ export default function Layout({ children = null! }: LayoutProps) {
               text={item.text}
               icon={item.icon}
               onClick={() => handleQuickAccessClick(index)}
+              isActive={activeToolIndex === index}
             />
           ))}
         </List>
