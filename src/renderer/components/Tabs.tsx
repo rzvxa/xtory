@@ -2,6 +2,7 @@
 import React from 'react';
 
 import Paper from '@mui/material/Paper';
+import TextField from '@mui/material/TextField';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
@@ -21,6 +22,7 @@ import CloseIcon from '@mui/icons-material/Close';
 interface Tab {
   id: string;
   title: string;
+  body: React.ReactNode;
 }
 
 // fake data generator
@@ -28,6 +30,17 @@ const getItems = (count: any): Tab[] =>
   Array.from({ length: count }, (v, k) => k).map((k) => ({
     id: `item-${k}`,
     title: `Conversation-${k}.xconv`,
+    body: (
+      <div>
+        <TextField
+          key={k}
+          id={`standard-basic-${k}`}
+          defaultValue="Hello World"
+          label="Standard"
+          variant="standard"
+        />
+      </div>
+    ),
   }));
 
 // a little function to help us with reordering the result
@@ -145,6 +158,7 @@ export default function Tabs() {
         </Droppable>
       </DragDropContext>
       <Divider />
+      {selectedTab.body}
     </>
   );
 }
