@@ -9,12 +9,13 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Tooltip from '@mui/material/Tooltip';
 
-import Tabs from './Tabs';
-
 import SnippetFolderIcon from '@mui/icons-material/SnippetFolder';
 import AccountTreeIcon from '@mui/icons-material/AccountTree';
 import GroupIcon from '@mui/icons-material/Group';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+
+import Tabs from './Tabs';
+import ProjectTool from './ToolBox/ProjectTool';
 
 interface LayoutProps {
   children?: React.ReactNode;
@@ -53,7 +54,7 @@ function ToolBox({
         display: visible ? 'block' : 'none',
         minWidth: `${width}px`,
         height: '100vh',
-        div: { display: 'none' },
+        '> div': { display: 'none' },
         [`&>*:nth-child(${activeIndex + 1})`]: { display: 'block' },
         ml: `${quickAccessWidth}px`,
       }}
@@ -160,7 +161,9 @@ export default function Layout({ children = null! }: LayoutProps) {
         width={toolBoxWidth}
         quickAccessWidth={quickAccessWidth}
       >
-        <Paper sx={{ height: '100%' }}>Files</Paper>
+        <Paper sx={{ height: '100%' }}>
+          <ProjectTool />
+        </Paper>
         <Paper sx={{ height: '100%' }}>Flow</Paper>
         <Paper sx={{ height: '100%' }}>NPCs</Paper>
         <Paper sx={{ height: '100%' }}>Locations</Paper>
