@@ -15,7 +15,7 @@
     "allowJs": true,
     "outDir": ".erb/dll",
     "paths": {
-      "@/assets/*": ["src/*"]
+      "@assets/*": ["./src/*"]
     }
   },
   "exclude": ["test", "release/build", "release/app/dist", ".erb/dll"]

@@ -19,29 +19,11 @@ import {
 import ForumIcon from '@mui/icons-material/Forum';
 import CloseIcon from '@mui/icons-material/Close';
 
-interface Tab {
-  id: string;
-  title: string;
-  body: React.ReactNode;
-}
+import { useAppDispatch, useAppSelector } from '../state/store/index';
+import { setActiveTabId, setTabs, changeTab } from '../state/store/tabs';
+import { TabState } from '../state/types/tabs/index';
 
-// fake data generator
-const getItems = (count: any): Tab[] =>
-  Array.from({ length: count }, (v, k) => k).map((k) => ({
-    id: `item-${k}`,
-    title: `Conversation-${k}.xconv`,
-    body: (
-      <div>
-        <TextField
-          key={k}
-          id={`standard-basic-${k}`}
-          defaultValue="Hello World"
-          label="Standard"
-          variant="standard"
-        />
-      </div>
-    ),
-  }));
+type Tab = TabState;
 
 // a little function to help us with reordering the result
 const reorder = (list: Tab[], startIndex: any, endIndex: any): Tab[] => {
@@ -87,8 +69,11 @@ const getListStyle = (theme: Theme, isDraggingOver: boolean) => ({
 
 export default function Tabs() {
   const theme: Theme = useTheme();
-  const [items, setItems] = React.useState<Tab[]>(getItems(6));
-  const [selectedTab, setSelectedTab] = React.useState<Tab>(items[0]);
+  const dispatch = useAppDispatch();
+
+  const activeTabId = useAppSelector((state) => state.tabsState.activeTabId);
+  const tabs = useAppSelector((state) => state.tabsState.tabs);
+  console.log(tabs, activeTabId);
 
   const onDragEnd = (result: DropResult) => {
     // dropped outside the list
@@ -97,17 +82,19 @@ export default function Tabs() {
     }
 
     const newItems: Tab[] = reorder(
-      items,
+      tabs,
       result.source.index,
       result.destination.index
     );
 
-    setItems(newItems);
+    dispatch(setTabs(newItems));
   };
 
   const handleTabClick = (index: number) => {
-    setSelectedTab(items[index]);
+    dispatch(setActiveTabId(tabs[index].id));
   };
+
+  const activeTab = tabs.find((t: Tab) => t.id === activeTabId) ?? null!;
 
   return (
     <>
@@ -119,7 +106,7 @@ export default function Tabs() {
               style={getListStyle(theme, snapshot.isDraggingOver)}
               {...provided.droppableProps}
             >
-              {items.map((item: any, index: number) => (
+              {tabs.map((item: any, index: number) => (
                 <Draggable key={item.id} draggableId={item.id} index={index}>
                   {(provided: any, snapshot: any) => (
                     <Paper
@@ -129,7 +116,7 @@ export default function Tabs() {
                       {...provided.dragHandleProps}
                       style={getItemStyle(
                         theme,
-                        selectedTab === item,
+                        activeTabId === item.id,
                         snapshot.isDragging,
                         provided.draggableProps.style
                       )}
@@ -158,7 +145,19 @@ export default function Tabs() {
         </Droppable>
       </DragDropContext>
       <Divider />
-      {selectedTab.body}
+      {/* body over here */}
+      <div>
+        <TextField
+          id="standard-basic"
+          defaultValue="Hello World"
+          label="Standard"
+          variant="standard"
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            dispatch(changeTab({ id: activeTabId, extra: e.target.value }));
+          }}
+          value={activeTab?.extra}
+        />
+      </div>
     </>
   );
 }
