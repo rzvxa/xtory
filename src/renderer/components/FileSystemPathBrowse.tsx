@@ -1,0 +1,58 @@
+import React from 'react';
+
+import Box from '@mui/material/Box';
+import TextField from '@mui/material/TextField';
+import InputAdornment from '@mui/material/InputAdornment';
+import IconButton from '@mui/material/IconButton';
+
+import FolderIcon from '@mui/icons-material/Folder';
+
+import { sanitizePath } from 'renderer/util';
+
+interface FileSystemPathBrowseProps {
+  label: string;
+  placeholder: string;
+  value: string;
+  onChange: (value: string) => void;
+}
+
+export default function FileSystemPathBrowse({
+  label,
+  placeholder,
+  value,
+  onChange,
+}: FileSystemPathBrowseProps) {
+  const onBrowseClick = async () => {
+    const result: any = await window.electron.ipcRenderer.invoke(
+      'browseFileSystem',
+      { properties: ['openDirectory'] }
+    );
+    if (result.canceled) {
+      return;
+    }
+    const output = sanitizePath(result.filePaths[0]);
+    onChange(output);
+  };
+
+  return (
+    <Box onClick={onBrowseClick} sx={{ width: '100%' }}>
+      <TextField
+        sx={{ width: '100%' }}
+        label={value && label}
+        placeholder={placeholder}
+        value={value}
+        InputProps={{
+          readOnly: true,
+          'aria-label': 'path-textfield',
+          endAdornment: (
+            <InputAdornment position="end">
+              <IconButton>
+                <FolderIcon />
+              </IconButton>
+            </InputAdornment>
+          ),
+        }}
+      />
+    </Box>
+  );
+}

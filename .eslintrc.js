@@ -10,6 +10,8 @@ module.exports = {
     'import/no-import-module-exports': 'off',
     'react/require-default-props': ['error', { functions: 'defaultArguments' }],
     'prettier/prettier': ['error', { endOfLine: 'auto' }],
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': 'warn',
   },
   parserOptions: {
     ecmaVersion: 2020,
@@ -31,4 +33,5 @@ module.exports = {
       '@typescript-eslint/parser': ['.ts', '.tsx'],
     },
   },
+  plugins: ['@typescript-eslint'],
 };

@@ -3,11 +3,8 @@ import { ThemeOptions, createTheme } from '@mui/material/styles';
 const themeOptions: ThemeOptions = {
   palette: {
     mode: 'dark',
-    text: {
-      primary: '#ebdbb2',
-    },
     primary: {
-      main: '#ebdbb2',
+      main: '#fbf1c7',
     },
     secondary: {
       main: '#fe8019',
@@ -15,6 +12,11 @@ const themeOptions: ThemeOptions = {
     background: {
       paper: '#3c3836',
       default: '#282828',
+    },
+    text: {
+      primary: '#ebdbb2',
+      secondary: '#fbf1c7',
+      disabled: '#928374',
     },
   },
   typography: {

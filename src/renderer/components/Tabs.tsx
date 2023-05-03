@@ -149,7 +149,6 @@ export default function Tabs() {
       <div>
         <TextField
           id="standard-basic"
-          defaultValue="Hello World"
           label="Standard"
           variant="standard"
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {

@@ -55,7 +55,7 @@ function ToolBox({
         minWidth: `${width}px`,
         height: '100vh',
         '> div': { display: 'none' },
-        [`&>*:nth-child(${activeIndex + 1})`]: { display: 'block' },
+        [`&>*:nth-of-type(${activeIndex + 1})`]: { display: 'block' },
         ml: `${quickAccessWidth}px`,
       }}
     >
@@ -148,6 +148,7 @@ export default function Layout({ children = null! }: LayoutProps) {
             { text: 'Locations', icon: <LocationOnIcon /> },
           ].map((item, index) => (
             <QuickAccessItem
+              key={item.text}
               text={item.text}
               icon={item.icon}
               onClick={() => handleQuickAccessClick(index)}
