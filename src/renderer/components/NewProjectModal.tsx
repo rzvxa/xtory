@@ -15,13 +15,22 @@ import FileSystemPathBrowse from './FileSystemPathBrowse';
 
 export interface NewProjectModel {
   projectName: string;
+  projectRoot: string;
+  addProjectNameToPath: boolean;
   projectPath: string;
+}
+
+export interface NewProjectCreateResult {
+  created: boolean;
+  projectNameError: string;
+  projectPathError: string;
 }
 
 interface NewProjectModalProps {
   open: boolean;
   // result would be null where modal is canceled
-  onClose: (result: NewProjectModel | null) => void;
+  onClose: () => void;
+  onCreate: (input: NewProjectModel) => NewProjectCreateResult;
 }
 
 type TooltipPlacement =
@@ -69,7 +78,6 @@ function TextWithTooltip({
   color = undefined,
   placement = undefined,
 }: TextWithTooltipProps) {
-  console.log(tooltipClasses.tooltip);
   return (
     <Tooltip
       title={title}
@@ -94,22 +102,55 @@ function TextWithTooltip({
   );
 }
 
-export function NewProjectModal({ open, onClose }: NewProjectModalProps) {
-  const [projectName, setProjectName] = React.useState<string>('');
-  const [projectPath, setProjectPath] = React.useState<string>('');
+export function NewProjectModal({
+  open,
+  onClose,
+  onCreate,
+}: NewProjectModalProps) {
+  const [projectName, setProjectNameState] = React.useState<string>('');
+  const [projectPath, setProjectPathState] = React.useState<string>('');
+  const [projectNameError, setProjectNameError] = React.useState<string>('');
+  const [projectPathError, setProjectPathError] = React.useState<string>('');
+
+  const setProjectName = (name: string) => {
+    setProjectNameState(name);
+    setProjectNameError('');
+  };
+
+  const setProjectPath = (path: string) => {
+    setProjectPathState(path);
+    setProjectPathError('');
+  };
+
   const [addProjectNameToPath, setAddProjectNameToPath] =
     React.useState<boolean>(true);
 
+  const combinedPath = projectPath + (addProjectNameToPath ? projectName : '');
+
   const onCancelButtonClick = () => {
-    onClose(null);
+    onClose();
+  };
+
+  const handleCreateErrors = (result: NewProjectCreateResult) => {
+    setProjectNameError(result.projectNameError);
+    setProjectPathError(result.projectPathError);
   };
 
   const onCreateAndOpenClick = () => {
     const model: NewProjectModel = {
       projectName,
-      projectPath,
+      projectRoot: projectPath,
+      projectPath: combinedPath,
+      addProjectNameToPath,
     };
-    onClose(model);
+
+    const result = onCreate(model);
+
+    if (result.created === true) {
+      onClose();
+      return;
+    }
+    handleCreateErrors(result);
   };
 
   const yourStoryFilesPreviewTooltipPlacement = (): TooltipPlacement => {
@@ -122,9 +163,6 @@ export function NewProjectModal({ open, onClose }: NewProjectModalProps) {
 
     return placement;
   };
-
-  const combinedPathLen =
-    projectPath.length + (addProjectNameToPath ? projectName.length : 0) + 20;
 
   return (
     <Modal open={open}>
@@ -159,6 +197,8 @@ export function NewProjectModal({ open, onClose }: NewProjectModalProps) {
               placeholder="Enter a Project Name"
               value={projectName}
               onChange={(e) => setProjectName(e.target.value)}
+              error={projectNameError !== ''}
+              helperText={projectNameError}
             />
             <FileSystemPathBrowse
               label="Project Path"
@@ -171,6 +211,8 @@ export function NewProjectModal({ open, onClose }: NewProjectModalProps) {
                 }
                 setProjectPath(path);
               }}
+              error={projectPathError !== ''}
+              helperText={projectPathError}
             />
             <FormControlLabel
               label="Add Project Name To The Path"
@@ -190,7 +232,7 @@ export function NewProjectModal({ open, onClose }: NewProjectModalProps) {
                 <Box
                   sx={{
                     display: 'flex',
-                    width: combinedPathLen > 100 ? 'fit-content' : '100%',
+                    width: combinedPath.length > 100 ? 'fit-content' : '100%',
                     justifyContent: 'center',
                   }}
                   pr={4}

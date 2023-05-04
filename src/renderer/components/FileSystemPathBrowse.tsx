@@ -14,6 +14,8 @@ interface FileSystemPathBrowseProps {
   placeholder: string;
   value: string;
   onChange: (value: string) => void;
+  error: boolean | undefined;
+  helperText: string | undefined;
 }
 
 export default function FileSystemPathBrowse({
@@ -21,6 +23,8 @@ export default function FileSystemPathBrowse({
   placeholder,
   value,
   onChange,
+  error,
+  helperText,
 }: FileSystemPathBrowseProps) {
   const onBrowseClick = async () => {
     const result: any = await window.electron.ipcRenderer.invoke(
@@ -52,6 +56,8 @@ export default function FileSystemPathBrowse({
             </InputAdornment>
           ),
         }}
+        error={error}
+        helperText={helperText}
       />
     </Box>
   );

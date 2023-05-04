@@ -11,7 +11,11 @@ import { useAppDispatch, useAppSelector } from 'renderer/state/store/index';
 import { setProjectPath } from 'renderer/state/store/project';
 
 import RecentProjectsList from './RecentProjectsList';
-import { NewProjectModal, NewProjectModel } from './NewProjectModal';
+import {
+  NewProjectModal,
+  NewProjectModel,
+  NewProjectCreateResult,
+} from './NewProjectModal';
 
 import 'renderer/styles/fonts/Damion.module.scss';
 
@@ -34,13 +38,31 @@ export default function StartPage() {
     setNewProjectModalOpen(true);
   };
 
-  const onNewProjectModalClose = (result: NewProjectModel) => {
-    if (result === null) {
-      setNewProjectModalOpen(false);
-      return;
-    }
+  const onNewProjectModalClose = () => {
+    setNewProjectModalOpen(false);
     openProject('Path');
-    console.log(result, 'result');
+  };
+
+  const onNewProjectModalCreate = ({
+    projectName,
+    projectRoot,
+  }: NewProjectModel): NewProjectCreateResult => {
+    let created = false;
+    let projectNameError = '';
+    let projectPathError = '';
+
+    if (projectName === '') {
+      projectNameError = "Project Name can't be empty";
+    }
+
+    if (projectRoot === '') {
+      projectPathError = "Project Path can't be empty";
+    }
+
+    // TODO remove this, for testing
+    created = projectNameError === '' && projectPathError === '';
+
+    return { created, projectNameError, projectPathError };
   };
 
   return (
@@ -108,6 +130,7 @@ export default function StartPage() {
       <NewProjectModal
         open={newProjectModalOpen}
         onClose={onNewProjectModalClose}
+        onCreate={onNewProjectModalCreate}
       />
     </>
   );
