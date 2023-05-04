@@ -40,7 +40,6 @@ export default function StartPage() {
 
   const onNewProjectModalClose = () => {
     setNewProjectModalOpen(false);
-    openProject('Path');
   };
 
   const onNewProjectModalCreate = ({
@@ -58,6 +57,9 @@ export default function StartPage() {
     if (projectRoot === '') {
       projectPathError = "Project Path can't be empty";
     }
+
+    // if created
+    //   openProject('Path');
 
     // TODO remove this, for testing
     created = projectNameError === '' && projectPathError === '';
