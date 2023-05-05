@@ -2,35 +2,31 @@ import React from 'react';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
 import Divider from '@mui/material/Divider';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Alert from '@mui/material/Alert';
 import Modal from '@mui/material/Modal';
+import Collapse from '@mui/material/Collapse';
 import Checkbox from '@mui/material/Checkbox';
 import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import CloseIcon from '@mui/icons-material/Close';
 
+import { NewProjectModel } from 'shared/types';
 import FileSystemPathBrowse from './FileSystemPathBrowse';
-
-export interface NewProjectModel {
-  projectName: string;
-  projectRoot: string;
-  addProjectNameToPath: boolean;
-  projectPath: string;
-}
 
 export interface NewProjectCreateResult {
   created: boolean;
-  projectNameError: string;
-  projectPathError: string;
+  errorMessage: string;
 }
 
 interface NewProjectModalProps {
   open: boolean;
   // result would be null where modal is canceled
-  onClose: () => void;
-  onCreate: (input: NewProjectModel) => NewProjectCreateResult;
+  onCancel: () => void;
+  onCreate: (input: NewProjectModel) => Promise<NewProjectCreateResult>;
 }
 
 type TooltipPlacement =
@@ -104,13 +100,14 @@ function TextWithTooltip({
 
 export function NewProjectModal({
   open,
-  onClose,
+  onCancel,
   onCreate,
 }: NewProjectModalProps) {
   const [projectName, setProjectNameState] = React.useState<string>('');
   const [projectPath, setProjectPathState] = React.useState<string>('');
   const [projectNameError, setProjectNameError] = React.useState<string>('');
   const [projectPathError, setProjectPathError] = React.useState<string>('');
+  const [errorMessage, setErrorMessage] = React.useState<string>('');
 
   const setProjectName = (name: string) => {
     setProjectNameState(name);
@@ -128,29 +125,41 @@ export function NewProjectModal({
   const combinedPath = projectPath + (addProjectNameToPath ? projectName : '');
 
   const onCancelButtonClick = () => {
-    onClose();
+    onCancel();
   };
 
-  const handleCreateErrors = (result: NewProjectCreateResult) => {
-    setProjectNameError(result.projectNameError);
-    setProjectPathError(result.projectPathError);
+  const validateFields = () => {
+    /* eslint-disable no-shadow */
+    let projectNameError = '';
+    let projectPathError = '';
+    /* eslint-enable no-shadow */
+
+    if (projectName === '') {
+      projectNameError = "Project Name can't be empty";
+    }
+
+    if (projectPath === '') {
+      projectPathError = "Project Path can't be empty";
+    }
+    setProjectNameError(projectNameError);
+    setProjectPathError(projectPathError);
+    return projectNameError === '' && projectPathError === '';
   };
 
-  const onCreateAndOpenClick = () => {
+  const onCreateAndOpenClick = async () => {
     const model: NewProjectModel = {
       projectName,
       projectRoot: projectPath,
       projectPath: combinedPath,
       addProjectNameToPath,
     };
+    if (!validateFields()) return;
 
-    const result = onCreate(model);
+    const result = await onCreate(model);
 
-    if (result.created === true) {
-      onClose();
-      return;
+    if (!result.created) {
+      setErrorMessage(result.errorMessage);
     }
-    handleCreateErrors(result);
   };
 
   const yourStoryFilesPreviewTooltipPlacement = (): TooltipPlacement => {
@@ -180,10 +189,31 @@ export function NewProjectModal({
             height: '100%',
           }}
         >
-          <Alert severity="warning">
-            WARNING: Xtory is in early development stage, Use it at your risk.
-            Breaking changes may occur till we hit version 1.0 !
-          </Alert>
+          <Collapse in={errorMessage !== ''} sx={{ mb: 1 }}>
+            <Alert
+              severity="error"
+              action={
+                <IconButton
+                  aria-label="close"
+                  color="inherit"
+                  size="small"
+                  onClick={() => {
+                    setErrorMessage('');
+                  }}
+                >
+                  <CloseIcon fontSize="inherit" />
+                </IconButton>
+              }
+            >
+              {errorMessage}
+            </Alert>
+          </Collapse>
+          <Collapse in={errorMessage === ''}>
+            <Alert severity="warning">
+              WARNING: Xtory is in early development stage, Use it at your risk.
+              Breaking changes may occur till we hit version 1.0 !
+            </Alert>
+          </Collapse>
           <Box
             sx={{
               display: 'flex',

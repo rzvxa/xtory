@@ -8,6 +8,7 @@ import IconButton from '@mui/material/IconButton';
 import FolderIcon from '@mui/icons-material/Folder';
 
 import { sanitizePath } from 'renderer/util';
+import { Channels } from 'shared/types';
 
 interface FileSystemPathBrowseProps {
   label: string;
@@ -28,7 +29,7 @@ export default function FileSystemPathBrowse({
 }: FileSystemPathBrowseProps) {
   const onBrowseClick = async () => {
     const result: any = await window.electron.ipcRenderer.invoke(
-      'browseFileSystem',
+      Channels.browseFileSystem,
       { properties: ['openDirectory'] }
     );
     if (result.canceled) {

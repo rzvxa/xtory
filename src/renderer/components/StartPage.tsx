@@ -10,12 +10,15 @@ import { useAppDispatch, useAppSelector } from 'renderer/state/store/index';
 
 import { setProjectPath } from 'renderer/state/store/project';
 
-import RecentProjectsList from './RecentProjectsList';
 import {
-  NewProjectModal,
+  Channels,
+  IpcResultStatus,
   NewProjectModel,
-  NewProjectCreateResult,
-} from './NewProjectModal';
+  CreateProjectResult,
+} from 'shared/types';
+
+import RecentProjectsList from './RecentProjectsList';
+import { NewProjectModal, NewProjectCreateResult } from './NewProjectModal';
 
 import 'renderer/styles/fonts/Damion.module.scss';
 
@@ -38,33 +41,31 @@ export default function StartPage() {
     setNewProjectModalOpen(true);
   };
 
-  const onNewProjectModalClose = () => {
+  const onNewProjectModalCancel = () => {
     setNewProjectModalOpen(false);
   };
 
-  const onNewProjectModalCreate = ({
-    projectName,
-    projectRoot,
-  }: NewProjectModel): NewProjectCreateResult => {
-    let created = false;
-    let projectNameError = '';
-    let projectPathError = '';
+  const onNewProjectModalCreate = async (
+    model: NewProjectModel
+  ): Promise<NewProjectCreateResult> => {
+    const result: CreateProjectResult =
+      await window.electron.ipcRenderer.invoke(
+        Channels.createNewProject,
+        model
+      );
 
-    if (projectName === '') {
-      projectNameError = "Project Name can't be empty";
+    if (result.status === IpcResultStatus.error) {
+      return { created: false, errorMessage: result.errorMessage };
     }
 
-    if (projectRoot === '') {
-      projectPathError = "Project Path can't be empty";
-    }
+    console.log('creationResult', result);
 
     // if created
     //   openProject('Path');
 
-    // TODO remove this, for testing
-    created = projectNameError === '' && projectPathError === '';
+    setNewProjectModalOpen(false);
 
-    return { created, projectNameError, projectPathError };
+    return { created: true };
   };
 
   return (
@@ -131,7 +132,7 @@ export default function StartPage() {
       </Box>
       <NewProjectModal
         open={newProjectModalOpen}
-        onClose={onNewProjectModalClose}
+        onCancel={onNewProjectModalCancel}
         onCreate={onNewProjectModalCreate}
       />
     </>
