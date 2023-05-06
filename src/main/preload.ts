@@ -22,9 +22,9 @@ const electronHandler = {
     },
     invoke(
       channel: ChannelsMain,
-      args?: unknown | unknown[]
+      ...args: unknown[]
     ): Promise<IpcResult | any> {
-      return ipcRenderer.invoke(channel, args);
+      return ipcRenderer.invoke(channel, ...args);
     },
   },
 };
