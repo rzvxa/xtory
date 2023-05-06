@@ -12,6 +12,8 @@ module.exports = {
     'prettier/prettier': ['error', { endOfLine: 'auto' }],
     'no-unused-vars': 'off',
     '@typescript-eslint/no-unused-vars': 'warn',
+    "no-shadow": "off",
+    "@typescript-eslint/no-shadow": "warn"
   },
   parserOptions: {
     ecmaVersion: 2020,
