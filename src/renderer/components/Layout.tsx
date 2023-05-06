@@ -10,9 +10,8 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import Tooltip from '@mui/material/Tooltip';
 
 import SnippetFolderIcon from '@mui/icons-material/SnippetFolder';
-import AccountTreeIcon from '@mui/icons-material/AccountTree';
+import SearchIcon from '@mui/icons-material/Search';
 import GroupIcon from '@mui/icons-material/Group';
-import LocationOnIcon from '@mui/icons-material/LocationOn';
 
 import Tabs from './Tabs';
 import ProjectTool from './ToolBox/ProjectTool';
@@ -105,6 +104,7 @@ function QuickAccessItem({
               minWidth: 0,
               mr: 'auto',
               justifyContent: 'center',
+              '& > *': { fontSize: 25 },
             }}
           >
             {icon}
@@ -143,9 +143,8 @@ export default function Layout({ children = null! }: LayoutProps) {
         <List sx={{ width: quickAccessWidth }}>
           {[
             { text: 'Files', icon: <SnippetFolderIcon /> },
-            { text: 'Flow', icon: <AccountTreeIcon /> },
+            { text: 'Find', icon: <SearchIcon /> },
             { text: 'NPCs', icon: <GroupIcon /> },
-            { text: 'Locations', icon: <LocationOnIcon /> },
           ].map((item, index) => (
             <QuickAccessItem
               key={item.text}
@@ -165,9 +164,8 @@ export default function Layout({ children = null! }: LayoutProps) {
         <Paper sx={{ height: '100%' }}>
           <ProjectTool />
         </Paper>
-        <Paper sx={{ height: '100%' }}>Flow</Paper>
+        <Paper sx={{ height: '100%' }}>Find</Paper>
         <Paper sx={{ height: '100%' }}>NPCs</Paper>
-        <Paper sx={{ height: '100%' }}>Locations</Paper>
       </ToolBox>
       <MainBox quickAccessWidth={quickAccessWidth} toolBoxWidth={toolBoxWidth}>
         <Tabs />

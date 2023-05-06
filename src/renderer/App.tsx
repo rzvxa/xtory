@@ -1,5 +1,6 @@
 import CssBaseline from '@mui/material/CssBaseline';
 import { ThemeProvider } from '@mui/material/styles';
+import SnackbarProvider from './components/SnackbarProvider';
 
 import StartPage from './components/StartPage';
 import Layout from './components/Layout';
@@ -15,7 +16,9 @@ export default function App() {
   return (
     <ThemeProvider theme={darkTheme}>
       <CssBaseline />
-      {projectPath ? <Layout /> : <StartPage />}
+      <SnackbarProvider>
+        {projectPath ? <Layout /> : <StartPage />}
+      </SnackbarProvider>
     </ThemeProvider>
   );
 }

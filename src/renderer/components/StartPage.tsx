@@ -5,6 +5,7 @@ import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import { useSnackbar } from 'notistack';
 
 import { useAppDispatch, useAppSelector } from 'renderer/state/store/index';
 
@@ -19,6 +20,7 @@ import {
   BrowseFileSystemResult,
 } from 'shared/types';
 
+import { useEzSnackbar } from 'renderer/ezSnackbar';
 import RecentProjectsList from './RecentProjectsList';
 import { NewProjectModal, NewProjectCreateResult } from './NewProjectModal';
 
@@ -30,13 +32,21 @@ const ActionButton = styled(Button)({
 });
 
 export default function StartPage() {
+  const { toaster } = useEzSnackbar();
   const dispatch = useAppDispatch();
 
   const [newProjectModalOpen, setNewProjectModalOpen] =
     React.useState<boolean>(false);
 
-  const openProject = (path: string) => {
-    dispatch(setProjectPath(path));
+  const openProject = async (path: string) => {
+    const result = await window.electron.ipcRenderer.invoke(
+      Channels.openProject,
+      path
+    );
+    if (result.status === IpcResultStatus.ok) {
+      dispatch(setProjectPath(path));
+    }
+    toaster.error(result.errorMessage);
   };
 
   const onNewProjectButtonClick = () => {
@@ -54,7 +64,7 @@ export default function StartPage() {
     }
 
     const projectPath = sanitizePath(result.filePaths[0]);
-    openProject(projectPath);
+    await openProject(projectPath);
   };
 
   const onNewProjectModalCancel = () => {
@@ -74,7 +84,7 @@ export default function StartPage() {
       return { created: false, errorMessage: result.errorMessage };
     }
 
-    openProject(model.projectPath);
+    await openProject(model.projectPath);
 
     setNewProjectModalOpen(false);
 
