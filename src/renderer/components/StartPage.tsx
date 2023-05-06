@@ -8,13 +8,15 @@ import Typography from '@mui/material/Typography';
 
 import { useAppDispatch, useAppSelector } from 'renderer/state/store/index';
 
+import { sanitizePath } from 'renderer/utils';
 import { setProjectPath } from 'renderer/state/store/project';
 
 import {
   Channels,
   IpcResultStatus,
   NewProjectModel,
-  CreateProjectResult,
+  CreateNewProjectResult,
+  BrowseFileSystemResult,
 } from 'shared/types';
 
 import RecentProjectsList from './RecentProjectsList';
@@ -41,6 +43,20 @@ export default function StartPage() {
     setNewProjectModalOpen(true);
   };
 
+  const onOpenProjectButtonClick = async () => {
+    const result: BrowseFileSystemResult =
+      await window.electron.ipcRenderer.invoke(Channels.browseFileSystem, {
+        properties: ['openDirectory'],
+      });
+
+    if (result.canceled) {
+      return;
+    }
+
+    const projectPath = sanitizePath(result.filePaths[0]);
+    openProject(projectPath);
+  };
+
   const onNewProjectModalCancel = () => {
     setNewProjectModalOpen(false);
   };
@@ -48,7 +64,7 @@ export default function StartPage() {
   const onNewProjectModalCreate = async (
     model: NewProjectModel
   ): Promise<NewProjectCreateResult> => {
-    const result: CreateProjectResult =
+    const result: CreateNewProjectResult =
       await window.electron.ipcRenderer.invoke(
         Channels.createNewProject,
         model
@@ -58,10 +74,7 @@ export default function StartPage() {
       return { created: false, errorMessage: result.errorMessage };
     }
 
-    console.log('creationResult', result);
-
-    // if created
-    //   openProject('Path');
+    openProject(model.projectPath);
 
     setNewProjectModalOpen(false);
 
@@ -101,7 +114,7 @@ export default function StartPage() {
           <ActionButton variant="contained" onClick={onNewProjectButtonClick}>
             New Project
           </ActionButton>
-          <ActionButton variant="contained" onClick={() => openProject('Path')}>
+          <ActionButton variant="contained" onClick={onOpenProjectButtonClick}>
             Open Project
           </ActionButton>
           <Box

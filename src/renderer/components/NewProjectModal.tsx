@@ -1,6 +1,7 @@
 import React from 'react';
 
 import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
 import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import Divider from '@mui/material/Divider';
@@ -12,14 +13,18 @@ import Collapse from '@mui/material/Collapse';
 import Checkbox from '@mui/material/Checkbox';
 import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
 import FormControlLabel from '@mui/material/FormControlLabel';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 import CloseIcon from '@mui/icons-material/Close';
 
-import { NewProjectModel } from 'shared/types';
+import { Channels, NewProjectModel } from 'shared/types';
 import FileSystemPathBrowse from './FileSystemPathBrowse';
 
 export interface NewProjectCreateResult {
   created: boolean;
-  errorMessage: string;
+  errorMessage?: string | undefined;
 }
 
 interface NewProjectModalProps {
@@ -105,9 +110,22 @@ export function NewProjectModal({
 }: NewProjectModalProps) {
   const [projectName, setProjectNameState] = React.useState<string>('');
   const [projectPath, setProjectPathState] = React.useState<string>('');
+  const [projectTemplate, setProjectTemplate] = React.useState<string>('');
+  const [projectTemplates, setProjectTemplates] = React.useState<string[]>([]);
   const [projectNameError, setProjectNameError] = React.useState<string>('');
   const [projectPathError, setProjectPathError] = React.useState<string>('');
   const [errorMessage, setErrorMessage] = React.useState<string>('');
+
+  React.useEffect(() => {
+    async function getTemplates() {
+      const result: string[] = await window.electron.ipcRenderer.invoke(
+        Channels.getXtoryTemplates
+      );
+      setProjectTemplates(result);
+      setProjectTemplate(result[0]);
+    }
+    getTemplates();
+  }, []);
 
   const setProjectName = (name: string) => {
     setProjectNameState(name);
@@ -124,6 +142,10 @@ export function NewProjectModal({
 
   const combinedPath = projectPath + (addProjectNameToPath ? projectName : '');
 
+  const onProjectTemplateChange = (event: SelectChangeEvent) => {
+    setProjectTemplate(event.target.value as string);
+  };
+
   const onCancelButtonClick = () => {
     onCancel();
   };
@@ -132,6 +154,7 @@ export function NewProjectModal({
     /* eslint-disable no-shadow */
     let projectNameError = '';
     let projectPathError = '';
+    let projectTemplateError = '';
     /* eslint-enable no-shadow */
 
     if (projectName === '') {
@@ -141,9 +164,21 @@ export function NewProjectModal({
     if (projectPath === '') {
       projectPathError = "Project Path can't be empty";
     }
+
+    if (projectTemplate === '') {
+      projectTemplateError = 'Please select a template!';
+    }
+
     setProjectNameError(projectNameError);
     setProjectPathError(projectPathError);
-    return projectNameError === '' && projectPathError === '';
+
+    if (projectTemplateError !== '') setErrorMessage(projectTemplateError);
+
+    return (
+      projectNameError === '' &&
+      projectPathError === '' &&
+      projectTemplateError === ''
+    );
   };
 
   const onCreateAndOpenClick = async () => {
@@ -152,6 +187,7 @@ export function NewProjectModal({
       projectRoot: projectPath,
       projectPath: combinedPath,
       addProjectNameToPath,
+      projectTemplate,
     };
     if (!validateFields()) return;
 
@@ -159,6 +195,7 @@ export function NewProjectModal({
 
     if (!result.created) {
       setErrorMessage(result.errorMessage);
+      setProjectName(projectName);
     }
   };
 
@@ -218,7 +255,7 @@ export function NewProjectModal({
             sx={{
               display: 'flex',
               flexDirection: 'column',
-              '& > div': { marginTop: 4 },
+              '& > div': { marginTop: 3 },
             }}
           >
             <TextField
@@ -244,16 +281,32 @@ export function NewProjectModal({
               error={projectPathError !== ''}
               helperText={projectPathError}
             />
-            <FormControlLabel
-              label="Add Project Name To The Path"
-              control={
-                <Checkbox
-                  checked={addProjectNameToPath}
-                  onChange={(e) => setAddProjectNameToPath(e.target.checked)}
-                />
-              }
-              labelPlacement="end"
-            />
+            <Stack direction="row" sx={{ maxHeight: '40px' }}>
+              <FormControlLabel
+                label="Add Project Name To The Path"
+                control={
+                  <Checkbox
+                    checked={addProjectNameToPath}
+                    onChange={(e) => setAddProjectNameToPath(e.target.checked)}
+                  />
+                }
+                labelPlacement="end"
+                sx={{ minWidth: 250 }}
+              />
+              <FormControl fullWidth>
+                <InputLabel>Template</InputLabel>
+                <Select
+                  sx={{ height: '40px' }}
+                  label="Template"
+                  value={projectTemplate}
+                  onChange={onProjectTemplateChange}
+                >
+                  {projectTemplates.map((template) => (
+                    <MenuItem value={template}>{template}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Stack>
             {projectPath && projectName && (
               <Box>
                 <Typography variant="subtitle1" mb={6}>

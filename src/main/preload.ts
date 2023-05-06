@@ -20,7 +20,10 @@ const electronHandler = {
     once(channel: Channels, func: (...args: unknown[]) => void) {
       ipcRenderer.once(channel, (_event, ...args) => func(...args));
     },
-    invoke(channel: Channels, args: unknown | unknown[]): Promise<IpcResult> {
+    invoke(
+      channel: Channels,
+      args?: unknown | unknown[]
+    ): Promise<IpcResult | any> {
       return ipcRenderer.invoke(channel, args);
     },
   },

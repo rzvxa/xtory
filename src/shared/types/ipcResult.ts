@@ -5,4 +5,5 @@ export enum IpcResultStatus {
 
 export interface IpcResult {
   status: IpcResultStatus;
+  errorMessage?: string | undefined;
 }

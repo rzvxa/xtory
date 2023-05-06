@@ -3,4 +3,5 @@ export interface NewProjectModel {
   projectRoot: string;
   addProjectNameToPath: boolean;
   projectPath: string;
+  projectTemplate: string;
 }
