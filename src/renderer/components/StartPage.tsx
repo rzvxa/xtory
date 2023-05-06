@@ -5,7 +5,6 @@ import Box from '@mui/material/Box';
 import Link from '@mui/material/Link';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
-import { useSnackbar } from 'notistack';
 
 import { useAppDispatch, useAppSelector } from 'renderer/state/store/index';
 
@@ -13,7 +12,7 @@ import { sanitizePath } from 'renderer/utils';
 import { setProjectPath } from 'renderer/state/store/project';
 
 import {
-  Channels,
+  ChannelsMain,
   IpcResultStatus,
   NewProjectModel,
   CreateNewProjectResult,
@@ -40,12 +39,14 @@ export default function StartPage() {
 
   const openProject = async (path: string) => {
     const result = await window.electron.ipcRenderer.invoke(
-      Channels.openProject,
+      ChannelsMain.openProject,
       path
     );
     if (result.status === IpcResultStatus.ok) {
       dispatch(setProjectPath(path));
+      return;
     }
+
     toaster.error(result.errorMessage);
   };
 
@@ -55,7 +56,7 @@ export default function StartPage() {
 
   const onOpenProjectButtonClick = async () => {
     const result: BrowseFileSystemResult =
-      await window.electron.ipcRenderer.invoke(Channels.browseFileSystem, {
+      await window.electron.ipcRenderer.invoke(ChannelsMain.browseFileSystem, {
         properties: ['openDirectory'],
       });
 
@@ -76,7 +77,7 @@ export default function StartPage() {
   ): Promise<NewProjectCreateResult> => {
     const result: CreateNewProjectResult =
       await window.electron.ipcRenderer.invoke(
-        Channels.createNewProject,
+        ChannelsMain.createNewProject,
         model
       );
 

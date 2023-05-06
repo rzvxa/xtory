@@ -19,7 +19,7 @@ import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import CloseIcon from '@mui/icons-material/Close';
 
-import { Channels, NewProjectModel } from 'shared/types';
+import { ChannelsMain, NewProjectModel } from 'shared/types';
 import FileSystemPathBrowse from './FileSystemPathBrowse';
 
 export interface NewProjectCreateResult {
@@ -119,7 +119,7 @@ export function NewProjectModal({
   React.useEffect(() => {
     async function getTemplates() {
       const result: string[] = await window.electron.ipcRenderer.invoke(
-        Channels.getXtoryTemplates
+        ChannelsMain.getXtoryTemplates
       );
       setProjectTemplates(result);
       setProjectTemplate(result[0]);

@@ -23,7 +23,7 @@ export default async function openProject(
   if (!configFile) {
     return {
       status: IpcResultStatus.error,
-      errorMessage: `Given path don't contain a .xtory file!`,
+      errorMessage: `Given path don't contain a ".xtory" file!`,
     };
   }
 
