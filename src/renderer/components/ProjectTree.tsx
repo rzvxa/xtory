@@ -11,6 +11,10 @@ import FlowIcon from '@mui/icons-material/AccountTree';
 import FolderIcon from '@mui/icons-material/Folder';
 import ForumIcon from '@mui/icons-material/Forum';
 
+import { ProjectTree as ProjectTreeState, ProjectTreeNode } from 'shared/types';
+
+import { useAppSelector } from 'renderer/state/store/index';
+
 interface DirItemProps {
   nodeId: string;
   label: string;
@@ -41,7 +45,32 @@ function TreeItem({ nodeId, label, icon, children }: DirItemProps) {
   );
 }
 
+interface TreeNodeProps {
+  treeData: ProjectTreeState | ProjectTreeNode;
+}
+
+function TreeNode({ treeData }: TreeNodeProps) {
+  const { name, path, isDir, children } = treeData;
+
+  return (
+    <TreeItem
+      nodeId={path}
+      label={name}
+      icon={isDir ? <FolderIcon /> : <ForumIcon />}
+    >
+      {children &&
+        Object.entries(children).map(([_, node]) => (
+          <TreeNode treeData={node} />
+        ))}
+    </TreeItem>
+  );
+}
+
 export default function ProjectTree() {
+  const projectTree: ProjectTreeState = useAppSelector(
+    (state) => state.projectState.projectTree
+  );
+
   return (
     <MuiTreeView
       aria-label="Project Tool"
@@ -49,21 +78,7 @@ export default function ProjectTree() {
       defaultExpandIcon={<ChevronRightIcon />}
       sx={{ height: '100%', flexGrow: 1, overflowY: 'auto' }}
     >
-      <TreeItem
-        nodeId="0"
-        label="Place Holder Project Name"
-        icon={<FolderIcon />}
-      >
-        <TreeItem nodeId="1" label="Side Quests #1" icon={<FolderIcon />}>
-          <TreeItem nodeId="2" label="Start Quest Conversations.xconv" icon={<ForumIcon />} />
-        </TreeItem>
-        <TreeItem nodeId="5" label="Main Story" icon={<FolderIcon />}>
-          <TreeItem nodeId="10" label="Main.xflow" icon={<FlowIcon />} />
-          <TreeItem nodeId="6" label="Conversations" icon={<FolderIcon />}>
-            <TreeItem nodeId="8" label="Tutorial Conversation.xconv" icon={<ForumIcon />} />
-          </TreeItem>
-        </TreeItem>
-      </TreeItem>
+      {projectTree && <TreeNode treeData={projectTree} />}
     </MuiTreeView>
   );
 }

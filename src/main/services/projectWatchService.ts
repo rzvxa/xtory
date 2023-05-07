@@ -34,9 +34,9 @@ class ProjectWatchService {
     this.unwatch();
     this.messageBroker = messageBroker;
     this.projectPath = projectPath;
-    const dirname = path.dirname(projectPath);
+    const name = projectPath.split('/').pop() || '';
     this.projectTree = {
-      name: dirname,
+      name,
       path: projectPath,
       isDir: true,
       children: {},
