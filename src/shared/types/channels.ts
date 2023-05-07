@@ -8,4 +8,5 @@ export enum ChannelsMain {
 
 export enum ChannelsRenderer {
   onProjectOpened = 'onProjectOpened',
+  onProjectTreeUpdated = 'onProjectTreeUpdated',
 }

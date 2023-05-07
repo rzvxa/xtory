@@ -8,7 +8,7 @@ import Typography from '@mui/material/Typography';
 
 import { useAppDispatch, useAppSelector } from 'renderer/state/store/index';
 
-import { sanitizePath } from 'renderer/utils';
+import { sanitizePath } from 'shared/utils';
 import { setProjectPath } from 'renderer/state/store/project';
 
 import {

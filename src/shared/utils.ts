@@ -36,3 +36,9 @@ export async function tryGetAsync<TResult>(
     return err(exception);
   }
 }
+
+export function sanitizePath(path: string, unixSep: boolean = true) {
+  let output: string = path;
+  if (unixSep) output = output.replaceAll('\\', '/');
+  return output;
+}

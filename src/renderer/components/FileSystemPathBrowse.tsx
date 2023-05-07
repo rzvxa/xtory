@@ -7,7 +7,7 @@ import IconButton from '@mui/material/IconButton';
 
 import FolderIcon from '@mui/icons-material/Folder';
 
-import { sanitizePath } from 'renderer/utils';
+import { sanitizePath } from 'shared/utils';
 import { ChannelsMain, BrowseFileSystemResult } from 'shared/types';
 
 interface FileSystemPathBrowseProps {

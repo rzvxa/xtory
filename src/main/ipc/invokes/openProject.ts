@@ -11,6 +11,8 @@ import {
   IpcResultStatus,
 } from 'shared/types';
 
+import projectWatchService from 'main/services/projectWatchService';
+
 export default async function openProject(
   { sender }: IpcMainInvokeEvent,
   projectPath: string
@@ -40,6 +42,10 @@ export default async function openProject(
       errorMessage: `Failed to open ${configPath}`,
     };
   }
+
+  projectWatchService.watch(projectPath, (channel, ...args) =>
+    sender.send(channel, ...args)
+  );
 
   sender.send(ChannelsRenderer.onProjectOpened, projectPath);
   return { status: IpcResultStatus.ok };

@@ -8,6 +8,7 @@ import { IpcResult, IpcResultStatus } from './types/ipcResult';
 import { CreateNewProjectResult } from './types/createNewProjectResult';
 import { BrowseFileSystemResult } from './types/browseFileSystemResult';
 import { OpenProjectResult } from './types/openProjectResult';
+import { ProjectTreeNode, ProjectTree } from './types/projectTree';
 
 export { ChannelsMain, ChannelsRenderer, IpcResultStatus };
 
@@ -21,4 +22,6 @@ export type {
   CreateNewProjectResult,
   BrowseFileSystemResult,
   OpenProjectResult,
+  ProjectTreeNode,
+  ProjectTree,
 };
