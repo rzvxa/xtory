@@ -12,9 +12,10 @@ import Tooltip from '@mui/material/Tooltip';
 import SnippetFolderIcon from '@mui/icons-material/SnippetFolder';
 import SearchIcon from '@mui/icons-material/Search';
 import GroupIcon from '@mui/icons-material/Group';
+import DataObjectIcon from '@mui/icons-material/DataObject';
 
 import Tabs from './Tabs';
-import ProjectTool from './ToolBox/ProjectTool';
+import { FilesTool, FindTool, NpcsTool, VariablesTool } from './ToolBox/index';
 
 interface LayoutProps {
   children?: React.ReactNode;
@@ -145,6 +146,7 @@ export default function Layout({ children = null! }: LayoutProps) {
             { text: 'Files', icon: <SnippetFolderIcon /> },
             { text: 'Find', icon: <SearchIcon /> },
             { text: 'NPCs', icon: <GroupIcon /> },
+            { text: 'Variables', icon: <DataObjectIcon /> },
           ].map((item, index) => (
             <QuickAccessItem
               key={item.text}
@@ -161,11 +163,10 @@ export default function Layout({ children = null! }: LayoutProps) {
         width={toolBoxWidth}
         quickAccessWidth={quickAccessWidth}
       >
-        <Paper sx={{ height: '100%' }}>
-          <ProjectTool />
-        </Paper>
-        <Paper sx={{ height: '100%' }}>Find</Paper>
-        <Paper sx={{ height: '100%' }}>NPCs</Paper>
+        <FilesTool />
+        <FindTool />
+        <NpcsTool />
+        <VariablesTool />
       </ToolBox>
       <MainBox quickAccessWidth={quickAccessWidth} toolBoxWidth={toolBoxWidth}>
         <Tabs />
