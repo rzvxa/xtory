@@ -2,7 +2,7 @@ import IpcInvokeEvent from './ipcInvokeEvent';
 
 type IpcInvoke = (
   event: IpcInvokeEvent,
-  ...args: unknown[]
+  ...args: any[]
 ) => any | Promise<any>;
 
 export default IpcInvoke;

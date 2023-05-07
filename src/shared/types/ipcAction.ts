@@ -1,5 +1,5 @@
 import IpcEvent from './ipcEvent';
 
-type IpcAction = (event: IpcEvent, ...args: unknown[]) => void;
+type IpcAction = (event: IpcEvent, ...args: any[]) => void;
 
 export default IpcAction;

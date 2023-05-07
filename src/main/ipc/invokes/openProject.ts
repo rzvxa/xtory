@@ -5,10 +5,14 @@ import path from 'path';
 import { fsUtils } from 'main/utils';
 import { tryGetAsync } from 'shared/utils';
 
-import { OpenProjectResult, IpcResultStatus } from 'shared/types';
+import {
+  ChannelsRenderer,
+  OpenProjectResult,
+  IpcResultStatus,
+} from 'shared/types';
 
 export default async function openProject(
-  event: IpcMainInvokeEvent,
+  { sender }: IpcMainInvokeEvent,
   projectPath: string
 ): Promise<OpenProjectResult> {
   if (!(await fsUtils.exists(projectPath))) {
@@ -36,5 +40,7 @@ export default async function openProject(
       errorMessage: `Failed to open ${configPath}`,
     };
   }
+
+  sender.send(ChannelsRenderer.onProjectOpened, projectPath);
   return { status: IpcResultStatus.ok };
 }

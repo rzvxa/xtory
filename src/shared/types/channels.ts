@@ -7,5 +7,5 @@ export enum ChannelsMain {
 }
 
 export enum ChannelsRenderer {
-  onOpenProject = 'onOpenProject',
+  onProjectOpened = 'onProjectOpened',
 }

@@ -7,6 +7,8 @@ import Layout from './components/Layout';
 
 import { useAppSelector } from './state/store/index';
 
+import './ipc.ts';
+
 import darkTheme from './styles/dark.theme';
 import './styles/Global.scss';
 

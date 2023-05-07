@@ -42,12 +42,10 @@ export default function StartPage() {
       ChannelsMain.openProject,
       path
     );
-    if (result.status === IpcResultStatus.ok) {
-      dispatch(setProjectPath(path));
-      return;
+    if (result.status === IpcResultStatus.error) {
+      toaster.error(result.errorMessage);
     }
 
-    toaster.error(result.errorMessage);
   };
 
   const onNewProjectButtonClick = () => {
