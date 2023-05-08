@@ -9,7 +9,6 @@ import MuiTreeItem from '@mui/lab/TreeItem';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import FlowIcon from '@mui/icons-material/AccountTree';
 import FolderIcon from '@mui/icons-material/Folder';
 import ForumIcon from '@mui/icons-material/Forum';
 
@@ -165,9 +164,9 @@ function TreeNode({ treeData }: TreeNodeProps) {
       onRename={onRename}
     >
       {children &&
-        Object.entries(children).map(([_, node]) => (
-          <TreeNode treeData={node} />
-        ))}
+        Object.entries(children)
+          .sort((a, b) => a[0].localeCompare(b[0]))
+          .map(([_, node]) => <TreeNode treeData={node} />)}
     </TreeItem>
   );
 }
