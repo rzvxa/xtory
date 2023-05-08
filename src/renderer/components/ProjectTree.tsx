@@ -49,6 +49,26 @@ function TreeItem({
 }: DirItemProps) {
   const [newName, setNewName] = React.useState<string>(label);
 
+  const handleKeyPress = React.useCallback(
+    (event: KeyboardEvent) => {
+      if (!isRename) return;
+      if (event.key === 'Enter') {
+        onRename(newName);
+      }
+    },
+    [isRename, onRename, newName]
+  );
+
+  React.useEffect(() => {
+    // attach the event listener
+    document.addEventListener('keydown', handleKeyPress);
+
+    // remove the event listener
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [handleKeyPress]);
+
   const onNewNameFocus = (event: React.FocusEvent<HTMLInputElement>) => {
     if (!isDir) {
       const lastIndexOfDot = newName.lastIndexOf('.');
@@ -111,7 +131,7 @@ function TreeNode({ treeData }: TreeNodeProps) {
   );
 
   const handleKeyPress = React.useCallback(
-    (event: any) => {
+    (event: KeyboardEvent) => {
       if (!isProjectTreeFocus) return;
       if (!treeNodeState.isSelected) return;
       if (event.key === 'F2') {
