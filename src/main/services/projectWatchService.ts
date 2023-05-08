@@ -8,7 +8,7 @@ export type ProjectWatchServiceMessageBroker = (
   ...args: any[]
 ) => void;
 
-const FlushInterval = 1000;
+const FlushInterval = 300;
 
 class ProjectWatchService {
   watcher: FSWatcher | null = null;
@@ -55,7 +55,7 @@ class ProjectWatchService {
         console.error('Error happened', error);
       });
 
-    this.worker = setInterval(() => this.#worker(), 1000);
+    this.worker = setInterval(() => this.#worker(), FlushInterval);
   }
 
   unwatch(): void {
