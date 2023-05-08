@@ -302,7 +302,9 @@ export function NewProjectModal({
                   onChange={onProjectTemplateChange}
                 >
                   {projectTemplates.map((template) => (
-                    <MenuItem value={template}>{template}</MenuItem>
+                    <MenuItem key={template} value={template}>
+                      {template}
+                    </MenuItem>
                   ))}
                 </Select>
               </FormControl>

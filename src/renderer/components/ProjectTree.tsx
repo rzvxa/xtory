@@ -148,11 +148,7 @@ function TreeNode({ treeData }: TreeNodeProps) {
     dispatch(setProjectTreeNodeState({ nodeId, isRename: false }));
     if (name === newName) return;
     const newPath = path.split('/').slice(0, -1).join('/').concat('/', newName);
-    window.electron.ipcRenderer.sendMessage(
-      ChannelsMain.fsMove,
-      path,
-      newPath
-    );
+    window.electron.ipcRenderer.sendMessage(ChannelsMain.fsMove, path, newPath);
   };
 
   React.useEffect(() => {
@@ -177,7 +173,7 @@ function TreeNode({ treeData }: TreeNodeProps) {
       {children &&
         Object.entries(children)
           .sort((a, b) => a[0].localeCompare(b[0]))
-          .map(([_, node]) => <TreeNode treeData={node} />)}
+          .map(([_, node]) => <TreeNode key={node.path} treeData={node} />)}
     </TreeItem>
   );
 }
