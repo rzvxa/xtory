@@ -1,5 +1,10 @@
 /* eslint-disable import/prefer-default-export */
-import { useSnackbar, closeSnackbar, SnackbarKey } from 'notistack';
+import {
+  useSnackbar,
+  closeSnackbar,
+  SnackbarKey,
+  WithSnackbarProps,
+} from 'notistack';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -29,3 +34,30 @@ export function useEzSnackbar() {
     toaster: { info, warning, error, success },
   };
 }
+
+let ezSnackbarGlobalRef: WithSnackbarProps;
+
+export function EzSnackbarGlobalRef() {
+  ezSnackbarGlobalRef = useEzSnackbar();
+  return null;
+}
+export const EzSnackbarRef = {
+  getRawRef() {
+    return ezSnackbarGlobalRef;
+  },
+  toast(message: string, variant: SnackVariant) {
+    ezSnackbarGlobalRef.toast(message, variant);
+  },
+  info(message: string) {
+    ezSnackbarGlobalRef.info(message);
+  },
+  warning(message: string) {
+    ezSnackbarGlobalRef.warning(message);
+  },
+  error(message: string) {
+    ezSnackbarGlobalRef.error(message);
+  },
+  success(message: string) {
+    ezSnackbarGlobalRef.success(message);
+  },
+};

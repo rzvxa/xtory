@@ -12,7 +12,11 @@ import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import FolderIcon from '@mui/icons-material/Folder';
 import ForumIcon from '@mui/icons-material/Forum';
 
-import { ProjectTree as ProjectTreeState, ProjectTreeNode } from 'shared/types';
+import {
+  ChannelsMain,
+  ProjectTree as ProjectTreeState,
+  ProjectTreeNode,
+} from 'shared/types';
 
 import { useAppSelector, useAppDispatch } from 'renderer/state/store';
 import { ProjectTreeNodeState } from 'renderer/state/types';
@@ -142,6 +146,13 @@ function TreeNode({ treeData }: TreeNodeProps) {
 
   const onRename = (newName: string) => {
     dispatch(setProjectTreeNodeState({ nodeId, isRename: false }));
+    if (name === newName) return;
+    const newPath = path.split('/').slice(0, -1).join('/').concat('/', newName);
+    window.electron.ipcRenderer.sendMessage(
+      ChannelsMain.fsMove,
+      path,
+      newPath
+    );
   };
 
   React.useEffect(() => {
@@ -198,7 +209,6 @@ export default function ProjectTree() {
     }
     dispatch(setProjectTreeNodeState({ nodeId, isSelected: true }));
     setLastSelected(nodeId);
-    console.log(nodeId, 'focus');
   };
 
   return (

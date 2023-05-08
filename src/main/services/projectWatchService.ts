@@ -33,11 +33,11 @@ class ProjectWatchService {
   ): void {
     this.unwatch();
     this.messageBroker = messageBroker;
-    this.projectPath = projectPath;
-    const name = projectPath.split('/').pop() || '';
+    this.projectPath = sanitizePath(projectPath);
+    const name = this.projectPath.split('/').pop() || '';
     this.projectTree = {
       name,
-      path: projectPath,
+      path: this.projectPath,
       isDir: true,
       children: {},
     };
@@ -106,7 +106,7 @@ class ProjectWatchService {
     const name = pathArr.pop()!;
     const node: ProjectTreeNode = {
       name,
-      path: _path,
+      path: sanitizedPath,
       isDir,
       ...(!isDir && { ext: path.extname(_path) }),
       ...(isDir && { children: {} }),
