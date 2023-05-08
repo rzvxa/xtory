@@ -1,7 +1,9 @@
 import React from 'react';
 
+import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
+import TextField from '@mui/material/TextField';
 import MuiTreeView from '@mui/lab/TreeView';
 import MuiTreeItem from '@mui/lab/TreeItem';
 
@@ -13,16 +15,53 @@ import ForumIcon from '@mui/icons-material/Forum';
 
 import { ProjectTree as ProjectTreeState, ProjectTreeNode } from 'shared/types';
 
-import { useAppSelector } from 'renderer/state/store/index';
+import { useAppSelector, useAppDispatch } from 'renderer/state/store';
+import { ProjectTreeNodeState } from 'renderer/state/types';
+import {
+  setIsProjectTreeFocus,
+  setProjectTreeNodeState,
+} from 'renderer/state/store/filesTool';
 
 interface DirItemProps {
   nodeId: string;
   label: string;
   icon: React.ReactNode;
+  isDir: boolean;
+  isRename: boolean;
+  onRename: (newName: string) => void;
   children: React.ReactNode | undefined;
 }
 
-function TreeItem({ nodeId, label, icon, children }: DirItemProps) {
+const NewNameTextInput = styled(TextField)(() => ({
+  '& .MuiInputBase-input': {
+    padding: '0 0 0 10px',
+  },
+}));
+
+function TreeItem({
+  nodeId,
+  label,
+  icon,
+  isDir,
+  isRename,
+  onRename,
+  children,
+}: DirItemProps) {
+  const [newName, setNewName] = React.useState<string>(label);
+
+  const onNewNameFocus = (event: React.FocusEvent<HTMLInputElement>) => {
+    if (!isDir) {
+      const lastIndexOfDot = newName.lastIndexOf('.');
+      event.target.setSelectionRange(0, lastIndexOfDot);
+    } else {
+      event.target.select();
+    }
+  };
+
+  const onNewNameBlur = () => {
+    onRename(newName);
+  };
+
   return (
     <MuiTreeItem
       nodeId={nodeId}
@@ -31,12 +70,22 @@ function TreeItem({ nodeId, label, icon, children }: DirItemProps) {
           <Box sx={{ display: 'flex', ml: -0.5, mr: 1, fontSize: 18 }}>
             {icon}
           </Box>
-          <Typography
-            variant="body2"
-            sx={{ fontWeight: 'inherit', flexGrow: 1 }}
-          >
-            {label}
-          </Typography>
+          {isRename ? (
+            <NewNameTextInput
+              value={newName}
+              onChange={(e) => setNewName(e.target.value)}
+              onFocus={onNewNameFocus}
+              onBlur={onNewNameBlur}
+              autoFocus
+            />
+          ) : (
+            <Typography
+              variant="body2"
+              sx={{ fontWeight: 'inherit', flexGrow: 1 }}
+            >
+              {label}
+            </Typography>
+          )}
         </Box>
       }
     >
@@ -50,13 +99,50 @@ interface TreeNodeProps {
 }
 
 function TreeNode({ treeData }: TreeNodeProps) {
+  const dispatch = useAppDispatch();
   const { name, path, isDir, children } = treeData;
+  const nodeId = path;
+
+  const treeNodeState: ProjectTreeNodeState | undefined = useAppSelector(
+    (state) => state.filesToolState.projectTreeNodeStates[nodeId] || {}
+  );
+  const isProjectTreeFocus: boolean = useAppSelector(
+    (state) => state.filesToolState.isProjectTreeFocus
+  );
+
+  const handleKeyPress = React.useCallback(
+    (event: any) => {
+      if (!isProjectTreeFocus) return;
+      if (!treeNodeState.isSelected) return;
+      if (event.key === 'F2') {
+        dispatch(setProjectTreeNodeState({ nodeId, isRename: true }));
+      }
+    },
+    [nodeId, isProjectTreeFocus, treeNodeState.isSelected, dispatch]
+  );
+
+  const onRename = (newName: string) => {
+    dispatch(setProjectTreeNodeState({ nodeId, isRename: false }));
+  };
+
+  React.useEffect(() => {
+    // attach the event listener
+    document.addEventListener('keydown', handleKeyPress);
+
+    // remove the event listener
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [handleKeyPress]);
 
   return (
     <TreeItem
-      nodeId={path}
+      nodeId={nodeId}
       label={name}
       icon={isDir ? <FolderIcon /> : <ForumIcon />}
+      isDir={isDir}
+      isRename={treeNodeState.isRename}
+      onRename={onRename}
     >
       {children &&
         Object.entries(children).map(([_, node]) => (
@@ -67,12 +153,40 @@ function TreeNode({ treeData }: TreeNodeProps) {
 }
 
 export default function ProjectTree() {
+  const dispatch = useAppDispatch();
   const projectTree: ProjectTreeState = useAppSelector(
     (state) => state.projectState.projectTree
   );
 
+  const [lastSelected, setLastSelected] = React.useState<string | null>(null);
+
+  const onFocus = () => {
+    dispatch(setIsProjectTreeFocus(true));
+  };
+
+  const onBlur = () => {
+    dispatch(setIsProjectTreeFocus(false));
+  };
+
+  const onNodeSelect = (event: React.SyntheticEvent, nodeId: string) => {
+    if (lastSelected) {
+      dispatch(
+        setProjectTreeNodeState({
+          nodeId: lastSelected,
+          isSelected: false,
+        })
+      );
+    }
+    dispatch(setProjectTreeNodeState({ nodeId, isSelected: true }));
+    setLastSelected(nodeId);
+    console.log(nodeId, 'focus');
+  };
+
   return (
     <MuiTreeView
+      onNodeSelect={onNodeSelect}
+      onFocus={onFocus}
+      onBlur={onBlur}
       aria-label="Project Tool"
       defaultCollapseIcon={<ExpandMoreIcon />}
       defaultExpandIcon={<ChevronRightIcon />}

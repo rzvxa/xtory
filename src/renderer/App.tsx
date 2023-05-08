@@ -1,4 +1,5 @@
 import CssBaseline from '@mui/material/CssBaseline';
+import GlobalStyles from '@mui/material/GlobalStyles';
 import { ThemeProvider } from '@mui/material/styles';
 import SnackbarProvider from './components/SnackbarProvider';
 
@@ -17,6 +18,14 @@ export default function App() {
 
   return (
     <ThemeProvider theme={darkTheme}>
+      <GlobalStyles
+        styles={(theme) => ({
+          '::selection': {
+            background: theme.palette.primary.main,
+            color: theme.palette.background.paper,
+          },
+        })}
+      />
       <CssBaseline />
       <SnackbarProvider>
         {projectPath ? <Layout /> : <StartPage />}

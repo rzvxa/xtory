@@ -1,3 +1,3 @@
 import { ProjectState } from './projectState';
 
-export { ProjectState };
+export type { ProjectState };

@@ -1,7 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 import { ProjectTree } from 'shared/types';
-
 import { ProjectState } from '../types/project/index';
 
 import { XTORY_PROJECT_STATE } from './constants';

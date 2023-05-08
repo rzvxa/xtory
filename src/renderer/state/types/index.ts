@@ -1,4 +1,11 @@
-import { ProjectState } from './project/index';
-import { TabState, TabsState } from './tabs/index';
+import { ProjectState } from './project';
+import { FilesToolState, ProjectTreeNodeState } from './toolBox';
+import { TabState, TabsState } from './tabs';
 
-export { TabState, TabsState, ProjectState };
+export {
+  TabState,
+  TabsState,
+  ProjectState,
+  FilesToolState,
+  ProjectTreeNodeState,
+};
