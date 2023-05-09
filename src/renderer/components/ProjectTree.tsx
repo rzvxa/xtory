@@ -4,6 +4,8 @@ import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
 import MuiTreeView from '@mui/lab/TreeView';
 import MuiTreeItem from '@mui/lab/TreeItem';
 
@@ -51,6 +53,29 @@ function TreeItem({
   children,
 }: DirItemProps) {
   const [newName, setNewName] = React.useState<string>(label);
+  const [contextMenu, setContextMenu] = React.useState<{
+    mouseX: number;
+    mouseY: number;
+  } | null>(null);
+
+  const handleContextMenu = (event: React.MouseEvent) => {
+    event.preventDefault();
+    setContextMenu(
+      contextMenu === null
+        ? {
+            mouseX: event.clientX + 2,
+            mouseY: event.clientY - 6,
+          }
+        : // repeated contextmenu when it is already open closes it with Chrome 84 on Ubuntu
+          // Other native context menus might behave different.
+          // With this behavior we prevent contextmenu from the backdrop to re-locale existing context menus.
+          null
+    );
+  };
+
+  const handleClose = () => {
+    setContextMenu(null);
+  };
 
   const handleKeyPress = React.useCallback(
     (event: KeyboardEvent) => {
@@ -89,7 +114,10 @@ function TreeItem({
     <MuiTreeItem
       nodeId={nodeId}
       label={
-        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+        <Box
+          onContextMenu={handleContextMenu}
+          sx={{ display: 'flex', alignItems: 'center', cursor: 'context-menu' }}
+        >
           <Box sx={{ display: 'flex', ml: -0.5, mr: 1, fontSize: 18 }}>
             {icon}
           </Box>
@@ -109,6 +137,22 @@ function TreeItem({
               {label}
             </Typography>
           )}
+
+          <Menu
+            open={contextMenu !== null}
+            onClose={handleClose}
+            anchorReference="anchorPosition"
+            disableScrollLock
+            anchorPosition={
+              contextMenu !== null
+                ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
+                : undefined
+            }
+          >
+            <MenuItem onClick={handleClose}>Delete</MenuItem>
+            <MenuItem onClick={handleClose}>Rename</MenuItem>
+            <MenuItem onClick={handleClose}>Open</MenuItem>
+          </Menu>
         </Box>
       }
     >
@@ -215,7 +259,7 @@ export default function ProjectTree() {
       aria-label="Project Tool"
       defaultCollapseIcon={<ExpandMoreIcon />}
       defaultExpandIcon={<ChevronRightIcon />}
-      sx={{ height: '100%', flexGrow: 1, overflowY: 'auto' }}
+      sx={{ flexGrow: 1, overflowY: 'auto' }}
     >
       {projectTree && <TreeNode treeData={projectTree} />}
     </MuiTreeView>

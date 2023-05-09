@@ -132,7 +132,7 @@ export default function Layout({ children = null! }: LayoutProps) {
   };
 
   return (
-    <Box sx={{ display: 'flex', overflow: 'hidden' }}>
+    <Box sx={{ display: 'flex', overflow: 'clip' }}>
       <MuiDrawer
         variant="permanent"
         sx={{
