@@ -39,7 +39,7 @@ class ProjectWatchService {
       name,
       path: this.projectPath,
       isDir: true,
-      children: {},
+      children: undefined,
     };
     this.watcher = watch(this.projectPath, {
       ignored: /^\./,
@@ -86,10 +86,10 @@ class ProjectWatchService {
     let parent = this.projectTree!;
 
     for (let i = 0; i < pathArr.length; i++) {
-      parent = parent.children![pathArr[i]];
-      if (!parent) {
-        return null;
+      if (!parent.children) {
+        parent.children = {};
       }
+      parent = parent.children![pathArr[i]] || {};
     }
 
     return parent;
@@ -109,7 +109,7 @@ class ProjectWatchService {
       path: sanitizedPath,
       isDir,
       ...(!isDir && { ext: path.extname(_path) }),
-      ...(isDir && { children: {} }),
+      ...(isDir && { children: undefined }),
     };
 
     const parent = this.#findNodeParent(pathArr);
@@ -118,6 +118,9 @@ class ProjectWatchService {
         'Path part does not exists in the ProjectTree, This Should Never Happen'
       );
       throw Error('Path part does not exists in the ProjectTree,');
+    }
+    if (!parent.children) {
+      parent.children = {};
     }
     parent.children![name] = node;
     this.isDirty = true;

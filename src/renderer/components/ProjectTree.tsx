@@ -11,8 +11,9 @@ import MuiTreeItem from '@mui/lab/TreeItem';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import FolderEmptyIcon from '@mui/icons-material/FolderOpen';
 import FolderIcon from '@mui/icons-material/Folder';
-import ForumIcon from '@mui/icons-material/Forum';
+import ConvIcon from '@mui/icons-material/Forum';
 
 import {
   ChannelsMain,
@@ -195,6 +196,19 @@ function TreeNode({ treeData }: TreeNodeProps) {
     window.electron.ipcRenderer.sendMessage(ChannelsMain.fsMove, path, newPath);
   };
 
+  const icon = () => {
+    if (!isDir) {
+      // file icon
+      return <ConvIcon />;
+    }
+    if (children) {
+  console.log(children, 'children')
+      return <FolderIcon />;
+    } else {
+      return <FolderEmptyIcon />;
+    }
+  };
+
   React.useEffect(() => {
     // attach the event listener
     document.addEventListener('keydown', handleKeyPress);
@@ -209,7 +223,7 @@ function TreeNode({ treeData }: TreeNodeProps) {
     <TreeItem
       nodeId={nodeId}
       label={name}
-      icon={isDir ? <FolderIcon /> : <ForumIcon />}
+      icon={icon()}
       isDir={isDir}
       isRename={treeNodeState.isRename}
       onRename={onRename}
