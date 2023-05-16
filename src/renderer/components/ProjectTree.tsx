@@ -34,6 +34,7 @@ interface DirItemProps {
   icon: React.ReactNode;
   isDir: boolean;
   isRename: boolean;
+  onDelete: () => void;
   onRename: (newName: string) => void;
   children: React.ReactNode | undefined;
 }
@@ -50,6 +51,7 @@ function TreeItem({
   icon,
   isDir,
   isRename,
+  onDelete,
   onRename,
   children,
 }: DirItemProps) {
@@ -150,7 +152,14 @@ function TreeItem({
                 : undefined
             }
           >
-            <MenuItem onClick={handleClose}>Delete</MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleClose();
+                onDelete();
+              }}
+            >
+              Delete
+            </MenuItem>
             <MenuItem onClick={handleClose}>Rename</MenuItem>
             <MenuItem onClick={handleClose}>Open</MenuItem>
           </Menu>
@@ -189,6 +198,10 @@ function TreeNode({ treeData }: TreeNodeProps) {
     [nodeId, isProjectTreeFocus, treeNodeState.isSelected, dispatch]
   );
 
+  const onDelete = () => {
+    window.electron.ipcRenderer.sendMessage(ChannelsMain.fsRemove, path);
+  };
+
   const onRename = (newName: string) => {
     dispatch(setProjectTreeNodeState({ nodeId, isRename: false }));
     if (name === newName) return;
@@ -202,7 +215,6 @@ function TreeNode({ treeData }: TreeNodeProps) {
       return <ConvIcon />;
     }
     if (children) {
-  console.log(children, 'children')
       return <FolderIcon />;
     } else {
       return <FolderEmptyIcon />;
@@ -226,6 +238,7 @@ function TreeNode({ treeData }: TreeNodeProps) {
       icon={icon()}
       isDir={isDir}
       isRename={treeNodeState.isRename}
+      onDelete={onDelete}
       onRename={onRename}
     >
       {children &&

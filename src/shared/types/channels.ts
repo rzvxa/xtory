@@ -4,6 +4,7 @@ export enum ChannelsMain {
   getXtoryTemplates = 'getXtoryTemplates',
   openProject = 'openProject',
   fsMove = 'fsMove',
+  fsRemove = 'fsRemove',
   customIPC = 'customIPC',
 }
 

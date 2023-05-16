@@ -3,6 +3,7 @@ import { ipcMain } from 'electron';
 import { ChannelsMain, IpcAction, IpcInvoke } from 'shared/types';
 
 import fsMoveIpcAction from './ipc/actions/fsMove';
+import fsRemoveIpcAction from './ipc/actions/fsRemove';
 
 import browseFileSystemIpcInvoke from './ipc/invokes/browseFileSystem';
 import createNewProjectIpcInvoke from './ipc/invokes/createNewProject';
@@ -18,6 +19,7 @@ const handle = (channel: ChannelsMain, ipcAction: IpcInvoke): void => {
 };
 
 on(ChannelsMain.fsMove, fsMoveIpcAction);
+on(ChannelsMain.fsRemove, fsRemoveIpcAction);
 
 handle(ChannelsMain.browseFileSystem, browseFileSystemIpcInvoke);
 handle(ChannelsMain.createNewProject, createNewProjectIpcInvoke);

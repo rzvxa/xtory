@@ -1,6 +1,6 @@
 import { resolveHtmlPath } from './utils/resolveHtmlPath';
 
-import { exists } from './utils/fsUtils/exists';
+import exists from './utils/fsUtils/exists';
 
 import {
   appPath,

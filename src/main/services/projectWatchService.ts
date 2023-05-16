@@ -139,11 +139,14 @@ class ProjectWatchService {
     const parent = this.#findNodeParent(pathArr);
 
     // parent already deleted
-    if (!parent) {
+    if (!parent || !parent.children) {
       return;
     }
 
-    delete parent.children![name];
+    delete parent.children[name];
+    if (!Object.entries(parent.children).length) {
+      delete parent.children;
+    }
     this.isDirty = true;
   }
 

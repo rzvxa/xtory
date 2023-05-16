@@ -42,3 +42,9 @@ export function sanitizePath(path: string, unixSep: boolean = true) {
   if (unixSep) output = output.replaceAll('\\', '/');
   return output;
 }
+
+export function delay(duration: number): Promise<void> {
+  return new Promise((resolve) => {
+    setTimeout(resolve, duration);
+  });
+}
