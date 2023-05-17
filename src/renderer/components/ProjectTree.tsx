@@ -4,16 +4,24 @@ import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
-import Menu from '@mui/material/Menu';
-import MenuItem from '@mui/material/MenuItem';
 import MuiTreeView from '@mui/lab/TreeView';
 import MuiTreeItem from '@mui/lab/TreeItem';
+import Divider from '@mui/material/Divider';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import FolderEmptyIcon from '@mui/icons-material/FolderOpen';
 import FolderIcon from '@mui/icons-material/Folder';
 import ConvIcon from '@mui/icons-material/Forum';
+
+import FileOpenIcon from '@mui/icons-material/FileOpen';
+import ContentCut from '@mui/icons-material/ContentCut';
+import ContentCopy from '@mui/icons-material/ContentCopy';
+import ContentPaste from '@mui/icons-material/ContentPaste';
+import InsertLinkIcon from '@mui/icons-material/InsertLink';
+import DatasetLinkedIcon from '@mui/icons-material/DatasetLinked';
+import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 import {
   ChannelsMain,
@@ -27,6 +35,8 @@ import {
   setIsProjectTreeFocus,
   setProjectTreeNodeState,
 } from 'renderer/state/store/filesTool';
+
+import { ContextMenu, ContextMenuItem } from './ContextMenu';
 
 interface DirItemProps {
   nodeId: string;
@@ -141,28 +151,54 @@ function TreeItem({
             </Typography>
           )}
 
-          <Menu
+          <ContextMenu
             open={contextMenu !== null}
             onClose={handleClose}
-            anchorReference="anchorPosition"
-            disableScrollLock
             anchorPosition={
               contextMenu !== null
                 ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
                 : undefined
             }
           >
-            <MenuItem
-              onClick={() => {
-                handleClose();
-                onDelete();
-              }}
-            >
-              Delete
-            </MenuItem>
-            <MenuItem onClick={handleClose}>Rename</MenuItem>
-            <MenuItem onClick={handleClose}>Open</MenuItem>
-          </Menu>
+            <ContextMenuItem
+              icon={<FileOpenIcon />}
+              label="Open"
+              shortcut="Enter"
+            />
+            <Divider variant="middle" />
+            <ContextMenuItem icon={<ContentCut />} label="Cut" shortcut="⌘X" />
+            <ContextMenuItem
+              icon={<ContentCopy />}
+              label="Copy"
+              shortcut="⌘C"
+            />
+            <ContextMenuItem
+              icon={<ContentPaste />}
+              label="Paste"
+              shortcut="⌘V"
+            />
+            <Divider variant="middle" />
+            <ContextMenuItem
+              icon={<InsertLinkIcon />}
+              label="Copy Path"
+              shortcut="Shift + Alt + C"
+            />
+            <ContextMenuItem
+              icon={<DatasetLinkedIcon />}
+              label="Copy Relative Path"
+            />
+            <Divider variant="middle" />
+            <ContextMenuItem
+              icon={<DriveFileRenameOutlineIcon />}
+              label="Rename..."
+              shortcut="F2"
+            />
+            <ContextMenuItem
+              icon={<DeleteIcon />}
+              label="Delete"
+              shortcut="Delete"
+            />
+          </ContextMenu>
         </Box>
       }
     >
@@ -216,9 +252,8 @@ function TreeNode({ treeData }: TreeNodeProps) {
     }
     if (children) {
       return <FolderIcon />;
-    } else {
-      return <FolderEmptyIcon />;
     }
+    return <FolderEmptyIcon />;
   };
 
   React.useEffect(() => {
