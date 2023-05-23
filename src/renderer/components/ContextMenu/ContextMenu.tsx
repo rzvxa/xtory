@@ -5,7 +5,7 @@ import MenuList from '@mui/material/MenuList';
 
 export interface ContextMenuProps {
   open: boolean;
-  onClose: () => void;
+  onClose: (event: React.MouseEvent | React.KeyboardEvent) => void;
   anchorPosition: { left: number; top: number } | undefined;
   children: React.ReactNode;
 }
@@ -31,7 +31,22 @@ export default function ContextMenu({
             '.MuiMenuItem-root': { padding: '1px 10px 1px 10px' },
           }}
         >
-          {children}
+          {React.Children.map<React.ReactNode, React.ReactNode>(
+            children,
+            (child: React.ReactNode) => {
+              if (React.isValidElement(child)) {
+                return React.cloneElement(child as React.ReactElement, {
+                  onClose: child.props.onClose
+                    ? (e: React.MouseEvent) => {
+                        child.props.onClose();
+                        onClose(e);
+                      }
+                    : onClose,
+                });
+              }
+              return null;
+            }
+          )}
         </MenuList>
       </Box>
     </Menu>

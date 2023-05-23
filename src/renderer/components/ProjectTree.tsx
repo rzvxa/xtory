@@ -40,6 +40,7 @@ import { ContextMenu, ContextMenuItem } from './ContextMenu';
 
 interface DirItemProps {
   nodeId: string;
+  root: boolean;
   label: string;
   icon: React.ReactNode;
   isDir: boolean;
@@ -57,6 +58,7 @@ const NewNameTextInput = styled(TextField)(() => ({
 
 function TreeItem({
   nodeId,
+  root,
   label,
   icon,
   isDir,
@@ -86,7 +88,9 @@ function TreeItem({
     );
   };
 
-  const handleClose = () => {
+  const handleClose = (event: React.MouseEvent | React.KeyboardEvent) => {
+    event.stopPropagation();
+    event.preventDefault();
     setContextMenu(null);
   };
 
@@ -165,39 +169,45 @@ function TreeItem({
               label="Open"
               shortcut="Enter"
             />
-            <Divider variant="middle" />
-            <ContextMenuItem icon={<ContentCut />} label="Cut" shortcut="⌘X" />
-            <ContextMenuItem
-              icon={<ContentCopy />}
-              label="Copy"
-              shortcut="⌘C"
-            />
-            <ContextMenuItem
-              icon={<ContentPaste />}
-              label="Paste"
-              shortcut="⌘V"
-            />
-            <Divider variant="middle" />
-            <ContextMenuItem
-              icon={<InsertLinkIcon />}
-              label="Copy Path"
-              shortcut="Shift + Alt + C"
-            />
-            <ContextMenuItem
-              icon={<DatasetLinkedIcon />}
-              label="Copy Relative Path"
-            />
-            <Divider variant="middle" />
-            <ContextMenuItem
-              icon={<DriveFileRenameOutlineIcon />}
-              label="Rename..."
-              shortcut="F2"
-            />
-            <ContextMenuItem
-              icon={<DeleteIcon />}
-              label="Delete"
-              shortcut="Delete"
-            />
+            {root || [
+              <Divider variant="middle" />,
+              <ContextMenuItem
+                icon={<ContentCut />}
+                label="Cut"
+                shortcut="⌘X"
+              />,
+              <ContextMenuItem
+                icon={<ContentCopy />}
+                label="Copy"
+                shortcut="⌘C"
+              />,
+              <ContextMenuItem
+                icon={<ContentPaste />}
+                label="Paste"
+                shortcut="⌘V"
+              />,
+              <Divider variant="middle" />,
+              <ContextMenuItem
+                icon={<InsertLinkIcon />}
+                label="Copy Path"
+                shortcut="Shift + Alt + C"
+              />,
+              <ContextMenuItem
+                icon={<DatasetLinkedIcon />}
+                label="Copy Relative Path"
+              />,
+              <Divider variant="middle" />,
+              <ContextMenuItem
+                icon={<DriveFileRenameOutlineIcon />}
+                label="Rename..."
+                shortcut="F2"
+              />,
+              <ContextMenuItem
+                icon={<DeleteIcon />}
+                label="Delete"
+                shortcut="Delete"
+              />,
+            ]}
           </ContextMenu>
         </Box>
       }
@@ -209,9 +219,10 @@ function TreeItem({
 
 interface TreeNodeProps {
   treeData: ProjectTreeState | ProjectTreeNode;
+  root?: boolean;
 }
 
-function TreeNode({ treeData }: TreeNodeProps) {
+function TreeNode({ treeData, root = false }: TreeNodeProps) {
   const dispatch = useAppDispatch();
   const { name, path, isDir, children } = treeData;
   const nodeId = path;
@@ -268,6 +279,7 @@ function TreeNode({ treeData }: TreeNodeProps) {
 
   return (
     <TreeItem
+      root={root}
       nodeId={nodeId}
       label={name}
       icon={icon()}
@@ -323,7 +335,7 @@ export default function ProjectTree() {
       defaultExpandIcon={<ChevronRightIcon />}
       sx={{ flexGrow: 1, overflowY: 'auto' }}
     >
-      {projectTree && <TreeNode treeData={projectTree} />}
+      {projectTree && <TreeNode treeData={projectTree} root />}
     </MuiTreeView>
   );
 }
