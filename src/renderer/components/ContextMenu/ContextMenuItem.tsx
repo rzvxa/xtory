@@ -5,7 +5,6 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import Typography from '@mui/material/Typography';
 
 export interface ContextMenuItemProps {
-  icon: React.ReactElement;
   label: string;
   shortcut?: string | undefined;
   onClick?: () => void | undefined;
@@ -13,7 +12,6 @@ export interface ContextMenuItemProps {
 }
 
 export default function ContextMenuItem({
-  icon,
   label,
   shortcut = undefined,
   onClick = undefined,
@@ -29,9 +27,6 @@ export default function ContextMenuItem({
   };
   return (
     <MenuItem onClick={clickHandler}>
-      <ListItemIcon>
-        {React.cloneElement(icon, { fontSize: 'small' })}
-      </ListItemIcon>
       <ListItemText>{label}</ListItemText>
       <Typography variant="body2" color="text.secondary">
         {shortcut}

@@ -169,7 +169,6 @@ function TreeItem({
             }
           >
             <ContextMenuItem
-              icon={<FileOpenIcon />}
               label="Open"
               shortcut="Enter"
             />
@@ -177,44 +176,37 @@ function TreeItem({
               <Divider key={'1'} variant="middle" />,
               <ContextMenuItem
                 key={'2'}
-                icon={<ContentCut />}
                 label="Cut"
                 shortcut="⌘X"
               />,
               <ContextMenuItem
                 key={'3'}
-                icon={<ContentCopy />}
                 label="Copy"
                 shortcut="⌘C"
               />,
               <ContextMenuItem
                 key={'4'}
-                icon={<ContentPaste />}
                 label="Paste"
                 shortcut="⌘V"
               />,
               <Divider key={'5'} variant="middle" />,
               <ContextMenuItem
                 key={'6'}
-                icon={<InsertLinkIcon />}
                 label="Copy Path"
                 shortcut="Shift + Alt + C"
               />,
               <ContextMenuItem
                 key={'7'}
-                icon={<DatasetLinkedIcon />}
                 label="Copy Relative Path"
               />,
               <Divider key={'8'} variant="middle" />,
               <ContextMenuItem
                 key={'9'}
-                icon={<DriveFileRenameOutlineIcon />}
                 label="Rename..."
                 shortcut="F2"
               />,
               <ContextMenuItem
                 key={'10'}
-                icon={<DeleteIcon />}
                 label="Delete"
                 shortcut="Delete"
               />,
