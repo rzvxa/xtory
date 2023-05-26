@@ -30,7 +30,10 @@ import {
 } from 'shared/types';
 
 import { useAppSelector, useAppDispatch } from 'renderer/state/store';
-import { ProjectTreeNodeState } from 'renderer/state/types';
+import {
+  ProjectTreeNodeState,
+  ProjectTreeNodeStates,
+} from 'renderer/state/types';
 import {
   setIsProjectTreeFocus,
   setProjectTreeNodeState,
@@ -129,6 +132,7 @@ function TreeItem({
 
   return (
     <MuiTreeItem
+      key={nodeId}
       nodeId={nodeId}
       label={
         <Box
@@ -301,8 +305,9 @@ export default function ProjectTree() {
   const projectTree: ProjectTreeState = useAppSelector(
     (state) => state.projectState.projectTree
   );
-
-  const [lastSelected, setLastSelected] = React.useState<string | null>(null);
+  const projectTreeStates: ProjectTreeNodeStates = useAppSelector(
+    (state) => state.filesToolState.projectTreeNodeStates
+  );
 
   const onFocus = () => {
     dispatch(setIsProjectTreeFocus(true));
@@ -313,21 +318,38 @@ export default function ProjectTree() {
   };
 
   const onNodeSelect = (event: React.SyntheticEvent, nodeId: string) => {
-    if (lastSelected) {
-      dispatch(
-        setProjectTreeNodeState({
-          nodeId: lastSelected,
-          isSelected: false,
-        })
+    Object.entries(projectTreeStates)
+      .filter((kv: [string, ProjectTreeNodeState]) => kv[1].isSelected)
+      .map((kv: [string, ProjectTreeNodeState]) =>
+        dispatch(
+          setProjectTreeNodeState({
+            nodeId: kv[0],
+            isSelected: false,
+          })
+        )
       );
-    }
     dispatch(setProjectTreeNodeState({ nodeId, isSelected: true }));
-    setLastSelected(nodeId);
+  };
+
+  const expanded = Object.entries(projectTreeStates)
+    .filter((kv: [string, ProjectTreeNodeState]) => kv[1].isExpanded)
+    .map((kv: [string, ProjectTreeNodeState]) => kv[0]);
+  const onNodeToggle = (event: React.SyntheticEvent, nodeIds: string[]) => {
+    const newIds = nodeIds.filter((id) => !expanded.includes(id));
+    const removedIds = expanded.filter((id) => !nodeIds.includes(id));
+    newIds.map((id) =>
+      dispatch(setProjectTreeNodeState({ nodeId: id, isExpanded: true }))
+    );
+    removedIds.map((id) =>
+      dispatch(setProjectTreeNodeState({ nodeId: id, isExpanded: false }))
+    );
   };
 
   return (
     <MuiTreeView
       onNodeSelect={onNodeSelect}
+      onNodeToggle={onNodeToggle}
+      expanded={expanded}
       onFocus={onFocus}
       onBlur={onBlur}
       aria-label="Project Tool"

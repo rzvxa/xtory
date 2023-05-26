@@ -1,5 +1,9 @@
 import { ProjectState } from './project';
-import { FilesToolState, ProjectTreeNodeState } from './toolBox';
+import {
+  FilesToolState,
+  ProjectTreeNodeState,
+  ProjectTreeNodeStates,
+} from './toolBox';
 import { TabState, TabsState } from './tabs';
 
 export {
@@ -8,4 +12,5 @@ export {
   ProjectState,
   FilesToolState,
   ProjectTreeNodeState,
+  ProjectTreeNodeStates,
 };
