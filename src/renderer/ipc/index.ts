@@ -1,7 +1,7 @@
 import { ChannelsRenderer, IpcAction } from 'shared/types';
-import onProjectOpenedIpcAction from './ipc/actions/onProjectOpened';
-import onProjectTreeUpdatedIpcAction from './ipc/actions/onProjectTreeUpdated';
-import toastMessageIpcAction from './ipc/actions/toastMessage';
+import onProjectOpenedIpcAction from './actions/onProjectOpened';
+import onProjectTreeUpdatedIpcAction from './actions/onProjectTreeUpdated';
+import toastMessageIpcAction from './actions/toastMessage';
 
 const on = (channel: ChannelsRenderer, ipcAction: IpcAction): void => {
   window.electron.ipcRenderer.on(channel, ipcAction);
