@@ -3,6 +3,8 @@ export enum ChannelsMain {
   createNewProject = 'createNewProject',
   getXtoryTemplates = 'getXtoryTemplates',
   openProject = 'openProject',
+  fspExists = 'fspExists',
+  fspMkdir = 'fspMkdir',
   fsMove = 'fsMove',
   fsRemove = 'fsRemove',
   customIPC = 'customIPC',

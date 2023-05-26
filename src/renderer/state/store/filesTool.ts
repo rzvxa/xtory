@@ -27,9 +27,27 @@ const filesTool: any = createSlice({
       const newState = Object.assign(oldState, payload);
       state.projectTreeNodeStates[payload.nodeId] = newState;
     },
+    setSelectedNode: (
+      state: FilesToolState,
+      { payload }: PayloadAction<string>
+    ) => {
+      Object.entries(state.projectTreeNodeStates).forEach(
+        (kv: [string, ProjectTreeNodeState]) => {
+          kv[1].isSelected = false;
+        }
+      );
+      const oldState = state.projectTreeNodeStates[payload] || {
+        nodeId: payload,
+      };
+      const newState = Object.assign(oldState, { isSelected: true });
+      state.projectTreeNodeStates[payload] = newState;
+    },
   },
 });
 
-export const { setIsProjectTreeFocus, setProjectTreeNodeState } =
-  filesTool.actions;
+export const {
+  setIsProjectTreeFocus,
+  setProjectTreeNodeState,
+  setSelectedNode,
+} = filesTool.actions;
 export default filesTool.reducer;

@@ -14,15 +14,6 @@ import FolderEmptyIcon from '@mui/icons-material/FolderOpen';
 import FolderIcon from '@mui/icons-material/Folder';
 import ConvIcon from '@mui/icons-material/Forum';
 
-import FileOpenIcon from '@mui/icons-material/FileOpen';
-import ContentCut from '@mui/icons-material/ContentCut';
-import ContentCopy from '@mui/icons-material/ContentCopy';
-import ContentPaste from '@mui/icons-material/ContentPaste';
-import InsertLinkIcon from '@mui/icons-material/InsertLink';
-import DatasetLinkedIcon from '@mui/icons-material/DatasetLinked';
-import DriveFileRenameOutlineIcon from '@mui/icons-material/DriveFileRenameOutline';
-import DeleteIcon from '@mui/icons-material/Delete';
-
 import {
   ChannelsMain,
   ProjectTree as ProjectTreeState,
@@ -37,6 +28,7 @@ import {
 import {
   setIsProjectTreeFocus,
   setProjectTreeNodeState,
+  setSelectedNode,
 } from 'renderer/state/store/filesTool';
 
 import { ContextMenu, ContextMenuItem } from './ContextMenu';
@@ -48,6 +40,7 @@ interface DirItemProps {
   icon: React.ReactNode;
   isDir: boolean;
   isRename: boolean;
+  newFolder: () => void;
   onDelete: () => void;
   onRename: (newName: string) => void;
   children: React.ReactNode | undefined;
@@ -66,6 +59,7 @@ function TreeItem({
   icon,
   isDir,
   isRename,
+  newFolder,
   onDelete,
   onRename,
   children,
@@ -168,48 +162,38 @@ function TreeItem({
                 : undefined
             }
           >
-            <ContextMenuItem
-              label="Open"
-              shortcut="Enter"
-            />
+            {isDir ? (
+              [
+                <ContextMenuItem
+                  key="1"
+                  label="New File"
+                  shortcut="Ctrl + N"
+                />,
+                <ContextMenuItem
+                  key="2"
+                  label="New Folder"
+                  shortcut="Ctrl + Shift + N"
+                  onClick={newFolder}
+                />,
+              ]
+            ) : (
+              <ContextMenuItem label="Open" shortcut="Enter" />
+            )}
             {root || [
-              <Divider key={'1'} variant="middle" />,
+              <Divider key="1" variant="middle" />,
+              <ContextMenuItem key="2" label="Cut" shortcut="⌘X" />,
+              <ContextMenuItem key="3" label="Copy" shortcut="⌘C" />,
+              <ContextMenuItem key="4" label="Paste" shortcut="⌘V" />,
+              <Divider key="5" variant="middle" />,
               <ContextMenuItem
-                key={'2'}
-                label="Cut"
-                shortcut="⌘X"
-              />,
-              <ContextMenuItem
-                key={'3'}
-                label="Copy"
-                shortcut="⌘C"
-              />,
-              <ContextMenuItem
-                key={'4'}
-                label="Paste"
-                shortcut="⌘V"
-              />,
-              <Divider key={'5'} variant="middle" />,
-              <ContextMenuItem
-                key={'6'}
+                key="6"
                 label="Copy Path"
                 shortcut="Shift + Alt + C"
               />,
-              <ContextMenuItem
-                key={'7'}
-                label="Copy Relative Path"
-              />,
-              <Divider key={'8'} variant="middle" />,
-              <ContextMenuItem
-                key={'9'}
-                label="Rename..."
-                shortcut="F2"
-              />,
-              <ContextMenuItem
-                key={'10'}
-                label="Delete"
-                shortcut="Delete"
-              />,
+              <ContextMenuItem key="7" label="Copy Relative Path" />,
+              <Divider key="8" variant="middle" />,
+              <ContextMenuItem key="9" label="Rename..." shortcut="F2" />,
+              <ContextMenuItem key="10" label="Delete" shortcut="Delete" />,
             ]}
           </ContextMenu>
         </Box>
@@ -247,6 +231,35 @@ function TreeNode({ treeData, root = false }: TreeNodeProps) {
     },
     [nodeId, isProjectTreeFocus, treeNodeState.isSelected, dispatch]
   );
+
+  const newFolder = async () => {
+    const basePath = `${path}/New Folder`;
+    let newPath;
+    let newCount = 0;
+    while (newCount >= 0) {
+      /* eslint-disable no-await-in-loop */
+      newPath = basePath + (newCount === 0 ? '' : ` ${newCount}`);
+      if (
+        !(await window.electron.ipcRenderer.invoke(
+          ChannelsMain.fspExists,
+          newPath
+        ))
+      ) {
+        await window.electron.ipcRenderer.invoke(
+          ChannelsMain.fspMkdir,
+          newPath
+        );
+        newCount = -1;
+        break;
+      }
+      newCount++;
+      /* eslint-enable no-await-in-loop */
+    }
+    console.log('newPath', newPath);
+    dispatch(setSelectedNode(newPath));
+    dispatch(setProjectTreeNodeState({ nodeId, isExpanded: true }))
+    dispatch(setProjectTreeNodeState({ nodeId: newPath, isRename: true }));
+  };
 
   const onDelete = () => {
     window.electron.ipcRenderer.sendMessage(ChannelsMain.fsRemove, path);
@@ -288,6 +301,7 @@ function TreeNode({ treeData, root = false }: TreeNodeProps) {
       icon={icon()}
       isDir={isDir}
       isRename={treeNodeState.isRename}
+      newFolder={newFolder}
       onDelete={onDelete}
       onRename={onRename}
     >
@@ -316,18 +330,12 @@ export default function ProjectTree() {
     dispatch(setIsProjectTreeFocus(false));
   };
 
+  const selected = Object.entries(projectTreeStates)
+    .filter((kv: [string, ProjectTreeNodeState]) => kv[1].isSelected)
+    .map((kv: [string, ProjectTreeNodeState]) => kv[0]);
+
   const onNodeSelect = (event: React.SyntheticEvent, nodeId: string) => {
-    Object.entries(projectTreeStates)
-      .filter((kv: [string, ProjectTreeNodeState]) => kv[1].isSelected)
-      .map((kv: [string, ProjectTreeNodeState]) =>
-        dispatch(
-          setProjectTreeNodeState({
-            nodeId: kv[0],
-            isSelected: false,
-          })
-        )
-      );
-    dispatch(setProjectTreeNodeState({ nodeId, isSelected: true }));
+    dispatch(setSelectedNode(nodeId));
   };
 
   const expanded = Object.entries(projectTreeStates)
@@ -347,6 +355,7 @@ export default function ProjectTree() {
   return (
     <MuiTreeView
       onNodeSelect={onNodeSelect}
+      selected={selected}
       onNodeToggle={onNodeToggle}
       expanded={expanded}
       onFocus={onFocus}

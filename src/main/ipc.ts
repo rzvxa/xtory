@@ -7,6 +7,8 @@ import fsRemoveIpcAction from './ipc/actions/fsRemove';
 
 import browseFileSystemIpcInvoke from './ipc/invokes/browseFileSystem';
 import createNewProjectIpcInvoke from './ipc/invokes/createNewProject';
+import fspExistsIpcInvoke from './ipc/invokes/fspExists';
+import fspMkdirIpcInvoke from './ipc/invokes/fspMkdir';
 import getXtoryTemplatesIpcInvoke from './ipc/invokes/getXtoryTemplates';
 import openProjectIpcInvoke from './ipc/invokes/openProject';
 
@@ -23,5 +25,7 @@ on(ChannelsMain.fsRemove, fsRemoveIpcAction);
 
 handle(ChannelsMain.browseFileSystem, browseFileSystemIpcInvoke);
 handle(ChannelsMain.createNewProject, createNewProjectIpcInvoke);
+handle(ChannelsMain.fspExists, fspExistsIpcInvoke);
+handle(ChannelsMain.fspMkdir, fspMkdirIpcInvoke);
 handle(ChannelsMain.getXtoryTemplates, getXtoryTemplatesIpcInvoke);
 handle(ChannelsMain.openProject, openProjectIpcInvoke);
