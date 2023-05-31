@@ -15,6 +15,7 @@ import FolderIcon from '@mui/icons-material/Folder';
 import ConvIcon from '@mui/icons-material/Forum';
 
 import {
+  Platform,
   ChannelsMain,
   ProjectTree as ProjectTreeState,
   ProjectTreeNode,
@@ -39,10 +40,14 @@ interface DirItemProps {
   label: string;
   icon: React.ReactNode;
   isDir: boolean;
+  // undefined if isDir is false
+  isExpanded: boolean | undefined;
   isRename: boolean;
-  newFolder: () => void;
+  onExpandToggle: () => void;
+  onNewFolder: () => void;
   onDelete: () => void;
-  onRename: (newName: string) => void;
+  onRename: () => void;
+  onRenameDone: (newName: string) => void;
   children: React.ReactNode | undefined;
 }
 
@@ -59,9 +64,12 @@ function TreeItem({
   icon,
   isDir,
   isRename,
-  newFolder,
+  isExpanded,
+  onExpandToggle,
+  onNewFolder,
   onDelete,
   onRename,
+  onRenameDone,
   children,
 }: DirItemProps) {
   const [newName, setNewName] = React.useState<string>(label);
@@ -94,11 +102,13 @@ function TreeItem({
   const handleKeyPress = React.useCallback(
     (event: KeyboardEvent) => {
       if (!isRename) return;
-      if (event.key === 'Enter') {
-        onRename(newName);
+      if (event.key === 'Escape') {
+        onRenameDone(label);
+      } else if (event.key === 'Enter') {
+        onRenameDone(newName);
       }
     },
-    [isRename, onRename, newName]
+    [isRename, onRenameDone, newName, label]
   );
 
   React.useEffect(() => {
@@ -121,8 +131,19 @@ function TreeItem({
   };
 
   const onNewNameBlur = () => {
-    onRename(newName);
+    onRenameDone(newName);
   };
+
+  const revealFileInOS = [
+    [Platform.win32, 'Reveal in File Explorer'],
+    [Platform.darwin, 'Reveal in File Explorer'],
+    [Platform.linux, 'Reveal in File Explorer'],
+  ].reduce((accumulator, current, index, array) => {
+    const [flag, value] = current;
+    if (index === array.length - 1 && accumulator === '') return value;
+    if (window.platform === flag) return value;
+    return accumulator;
+  }, '');
 
   return (
     <MuiTreeItem
@@ -166,34 +187,40 @@ function TreeItem({
               [
                 <ContextMenuItem
                   key="1"
-                  label="New File"
-                  shortcut="Ctrl + N"
+                  label={isExpanded ? 'Collapse' : 'Expand'}
+                  shortcut="Enter"
+                  onClick={onExpandToggle}
                 />,
                 <ContextMenuItem
                   key="2"
                   label="New Folder"
                   shortcut="Ctrl + Shift + N"
-                  onClick={newFolder}
+                  onClick={onNewFolder}
                 />,
               ]
             ) : (
               <ContextMenuItem label="Open" shortcut="Enter" />
             )}
+            <Divider variant="middle" />
+            <ContextMenuItem label={revealFileInOS} />,
+            <Divider variant="middle" />
+            <ContextMenuItem label="Copy Path" shortcut="Shift + Alt + C" />
+            ,
+            <ContextMenuItem label="Copy Relative Path" />,
             {root || [
               <Divider key="1" variant="middle" />,
-              <ContextMenuItem key="2" label="Cut" shortcut="⌘X" />,
-              <ContextMenuItem key="3" label="Copy" shortcut="⌘C" />,
-              <ContextMenuItem key="4" label="Paste" shortcut="⌘V" />,
-              <Divider key="5" variant="middle" />,
               <ContextMenuItem
-                key="6"
-                label="Copy Path"
-                shortcut="Shift + Alt + C"
+                key="2"
+                label="Rename..."
+                shortcut="F2"
+                onClick={onRename}
               />,
-              <ContextMenuItem key="7" label="Copy Relative Path" />,
-              <Divider key="8" variant="middle" />,
-              <ContextMenuItem key="9" label="Rename..." shortcut="F2" />,
-              <ContextMenuItem key="10" label="Delete" shortcut="Delete" />,
+              <ContextMenuItem
+                key="3"
+                label="Delete"
+                shortcut="Delete"
+                onClick={onDelete}
+              />,
             ]}
           </ContextMenu>
         </Box>
@@ -232,7 +259,13 @@ function TreeNode({ treeData, root = false }: TreeNodeProps) {
     [nodeId, isProjectTreeFocus, treeNodeState.isSelected, dispatch]
   );
 
-  const newFolder = async () => {
+  const onExpandToggle = () => {
+    dispatch(
+      setProjectTreeNodeState({ nodeId, isExpanded: !treeNodeState.isExpanded })
+    );
+  };
+
+  const onNewFolder = async () => {
     const basePath = `${path}/New Folder`;
     let newPath;
     let newCount = 0;
@@ -255,9 +288,8 @@ function TreeNode({ treeData, root = false }: TreeNodeProps) {
       newCount++;
       /* eslint-enable no-await-in-loop */
     }
-    console.log('newPath', newPath);
     dispatch(setSelectedNode(newPath));
-    dispatch(setProjectTreeNodeState({ nodeId, isExpanded: true }))
+    dispatch(setProjectTreeNodeState({ nodeId, isExpanded: true }));
     dispatch(setProjectTreeNodeState({ nodeId: newPath, isRename: true }));
   };
 
@@ -265,7 +297,14 @@ function TreeNode({ treeData, root = false }: TreeNodeProps) {
     window.electron.ipcRenderer.sendMessage(ChannelsMain.fsRemove, path);
   };
 
-  const onRename = (newName: string) => {
+  const onRename = () => {
+    console.log('rename');
+    setTimeout(() =>
+      dispatch(setProjectTreeNodeState({ nodeId, isRename: true }))
+    );
+  };
+
+  const onRenameDone = (newName: string) => {
     dispatch(setProjectTreeNodeState({ nodeId, isRename: false }));
     if (name === newName) return;
     const newPath = path.split('/').slice(0, -1).join('/').concat('/', newName);
@@ -300,10 +339,13 @@ function TreeNode({ treeData, root = false }: TreeNodeProps) {
       label={name}
       icon={icon()}
       isDir={isDir}
+      isExpanded={treeNodeState.isExpanded}
       isRename={treeNodeState.isRename}
-      newFolder={newFolder}
+      onExpandToggle={onExpandToggle}
+      onNewFolder={onNewFolder}
       onDelete={onDelete}
       onRename={onRename}
+      onRenameDone={onRenameDone}
     >
       {children &&
         Object.entries(children)
@@ -354,7 +396,7 @@ export default function ProjectTree() {
 
   return (
     <MuiTreeView
-      onNodeSelect={onNodeSelect}
+      onNodeSelect={(e: any, i: any) => onNodeSelect(e, i as string)}
       selected={selected}
       onNodeToggle={onNodeToggle}
       expanded={expanded}
