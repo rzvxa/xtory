@@ -136,8 +136,8 @@ function TreeItem({
 
   const revealFileInOS = [
     [Platform.win32, 'Reveal in File Explorer'],
-    [Platform.darwin, 'Reveal in File Explorer'],
-    [Platform.linux, 'Reveal in File Explorer'],
+    [Platform.darwin, 'Reveal in Finder'],
+    [Platform.linux, 'Open Containing Folder'],
   ].reduce((accumulator, current, index, array) => {
     const [flag, value] = current;
     if (index === array.length - 1 && accumulator === '') return value;
