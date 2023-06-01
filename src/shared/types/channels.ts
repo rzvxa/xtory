@@ -7,6 +7,7 @@ export enum ChannelsMain {
   fspMkdir = 'fspMkdir',
   fsMove = 'fsMove',
   fsRemove = 'fsRemove',
+  revealPathInOS = 'revealPathInOS',
   customIPC = 'customIPC',
 }
 

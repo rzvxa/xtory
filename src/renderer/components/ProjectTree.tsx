@@ -45,6 +45,7 @@ interface DirItemProps {
   isRename: boolean;
   onExpandToggle: () => void;
   onNewFolder: () => void;
+  onReveal: () => void;
   onDelete: () => void;
   onRename: () => void;
   onRenameDone: (newName: string) => void;
@@ -67,6 +68,7 @@ function TreeItem({
   isExpanded,
   onExpandToggle,
   onNewFolder,
+  onReveal,
   onDelete,
   onRename,
   onRenameDone,
@@ -134,7 +136,7 @@ function TreeItem({
     onRenameDone(newName);
   };
 
-  const revealFileInOS = [
+  const revealPathInOS = [
     [Platform.win32, 'Reveal in File Explorer'],
     [Platform.darwin, 'Reveal in Finder'],
     [Platform.linux, 'Open Containing Folder'],
@@ -202,7 +204,7 @@ function TreeItem({
               <ContextMenuItem label="Open" shortcut="Enter" />
             )}
             <Divider variant="middle" />
-            <ContextMenuItem label={revealFileInOS} />,
+            <ContextMenuItem label={revealPathInOS} onClick={onReveal} />,
             <Divider variant="middle" />
             <ContextMenuItem label="Copy Path" shortcut="Shift + Alt + C" />
             ,
@@ -293,12 +295,16 @@ function TreeNode({ treeData, root = false }: TreeNodeProps) {
     dispatch(setProjectTreeNodeState({ nodeId: newPath, isRename: true }));
   };
 
+  const onReveal = () => {
+    window.electron.ipcRenderer.sendMessage(ChannelsMain.revealPathInOS, path);
+  };
+
   const onDelete = () => {
     window.electron.ipcRenderer.sendMessage(ChannelsMain.fsRemove, path);
   };
 
   const onRename = () => {
-    console.log('rename');
+    // setting a timeout to let this render call ends!
     setTimeout(() =>
       dispatch(setProjectTreeNodeState({ nodeId, isRename: true }))
     );
@@ -343,6 +349,7 @@ function TreeNode({ treeData, root = false }: TreeNodeProps) {
       isRename={treeNodeState.isRename}
       onExpandToggle={onExpandToggle}
       onNewFolder={onNewFolder}
+      onReveal={onReveal}
       onDelete={onDelete}
       onRename={onRename}
       onRenameDone={onRenameDone}
