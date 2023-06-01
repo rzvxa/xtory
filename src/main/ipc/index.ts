@@ -2,15 +2,16 @@ import { ipcMain } from 'electron';
 
 import { ChannelsMain, IpcAction, IpcInvoke } from 'shared/types';
 
-import fsMoveIpcAction from './ipc/actions/fsMove';
-import fsRemoveIpcAction from './ipc/actions/fsRemove';
+import fsMoveIpcAction from './actions/fsMove';
+import fsRemoveIpcAction from './actions/fsRemove';
+import revealPathInOSAction from './actions/revealPathInOS';
 
-import browseFileSystemIpcInvoke from './ipc/invokes/browseFileSystem';
-import createNewProjectIpcInvoke from './ipc/invokes/createNewProject';
-import fspExistsIpcInvoke from './ipc/invokes/fspExists';
-import fspMkdirIpcInvoke from './ipc/invokes/fspMkdir';
-import getXtoryTemplatesIpcInvoke from './ipc/invokes/getXtoryTemplates';
-import openProjectIpcInvoke from './ipc/invokes/openProject';
+import browseFileSystemIpcInvoke from './invokes/browseFileSystem';
+import createNewProjectIpcInvoke from './invokes/createNewProject';
+import fspExistsIpcInvoke from './invokes/fspExists';
+import fspMkdirIpcInvoke from './invokes/fspMkdir';
+import getXtoryTemplatesIpcInvoke from './invokes/getXtoryTemplates';
+import openProjectIpcInvoke from './invokes/openProject';
 
 const on = (channel: ChannelsMain, ipcAction: IpcAction): void => {
   ipcMain.on(channel, ipcAction);
@@ -22,6 +23,7 @@ const handle = (channel: ChannelsMain, ipcAction: IpcInvoke): void => {
 
 on(ChannelsMain.fsMove, fsMoveIpcAction);
 on(ChannelsMain.fsRemove, fsRemoveIpcAction);
+on(ChannelsMain.revealPathInOS, revealPathInOSAction);
 
 handle(ChannelsMain.browseFileSystem, browseFileSystemIpcInvoke);
 handle(ChannelsMain.createNewProject, createNewProjectIpcInvoke);
