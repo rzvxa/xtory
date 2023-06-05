@@ -48,6 +48,8 @@ interface DirItemProps {
   onReveal: () => void;
   onDelete: () => void;
   onRename: () => void;
+  onCopyPath: () => void;
+  onCopyRelativePath: () => void;
   onRenameDone: (newName: string) => void;
   children: React.ReactNode | undefined;
 }
@@ -69,6 +71,8 @@ function TreeItem({
   onExpandToggle,
   onNewFolder,
   onReveal,
+  onCopyPath,
+  onCopyRelativePath,
   onDelete,
   onRename,
   onRenameDone,
@@ -206,9 +210,17 @@ function TreeItem({
             <Divider variant="middle" />
             <ContextMenuItem label={revealPathInOS} onClick={onReveal} />,
             <Divider variant="middle" />
-            <ContextMenuItem label="Copy Path" shortcut="Shift + Alt + C" />
+            <ContextMenuItem
+              label="Copy Path"
+              shortcut="Shift + Alt + C"
+              onClick={onCopyPath}
+            />
             ,
-            <ContextMenuItem label="Copy Relative Path" />,
+            <ContextMenuItem
+              label="Copy Relative Path"
+              onClick={onCopyRelativePath}
+            />
+            ,
             {root || [
               <Divider key="1" variant="middle" />,
               <ContextMenuItem
@@ -249,6 +261,9 @@ function TreeNode({ treeData, root = false }: TreeNodeProps) {
   const isProjectTreeFocus: boolean = useAppSelector(
     (state) => state.filesToolState.isProjectTreeFocus
   );
+  const projectPath: string = useAppSelector(
+    (state) => state.projectState.projectPath
+  )!;
 
   const handleKeyPress = React.useCallback(
     (event: KeyboardEvent) => {
@@ -310,6 +325,14 @@ function TreeNode({ treeData, root = false }: TreeNodeProps) {
     );
   };
 
+  const onCopyPath = () => {
+    navigator.clipboard.writeText(path);
+  };
+
+  const onCopyRelativePath = () => {
+    navigator.clipboard.writeText(path.replace(`${projectPath}/`, ''));
+  };
+
   const onRenameDone = (newName: string) => {
     dispatch(setProjectTreeNodeState({ nodeId, isRename: false }));
     if (name === newName) return;
@@ -352,6 +375,8 @@ function TreeNode({ treeData, root = false }: TreeNodeProps) {
       onReveal={onReveal}
       onDelete={onDelete}
       onRename={onRename}
+      onCopyPath={onCopyPath}
+      onCopyRelativePath={onCopyRelativePath}
       onRenameDone={onRenameDone}
     >
       {children &&
