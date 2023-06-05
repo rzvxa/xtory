@@ -32,7 +32,7 @@ const revealPathInWindows = async (
     return;
   }
 
-  const proc = spawn('explorer', [revealPath]);
+  const proc = spawn('explorer', [revealPath.replaceAll('/', '\\')]);
   proc.on('error', (err) => {
     proc.kill();
     onError(err);
