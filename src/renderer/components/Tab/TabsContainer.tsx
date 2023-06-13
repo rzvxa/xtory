@@ -19,9 +19,9 @@ import {
 import ForumIcon from '@mui/icons-material/Forum';
 import CloseIcon from '@mui/icons-material/Close';
 
-import { useAppDispatch, useAppSelector } from '../state/store/index';
-import { setActiveTabId, setTabs, changeTab } from '../state/store/tabs';
-import { TabState } from '../state/types/tabs/index';
+import { useAppDispatch, useAppSelector } from 'renderer/state/store/index';
+import { setActiveTabId, setTabs, changeTab } from 'renderer/state/store/tabs';
+import { TabState } from 'renderer/state/types/tabs/index';
 
 type Tab = TabState;
 

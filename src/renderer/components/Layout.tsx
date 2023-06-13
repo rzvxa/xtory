@@ -14,7 +14,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import GroupIcon from '@mui/icons-material/Group';
 import DataObjectIcon from '@mui/icons-material/DataObject';
 
-import Tabs from './Tabs';
+import TabsContainer from './Tab/TabsContainer';
 import { FilesTool, FindTool, NpcsTool, VariablesTool } from './ToolBox/index';
 
 interface LayoutProps {
@@ -169,7 +169,7 @@ export default function Layout({ children = null! }: LayoutProps) {
         <VariablesTool />
       </ToolBox>
       <MainBox quickAccessWidth={quickAccessWidth} toolBoxWidth={toolBoxWidth}>
-        <Tabs />
+        <TabsContainer />
       </MainBox>
     </Box>
   );
