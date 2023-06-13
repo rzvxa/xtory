@@ -67,7 +67,7 @@ const getListStyle = (theme: Theme, isDraggingOver: boolean) => ({
   overflow: 'auto',
 });
 
-export default function Tabs() {
+export default function TabsContainer() {
   const theme: Theme = useTheme();
   const dispatch = useAppDispatch();
 
