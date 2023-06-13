@@ -2,7 +2,6 @@
 import React from 'react';
 
 import Paper from '@mui/material/Paper';
-import TextField from '@mui/material/TextField';
 import Divider from '@mui/material/Divider';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
@@ -20,8 +19,9 @@ import ForumIcon from '@mui/icons-material/Forum';
 import CloseIcon from '@mui/icons-material/Close';
 
 import { useAppDispatch, useAppSelector } from 'renderer/state/store/index';
-import { setActiveTabId, setTabs, changeTab } from 'renderer/state/store/tabs';
+import { setActiveTabId, setTabs } from 'renderer/state/store/tabs';
 import { TabState } from 'renderer/state/types/tabs/index';
+import TabView from './TabView';
 
 type Tab = TabState;
 
@@ -73,7 +73,6 @@ export default function TabsContainer() {
 
   const activeTabId = useAppSelector((state) => state.tabsState.activeTabId);
   const tabs = useAppSelector((state) => state.tabsState.tabs);
-  console.log(tabs, activeTabId);
 
   const onDragEnd = (result: DropResult) => {
     // dropped outside the list
@@ -146,17 +145,7 @@ export default function TabsContainer() {
       </DragDropContext>
       <Divider />
       {/* body over here */}
-      <div>
-        <TextField
-          id="standard-basic"
-          label="Standard"
-          variant="standard"
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            dispatch(changeTab({ id: activeTabId, extra: e.target.value }));
-          }}
-          value={activeTab?.extra}
-        />
-      </div>
+      {activeTabId && <TabView tabId={activeTabId!} state={activeTab} />}
     </>
   );
 }
