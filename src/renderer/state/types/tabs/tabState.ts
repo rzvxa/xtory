@@ -1,5 +1,8 @@
+import { TabType } from './tabType';
+
 export interface TabState {
   id: string;
   title: string;
-  extra: string;
+  tabType: TabType;
+  tabData: any;
 }

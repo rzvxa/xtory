@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { TabState, TabsState } from '../types/tabs/index';
+import { TabType, TabState, TabsState } from '../types/tabs/index';
 
 import { XTORY_TABS_STATE } from './constants';
 
@@ -9,7 +9,8 @@ const getItems = (count: any): TabState[] =>
   Array.from({ length: count }, (v, k) => k).map((k) => ({
     id: `tab-${k}`,
     title: `Conversation-${k}.xconv`,
-    extra: 'extra',
+    tabType: TabType.file,
+    tabData: { extra: 'extra'},
   }));
 
 export const initialState: TabsState = {
@@ -41,12 +42,12 @@ const tabs: any = createSlice({
     },
     changeTab: (
       state: TabsState,
-      { payload }: PayloadAction<{ id: string; extra: string }>
+      { payload }: PayloadAction<{ id: string; tabData: object }>
     ) => {
       const tabIndex = state.tabs.findIndex(
         (tab: TabState) => tab.id === payload.id
       );
-      state.tabs[tabIndex].extra = payload.extra;
+      state.tabs[tabIndex].tabData = payload.tabData;
     },
     setState: setStateReducer<TabsState>(),
   },

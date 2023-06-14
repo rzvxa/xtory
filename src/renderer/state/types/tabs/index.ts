@@ -1,4 +1,6 @@
+import { TabType } from './tabType';
 import { TabState } from './tabState';
 import { TabsState } from './tabsState';
 
-export { TabState, TabsState };
+export type { TabState, TabsState };
+export { TabType };

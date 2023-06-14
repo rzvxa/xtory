@@ -20,9 +20,11 @@ export default function TabView({ tabId, state }: TabViewProps) {
         label="Standard"
         variant="standard"
         onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-          dispatch(changeTab({ id: tabId, extra: e.target.value }));
+          dispatch(
+            changeTab({ id: tabId, tabData: { extra: e.target.value } })
+          );
         }}
-        value={state.extra}
+        value={state.tabData.extra}
       />
     </div>
   );
