@@ -19,7 +19,7 @@ import ForumIcon from '@mui/icons-material/Forum';
 import CloseIcon from '@mui/icons-material/Close';
 
 import { useAppDispatch, useAppSelector } from 'renderer/state/store/index';
-import { setActiveTabId, setTabs } from 'renderer/state/store/tabs';
+import { setActiveTabId, setTabs, removeTab } from 'renderer/state/store/tabs';
 import { TabState } from 'renderer/state/types/tabs/index';
 import TabView from './TabView';
 
@@ -93,6 +93,15 @@ export default function TabsContainer() {
     dispatch(setActiveTabId(tabs[index].id));
   };
 
+  const handleTabClose = (index: number, tabId: string) => {
+    if (tabId === activeTabId) {
+      const nextTabIndex = index === 0 ? 1 : index - 1;
+      const nextTab = tabs[nextTabIndex];
+      dispatch(setActiveTabId(nextTab.id));
+    }
+    dispatch(removeTab(tabId));
+  };
+
   const activeTab = tabs.find((t: Tab) => t.id === activeTabId) ?? null!;
 
   return (
@@ -131,6 +140,8 @@ export default function TabsContainer() {
                           height: '24px',
                         }}
                         aria-label="Close"
+                        onMouseDown={(e) => e.stopPropagation()}
+                        onClick={() => handleTabClose(index, item.id)}
                       >
                         <CloseIcon sx={{ fontSize: 15 }} />
                       </IconButton>

@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import { TabType, TabState, TabsState } from '../types/tabs/index';
+import { TabType, TabState, TabsState } from '../types/tabs';
 
 import { XTORY_TABS_STATE } from './constants';
 
@@ -10,7 +10,7 @@ const getItems = (count: any): TabState[] =>
     id: `tab-${k}`,
     title: `Conversation-${k}.xconv`,
     tabType: TabType.file,
-    tabData: { extra: 'extra'},
+    tabData: { extra: 'extra' },
   }));
 
 export const initialState: TabsState = {
@@ -40,6 +40,15 @@ const tabs: any = createSlice({
       state.tabs = payload;
       // TODO save current(state) over here!
     },
+    addTab: (state: TabsState, { payload }: PayloadAction<TabState>) => {
+      if (state.tabs.find((tab) => tab.id === payload.id)) {
+        return;
+      }
+      state.tabs.push(payload);
+    },
+    removeTab: (state: TabsState, { payload }: PayloadAction<string>) => {
+      state.tabs = state.tabs.filter((tab) => tab.id !== payload);
+    },
     changeTab: (
       state: TabsState,
       { payload }: PayloadAction<{ id: string; tabData: object }>
@@ -53,5 +62,6 @@ const tabs: any = createSlice({
   },
 });
 
-export const { setActiveTabId, setTabs, changeTab, setState } = tabs.actions;
+export const { setActiveTabId, setTabs, addTab, removeTab, changeTab, setState } =
+  tabs.actions;
 export default tabs.reducer;

@@ -32,6 +32,9 @@ import {
   setSelectedNode,
 } from 'renderer/state/store/filesTool';
 
+import { TabType } from 'renderer/state/types/tabs';
+import { addTab } from 'renderer/state/store/tabs';
+
 import { ContextMenu, ContextMenuItem } from './ContextMenu';
 
 interface DirItemProps {
@@ -43,6 +46,7 @@ interface DirItemProps {
   // undefined if isDir is false
   isExpanded: boolean | undefined;
   isRename: boolean;
+  onOpen: () => void;
   onExpandToggle: () => void;
   onNewFolder: () => void;
   onReveal: () => void;
@@ -68,6 +72,7 @@ function TreeItem({
   isDir,
   isRename,
   isExpanded,
+  onOpen,
   onExpandToggle,
   onNewFolder,
   onReveal,
@@ -205,7 +210,7 @@ function TreeItem({
                 />,
               ]
             ) : (
-              <ContextMenuItem label="Open" shortcut="Enter" />
+              <ContextMenuItem label="Open" shortcut="Enter" onClick={onOpen} />
             )}
             <Divider variant="middle" />
             <ContextMenuItem label={revealPathInOS} onClick={onReveal} />,
@@ -275,6 +280,18 @@ function TreeNode({ treeData, root = false }: TreeNodeProps) {
     },
     [nodeId, isProjectTreeFocus, treeNodeState.isSelected, dispatch]
   );
+
+  const onOpen = () => {
+    console.log('open file: ', path);
+    dispatch(
+      addTab({
+        id: nodeId,
+        title: 'TITLE',
+        tabType: TabType.file,
+        tabData: { extra: 'halaloya' },
+      })
+    );
+  };
 
   const onExpandToggle = () => {
     dispatch(
@@ -370,6 +387,7 @@ function TreeNode({ treeData, root = false }: TreeNodeProps) {
       isDir={isDir}
       isExpanded={treeNodeState.isExpanded}
       isRename={treeNodeState.isRename}
+      onOpen={onOpen}
       onExpandToggle={onExpandToggle}
       onNewFolder={onNewFolder}
       onReveal={onReveal}
