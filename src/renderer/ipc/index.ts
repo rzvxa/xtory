@@ -1,5 +1,6 @@
 import { ChannelsRenderer, IpcAction } from 'shared/types';
 import onProjectOpenedIpcAction from './actions/onProjectOpened';
+import onOpenFileAsTabAction from './actions/onOpenFileAsTab';
 import onProjectTreeUpdatedIpcAction from './actions/onProjectTreeUpdated';
 import toastMessageIpcAction from './actions/toastMessage';
 
@@ -8,5 +9,6 @@ const on = (channel: ChannelsRenderer, ipcAction: IpcAction): void => {
 };
 
 on(ChannelsRenderer.onProjectOpened, onProjectOpenedIpcAction);
+on(ChannelsRenderer.onOpenFileAsTab, onOpenFileAsTabAction);
 on(ChannelsRenderer.onProjectTreeUpdated, onProjectTreeUpdatedIpcAction);
 on(ChannelsRenderer.toastMessage, toastMessageIpcAction);

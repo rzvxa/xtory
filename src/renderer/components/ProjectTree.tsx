@@ -32,9 +32,6 @@ import {
   setSelectedNode,
 } from 'renderer/state/store/filesTool';
 
-import { TabType } from 'renderer/state/types/tabs';
-import { addTab } from 'renderer/state/store/tabs';
-
 import { ContextMenu, ContextMenuItem } from './ContextMenu';
 
 interface DirItemProps {
@@ -283,14 +280,7 @@ function TreeNode({ treeData, root = false }: TreeNodeProps) {
 
   const onOpen = () => {
     console.log('open file: ', path);
-    dispatch(
-      addTab({
-        id: nodeId,
-        title: 'TITLE',
-        tabType: TabType.file,
-        tabData: { extra: 'halaloya' },
-      })
-    );
+    window.electron.ipcRenderer.sendMessage(ChannelsMain.openFileAsTab, path);
   };
 
   const onExpandToggle = () => {

@@ -1,3 +1,4 @@
+import React from 'react';
 import CssBaseline from '@mui/material/CssBaseline';
 import GlobalStyles from '@mui/material/GlobalStyles';
 import { ThemeProvider } from '@mui/material/styles';
@@ -15,6 +16,18 @@ import './styles/Global.scss';
 
 export default function App() {
   const projectPath = useAppSelector((state) => state.projectState.projectPath);
+  React.useEffect(() => {
+    const handleAuxClick = (event: MouseEvent) => {
+      if (event.button === 1) {
+        event.preventDefault();
+      }
+    };
+
+    document.addEventListener('mousedown', handleAuxClick);
+    return () => {
+      document.removeEventListener('mousedown', handleAuxClick);
+    };
+  }, []);
 
   return (
     <ThemeProvider theme={darkTheme}>

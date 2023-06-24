@@ -97,7 +97,7 @@ export default function TabsContainer() {
     if (tabId === activeTabId) {
       const nextTabIndex = index === 0 ? 1 : index - 1;
       const nextTab = tabs[nextTabIndex];
-      dispatch(setActiveTabId(nextTab.id));
+      dispatch(setActiveTabId(nextTab?.id || null));
     }
     dispatch(removeTab(tabId));
   };
@@ -119,6 +119,7 @@ export default function TabsContainer() {
                   {(provided: any, snapshot: any) => (
                     <Paper
                       onMouseDown={() => handleTabClick(index)}
+                      onAuxClick={() => handleTabClose(index, item.id) }
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}

@@ -3,6 +3,7 @@ export enum ChannelsMain {
   createNewProject = 'createNewProject',
   getXtoryTemplates = 'getXtoryTemplates',
   openProject = 'openProject',
+  openFileAsTab = 'openFileAsTab',
   fspExists = 'fspExists',
   fspMkdir = 'fspMkdir',
   fsMove = 'fsMove',
@@ -14,5 +15,6 @@ export enum ChannelsMain {
 export enum ChannelsRenderer {
   toastMessage = 'toastMessage',
   onProjectOpened = 'onProjectOpened',
+  onOpenFileAsTab = 'onOpenFileAsTab',
   onProjectTreeUpdated = 'onProjectTreeUpdated',
 }

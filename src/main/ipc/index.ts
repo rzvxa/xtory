@@ -4,6 +4,7 @@ import { ChannelsMain, IpcAction, IpcInvoke } from 'shared/types';
 
 import fsMoveIpcAction from './actions/fsMove';
 import fsRemoveIpcAction from './actions/fsRemove';
+import openFileAsTabAction from './actions/openFileAsTab';
 import revealPathInOSAction from './actions/revealPathInOS';
 
 import browseFileSystemIpcInvoke from './invokes/browseFileSystem';
@@ -23,6 +24,7 @@ const handle = (channel: ChannelsMain, ipcAction: IpcInvoke): void => {
 
 on(ChannelsMain.fsMove, fsMoveIpcAction);
 on(ChannelsMain.fsRemove, fsRemoveIpcAction);
+on(ChannelsMain.openFileAsTab, openFileAsTabAction);
 on(ChannelsMain.revealPathInOS, revealPathInOSAction);
 
 handle(ChannelsMain.browseFileSystem, browseFileSystemIpcInvoke);
