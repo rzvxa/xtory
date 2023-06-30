@@ -1,11 +1,6 @@
 import React from 'react';
 
-import { styled } from '@mui/material/styles';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import TextField from '@mui/material/TextField';
 import MuiTreeView from '@mui/lab/TreeView';
-import MuiTreeItem from '@mui/lab/TreeItem';
 import Divider from '@mui/material/Divider';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
@@ -21,6 +16,7 @@ import {
   ProjectTreeNode,
 } from 'shared/types';
 
+import { ContextMenuItem } from 'renderer/components/ContextMenu';
 import { useAppSelector, useAppDispatch } from 'renderer/state/store';
 import {
   ProjectTreeNodeState,
@@ -32,220 +28,9 @@ import {
   setSelectedNode,
 } from 'renderer/state/store/filesTool';
 
-import { ContextMenu, ContextMenuItem } from './ContextMenu';
+import useGuid from 'renderer/utils/useGuid';
 
-interface DirItemProps {
-  nodeId: string;
-  root: boolean;
-  label: string;
-  icon: React.ReactNode;
-  isDir: boolean;
-  // undefined if isDir is false
-  isExpanded: boolean | undefined;
-  isRename: boolean;
-  onOpen: () => void;
-  onExpandToggle: () => void;
-  onNewFolder: () => void;
-  onReveal: () => void;
-  onDelete: () => void;
-  onRename: () => void;
-  onCopyPath: () => void;
-  onCopyRelativePath: () => void;
-  onRenameDone: (newName: string) => void;
-  children: React.ReactNode | undefined;
-}
-
-const NewNameTextInput = styled(TextField)(() => ({
-  '& .MuiInputBase-input': {
-    padding: '0 0 0 10px',
-  },
-}));
-
-function TreeItem({
-  nodeId,
-  root,
-  label,
-  icon,
-  isDir,
-  isRename,
-  isExpanded,
-  onOpen,
-  onExpandToggle,
-  onNewFolder,
-  onReveal,
-  onCopyPath,
-  onCopyRelativePath,
-  onDelete,
-  onRename,
-  onRenameDone,
-  children,
-}: DirItemProps) {
-  const [newName, setNewName] = React.useState<string>(label);
-  const [contextMenu, setContextMenu] = React.useState<{
-    mouseX: number;
-    mouseY: number;
-  } | null>(null);
-
-  const handleContextMenu = (event: React.MouseEvent) => {
-    event.preventDefault();
-    setContextMenu(
-      contextMenu === null
-        ? {
-            mouseX: event.clientX + 2,
-            mouseY: event.clientY - 6,
-          }
-        : // repeated contextmenu when it is already open closes it with Chrome 84 on Ubuntu
-          // Other native context menus might behave different.
-          // With this behavior we prevent contextmenu from the backdrop to re-locale existing context menus.
-          null
-    );
-  };
-
-  const handleClose = (event: React.MouseEvent | React.KeyboardEvent) => {
-    event.stopPropagation();
-    event.preventDefault();
-    setContextMenu(null);
-  };
-
-  const handleKeyPress = React.useCallback(
-    (event: KeyboardEvent) => {
-      if (!isRename) return;
-      if (event.key === 'Escape') {
-        onRenameDone(label);
-      } else if (event.key === 'Enter') {
-        onRenameDone(newName);
-      }
-    },
-    [isRename, onRenameDone, newName, label]
-  );
-
-  React.useEffect(() => {
-    // attach the event listener
-    document.addEventListener('keydown', handleKeyPress);
-
-    // remove the event listener
-    return () => {
-      document.removeEventListener('keydown', handleKeyPress);
-    };
-  }, [handleKeyPress]);
-
-  const onNewNameFocus = (event: React.FocusEvent<HTMLInputElement>) => {
-    if (!isDir) {
-      const lastIndexOfDot = newName.lastIndexOf('.');
-      event.target.setSelectionRange(0, lastIndexOfDot);
-    } else {
-      event.target.select();
-    }
-  };
-
-  const onNewNameBlur = () => {
-    onRenameDone(newName);
-  };
-
-  const revealPathInOS = [
-    [Platform.win32, 'Reveal in File Explorer'],
-    [Platform.darwin, 'Reveal in Finder'],
-    [Platform.linux, 'Open Containing Folder'],
-  ].reduce((accumulator, current, index, array) => {
-    const [flag, value] = current;
-    if (index === array.length - 1 && accumulator === '') return value;
-    if (window.platform === flag) return value;
-    return accumulator;
-  }, '');
-
-  return (
-    <MuiTreeItem
-      key={nodeId}
-      nodeId={nodeId}
-      label={
-        <Box
-          onContextMenu={handleContextMenu}
-          sx={{ display: 'flex', alignItems: 'center', cursor: 'context-menu' }}
-        >
-          <Box sx={{ display: 'flex', ml: -0.5, mr: 1, fontSize: 18 }}>
-            {icon}
-          </Box>
-          {isRename ? (
-            <NewNameTextInput
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              onFocus={onNewNameFocus}
-              onBlur={onNewNameBlur}
-              autoFocus
-            />
-          ) : (
-            <Typography
-              variant="body2"
-              sx={{ fontWeight: 'inherit', flexGrow: 1 }}
-            >
-              {label}
-            </Typography>
-          )}
-
-          <ContextMenu
-            open={contextMenu !== null}
-            onClose={handleClose}
-            anchorPosition={
-              contextMenu !== null
-                ? { top: contextMenu.mouseY, left: contextMenu.mouseX }
-                : undefined
-            }
-          >
-            {isDir ? (
-              [
-                <ContextMenuItem
-                  key="1"
-                  label={isExpanded ? 'Collapse' : 'Expand'}
-                  shortcut="Enter"
-                  onClick={onExpandToggle}
-                />,
-                <ContextMenuItem
-                  key="2"
-                  label="New Folder"
-                  shortcut="Ctrl + Shift + N"
-                  onClick={onNewFolder}
-                />,
-              ]
-            ) : (
-              <ContextMenuItem label="Open" shortcut="Enter" onClick={onOpen} />
-            )}
-            <Divider variant="middle" />
-            <ContextMenuItem label={revealPathInOS} onClick={onReveal} />,
-            <Divider variant="middle" />
-            <ContextMenuItem
-              label="Copy Path"
-              shortcut="Shift + Alt + C"
-              onClick={onCopyPath}
-            />
-            ,
-            <ContextMenuItem
-              label="Copy Relative Path"
-              onClick={onCopyRelativePath}
-            />
-            ,
-            {root || [
-              <Divider key="1" variant="middle" />,
-              <ContextMenuItem
-                key="2"
-                label="Rename..."
-                shortcut="F2"
-                onClick={onRename}
-              />,
-              <ContextMenuItem
-                key="3"
-                label="Delete"
-                shortcut="Delete"
-                onClick={onDelete}
-              />,
-            ]}
-          </ContextMenu>
-        </Box>
-      }
-    >
-      {children}
-    </MuiTreeItem>
-  );
-}
+import TreeItem from './TreeItem';
 
 interface TreeNodeProps {
   treeData: ProjectTreeState | ProjectTreeNode;
@@ -279,7 +64,6 @@ function TreeNode({ treeData, root = false }: TreeNodeProps) {
   );
 
   const onOpen = () => {
-    console.log('open file: ', path);
     window.electron.ipcRenderer.sendMessage(ChannelsMain.openFileAsTab, path);
   };
 
@@ -290,7 +74,8 @@ function TreeNode({ treeData, root = false }: TreeNodeProps) {
   };
 
   const onNewFolder = async () => {
-    const basePath = `${path}/New Folder`;
+    const rootPath = isDir ? path : path.split('/').slice(0, -1).join('/');
+    const basePath = `${rootPath}/New Folder`;
     let newPath;
     let newCount = 0;
     while (newCount >= 0) {
@@ -358,6 +143,83 @@ function TreeNode({ treeData, root = false }: TreeNodeProps) {
     return <FolderEmptyIcon />;
   };
 
+  const revealPathInOS = [
+    [Platform.win32, 'Reveal in File Explorer'],
+    [Platform.darwin, 'Reveal in Finder'],
+    [Platform.linux, 'Open Containing Folder'],
+  ].reduce((accumulator, current, index, array) => {
+    const [flag, value] = current;
+    if (index === array.length - 1 && accumulator === '') return value;
+    if (window.platform === flag) return value;
+    return accumulator;
+  }, '');
+
+  const dirContextItems = [
+    <ContextMenuItem
+      key={useGuid()}
+      label={treeNodeState.isExpanded ? 'Collapse' : 'Expand'}
+      shortcut="Enter"
+      onClick={onExpandToggle}
+    />,
+  ];
+
+  const fileContextItems = [
+    <ContextMenuItem
+      key={useGuid()}
+      label="Open"
+      shortcut="Enter"
+      onClick={onOpen}
+    />,
+  ];
+
+  const createContextMenuItems = [
+    <ContextMenuItem
+      key={useGuid()}
+      label="New Folder"
+      shortcut="Ctrl + Shift + N"
+      onClick={() => {
+        onNewFolder();
+      }}
+    />,
+  ];
+
+  const contextMenuItems = [
+    ...(isDir ? dirContextItems : fileContextItems),
+    <Divider key={useGuid()} variant="middle" />,
+    ...createContextMenuItems,
+    <Divider key={useGuid()} variant="middle" />,
+    <ContextMenuItem
+      key={useGuid()}
+      label={revealPathInOS}
+      onClick={onReveal}
+    />,
+    <Divider key={useGuid()} variant="middle" />,
+    <ContextMenuItem
+      key={useGuid()}
+      label="Copy Path"
+      shortcut="Shift + Alt + C"
+      onClick={onCopyPath}
+    />,
+    <ContextMenuItem
+      key={useGuid()}
+      label="Copy Relative Path"
+      onClick={onCopyRelativePath}
+    />,
+    <Divider key={useGuid()} variant="middle" />,
+    <ContextMenuItem
+      key={useGuid()}
+      label="Rename..."
+      shortcut="F2"
+      onClick={onRename}
+    />,
+    <ContextMenuItem
+      key={useGuid()}
+      label="Delete"
+      shortcut="Delete"
+      onClick={onDelete}
+    />,
+  ];
+
   React.useEffect(() => {
     // attach the event listener
     document.addEventListener('keydown', handleKeyPress);
@@ -370,22 +232,13 @@ function TreeNode({ treeData, root = false }: TreeNodeProps) {
 
   return (
     <TreeItem
-      root={root}
       nodeId={nodeId}
       label={name}
       icon={icon()}
       isDir={isDir}
-      isExpanded={treeNodeState.isExpanded}
       isRename={treeNodeState.isRename}
-      onOpen={onOpen}
-      onExpandToggle={onExpandToggle}
-      onNewFolder={onNewFolder}
-      onReveal={onReveal}
-      onDelete={onDelete}
-      onRename={onRename}
-      onCopyPath={onCopyPath}
-      onCopyRelativePath={onCopyRelativePath}
       onRenameDone={onRenameDone}
+      contextMenuItems={contextMenuItems}
     >
       {children &&
         Object.entries(children)

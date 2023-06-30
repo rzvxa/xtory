@@ -1,5 +1,5 @@
 import { IpcEvent } from 'shared/types';
-import { EzSnackbarRef, SnackVariant } from 'renderer/ezSnackbar';
+import { EzSnackbarRef, SnackVariant } from 'renderer/utils/ezSnackbar';
 
 export default function toastMessage(
   _: IpcEvent,

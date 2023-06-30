@@ -1,7 +1,7 @@
 import React from 'react';
 import { styled } from '@mui/material/styles';
 import { SnackbarProvider as Provider, MaterialDesignContent } from 'notistack';
-import { EzSnackbarGlobalRef } from 'renderer/ezSnackbar';
+import { EzSnackbarGlobalRef } from 'renderer/utils/ezSnackbar';
 
 export interface SnackbarProviderProps {
   children: React.ReactNode;

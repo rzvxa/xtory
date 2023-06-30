@@ -1,7 +1,7 @@
 import React from 'react';
 
 import ToolContainer from './ToolContainer';
-import ProjectTree from '../ProjectTree';
+import ProjectTree from '../ProjectTree/ProjectTree';
 
 export default function FilesTool() {
   return (

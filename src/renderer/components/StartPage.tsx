@@ -19,7 +19,7 @@ import {
   BrowseFileSystemResult,
 } from 'shared/types';
 
-import { useEzSnackbar } from 'renderer/ezSnackbar';
+import { useEzSnackbar } from 'renderer/utils/ezSnackbar';
 import RecentProjectsList from './RecentProjectsList';
 import { NewProjectModal, NewProjectCreateResult } from './NewProjectModal';
 
