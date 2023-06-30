@@ -25,11 +25,11 @@ export default async function openProject(
   }
   const configFile = (await readdir(projectPath, { withFileTypes: true }))
     .filter((src) => src.isFile)
-    .find((src) => path.extname(src.name) === '.xtory');
+    .find((src) => path.extname(src.name) === '.xproj');
   if (!configFile) {
     return {
       status: IpcResultStatus.error,
-      errorMessage: `Given path don't contain a ".xtory" file!`,
+      errorMessage: `Given path don't contain a ".xproj" file!`,
     };
   }
 
