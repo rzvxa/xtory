@@ -11,6 +11,7 @@ import browseFileSystemIpcInvoke from './invokes/browseFileSystem';
 import createNewProjectIpcInvoke from './invokes/createNewProject';
 import fspExistsIpcInvoke from './invokes/fspExists';
 import fspMkdirIpcInvoke from './invokes/fspMkdir';
+import fspWriteFileIpcInvoke from './invokes/fspWriteFile';
 import getXtoryTemplatesIpcInvoke from './invokes/getXtoryTemplates';
 import openProjectIpcInvoke from './invokes/openProject';
 
@@ -31,5 +32,6 @@ handle(ChannelsMain.browseFileSystem, browseFileSystemIpcInvoke);
 handle(ChannelsMain.createNewProject, createNewProjectIpcInvoke);
 handle(ChannelsMain.fspExists, fspExistsIpcInvoke);
 handle(ChannelsMain.fspMkdir, fspMkdirIpcInvoke);
+handle(ChannelsMain.fspWriteFile, fspWriteFileIpcInvoke);
 handle(ChannelsMain.getXtoryTemplates, getXtoryTemplatesIpcInvoke);
 handle(ChannelsMain.openProject, openProjectIpcInvoke);

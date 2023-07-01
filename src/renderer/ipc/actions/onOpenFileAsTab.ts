@@ -10,12 +10,18 @@ export default function onOpenFileAsTab(
   content: string
 ) {
   const title = path.split('/').pop(); // get the file name
+  const [name, extension] = title!.split('.');
   store.dispatch(
     addTab({
       id: path,
       title,
       tabType: TabType.file,
-      tabData: { extra: content },
+      tabData: {
+        path,
+        name,
+        extension,
+        extra: content,
+      },
     })
   );
   store.dispatch(setActiveTabId(path));

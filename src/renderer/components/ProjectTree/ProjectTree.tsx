@@ -102,6 +102,38 @@ function TreeNode({ treeData, root = false }: TreeNodeProps) {
     dispatch(setProjectTreeNodeState({ nodeId: newPath, isRename: true }));
   };
 
+  const onNewFile = async (extension: string, defaultName: string) => {
+    const rootPath = isDir ? path : path.split('/').slice(0, -1).join('/');
+    const basePath = `${rootPath}/${defaultName}`;
+    let newPath;
+    let newCount = 0;
+    while (newCount >= 0) {
+      /* eslint-disable no-await-in-loop */
+      newPath = `${basePath}${
+        newCount === 0 ? '' : ` ${newCount}`
+      }.${extension}`;
+      if (
+        !(await window.electron.ipcRenderer.invoke(
+          ChannelsMain.fspExists,
+          newPath
+        ))
+      ) {
+        await window.electron.ipcRenderer.invoke(
+          ChannelsMain.fspWriteFile,
+          newPath,
+          'data123'
+        );
+        newCount = -1;
+        break;
+      }
+      newCount++;
+      /* eslint-enable no-await-in-loop */
+    }
+    dispatch(setSelectedNode(newPath));
+    dispatch(setProjectTreeNodeState({ nodeId, isExpanded: true }));
+    dispatch(setProjectTreeNodeState({ nodeId: newPath, isRename: true }));
+  };
+
   const onReveal = () => {
     window.electron.ipcRenderer.sendMessage(ChannelsMain.revealPathInOS, path);
   };
@@ -176,9 +208,15 @@ function TreeNode({ treeData, root = false }: TreeNodeProps) {
     <ContextMenuItem
       key={useGuid()}
       label="New Folder"
-      shortcut="Ctrl + Shift + N"
       onClick={() => {
         onNewFolder();
+      }}
+    />,
+    <ContextMenuItem
+      key={useGuid()}
+      label="New Sub Story"
+      onClick={() => {
+        onNewFile('xtory', 'New Sub Story');
       }}
     />,
   ];

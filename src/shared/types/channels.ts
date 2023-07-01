@@ -6,6 +6,7 @@ export enum ChannelsMain {
   openFileAsTab = 'openFileAsTab',
   fspExists = 'fspExists',
   fspMkdir = 'fspMkdir',
+  fspWriteFile = 'fspWriteFile',
   fsMove = 'fsMove',
   fsRemove = 'fsRemove',
   revealPathInOS = 'revealPathInOS',

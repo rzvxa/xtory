@@ -4,9 +4,10 @@ import {
   ProjectTreeNodeState,
   ProjectTreeNodeStates,
 } from './toolBox';
-import { TabState, TabsState } from './tabs';
+import { TabType, TabState, TabsState } from './tabs';
 
 export {
+  TabType,
   TabState,
   TabsState,
   ProjectState,

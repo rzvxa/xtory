@@ -9,8 +9,8 @@ const getItems = (count: any): TabState[] =>
   Array.from({ length: count }, (v, k) => k).map((k) => ({
     id: `tab-${k}`,
     title: `Conversation-${k}.xconv`,
-    tabType: TabType.file,
-    tabData: { extra: 'extra' },
+    tabType: TabType.instance,
+    tabData: 'extra',
   }));
 
 export const initialState: TabsState = {
