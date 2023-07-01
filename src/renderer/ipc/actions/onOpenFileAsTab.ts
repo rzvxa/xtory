@@ -20,7 +20,7 @@ export default function onOpenFileAsTab(
         path,
         name,
         extension,
-        extra: content,
+        content,
       },
     })
   );

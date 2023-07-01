@@ -1,11 +1,5 @@
 import { TabType } from './tabType';
-
-export interface FileTabData {
-  path: string;
-  name: string;
-  extension: string;
-  content: string;
-}
+import { FileTabData } from './fileTabData';
 
 export interface TabState {
   id: string;

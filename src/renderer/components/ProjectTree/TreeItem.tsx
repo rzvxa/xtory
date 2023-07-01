@@ -7,6 +7,9 @@ import MuiTreeItem from '@mui/lab/TreeItem';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+
 import { ContextMenu, ContextMenuItem } from 'renderer/components/ContextMenu';
 
 export interface TreeItemProps {
@@ -17,6 +20,9 @@ export interface TreeItemProps {
   // undefined if isDir is false
   isRename: boolean;
   onRenameDone: (newName: string) => void;
+  onDoubleClick: () => void;
+  onCollapse: () => void;
+  onExpand: () => void;
   contextMenuItems: React.ReactNode[];
   children: React.ReactNode | undefined;
 }
@@ -34,6 +40,9 @@ export default function TreeItem({
   isDir,
   isRename,
   onRenameDone,
+  onDoubleClick,
+  onCollapse,
+  onExpand,
   contextMenuItems,
   children,
 }: TreeItemProps) {
@@ -103,6 +112,9 @@ export default function TreeItem({
     <MuiTreeItem
       key={nodeId}
       nodeId={nodeId}
+      onDoubleClick={onDoubleClick}
+      collapseIcon={<ExpandMoreIcon onClick={onCollapse} />}
+      expandIcon={<ChevronRightIcon onClick={onExpand} />}
       label={
         <Box
           onContextMenu={handleContextMenu}

@@ -3,8 +3,6 @@ import React from 'react';
 import MuiTreeView from '@mui/lab/TreeView';
 import Divider from '@mui/material/Divider';
 
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import FolderEmptyIcon from '@mui/icons-material/FolderOpen';
 import FolderIcon from '@mui/icons-material/Folder';
 import ConvIcon from '@mui/icons-material/Forum';
@@ -164,6 +162,14 @@ function TreeNode({ treeData, root = false }: TreeNodeProps) {
     window.electron.ipcRenderer.sendMessage(ChannelsMain.fsMove, path, newPath);
   };
 
+  const onCollapse = () => {
+    dispatch(setProjectTreeNodeState({ nodeId, isExpanded: false }));
+  };
+
+  const onExpand = () => {
+    dispatch(setProjectTreeNodeState({ nodeId, isExpanded: true }));
+  };
+
   const icon = () => {
     if (!isDir) {
       // file icon
@@ -276,6 +282,11 @@ function TreeNode({ treeData, root = false }: TreeNodeProps) {
       isDir={isDir}
       isRename={treeNodeState.isRename}
       onRenameDone={onRenameDone}
+      onDoubleClick={() => {
+        if (!isDir) onOpen();
+      }}
+      onCollapse={onCollapse}
+      onExpand={onExpand}
       contextMenuItems={contextMenuItems}
     >
       {children &&
@@ -315,6 +326,8 @@ export default function ProjectTree() {
     .filter((kv: [string, ProjectTreeNodeState]) => kv[1].isExpanded)
     .map((kv: [string, ProjectTreeNodeState]) => kv[0]);
   const onNodeToggle = (event: React.SyntheticEvent, nodeIds: string[]) => {
+    const mouseEvent = event as React.MouseEvent;
+    if (mouseEvent.detail !== 2) return; // only toggle on double clicks!
     const newIds = nodeIds.filter((id) => !expanded.includes(id));
     const removedIds = expanded.filter((id) => !nodeIds.includes(id));
     newIds.map((id) =>
@@ -334,8 +347,6 @@ export default function ProjectTree() {
       onFocus={onFocus}
       onBlur={onBlur}
       aria-label="Project Tool"
-      defaultCollapseIcon={<ExpandMoreIcon />}
-      defaultExpandIcon={<ChevronRightIcon />}
       sx={{ flexGrow: 1, overflowY: 'auto' }}
     >
       {projectTree && <TreeNode treeData={projectTree} root />}
