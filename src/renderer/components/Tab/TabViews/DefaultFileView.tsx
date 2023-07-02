@@ -11,7 +11,7 @@ export interface DefaultFileViewProps {
 
 export default function DefaultFileView({ tabData }: DefaultFileViewProps) {
   return (
-    <Box>
+    <Box sx={{ height: '100%', overflow: 'scroll' }}>
       <Input
         id="standard-basic"
         value={tabData.content}
@@ -21,7 +21,7 @@ export default function DefaultFileView({ tabData }: DefaultFileViewProps) {
           width: '100%',
           '.MuiInputBase-root': {
             height: '100%',
-        },
+          },
         }}
       />
     </Box>

@@ -83,7 +83,8 @@
     "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^18.2.0",
     "react-redux": "^8.0.5",
-    "react-router-dom": "^6.8.1"
+    "react-router-dom": "^6.8.1",
+    "reactflow": "^11.7.4"
   },
   "devDependencies": {
     "@electron/notarize": "^1.2.3",

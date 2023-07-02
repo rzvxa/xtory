@@ -31,7 +31,7 @@ export default function TabView({ tabId, state }: TabViewProps) {
   };
 
   return (
-    <Box sx={{ height: 'calc(100vh - 45px)', overflow: 'scroll' }}>
+    <Box sx={{ height: 'calc(100vh - 52px)', overflow: 'hidden' }}>
       {state.tabType === TabType.file ? (
         dispatchFileView()
       ) : (
