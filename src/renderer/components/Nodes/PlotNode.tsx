@@ -1,10 +1,11 @@
 import React from 'react';
 
-import { Handle, Position, NodeProps } from 'reactflow';
+import { Handle, Position, NodeProps, useReactFlow, useStore } from 'reactflow';
 import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
+import useInit from 'renderer/utils/useInit';
 
 type NodeViewProps = {
   selected: boolean;
@@ -27,8 +28,38 @@ const NodeView = styled(Box)<NodeViewProps>`
   }
 `;
 
-export default React.memo(({ data, selected }: NodeProps) => {
-  console.log(data);
+export default React.memo(({ id, data, selected }: NodeProps) => {
+  const { setCenter } = useReactFlow();
+  const node = useStore((s) => s.nodeInternals.get(id));
+  const inputRef = React.useRef<HTMLInputElement>(null);
+
+  const focusOnInput = React.useCallback(
+    (resolve: undefined | (() => void) = undefined) => {
+      // TODO find a better way than timeout,
+      // TODO it won't work directy, messy workaround!
+      setTimeout(() => {
+        if (
+          inputRef &&
+          inputRef.current &&
+          selected &&
+          node &&
+          node.width &&
+          node.height
+        ) {
+          inputRef.current.focus();
+          const x = node.position.x + node.width / 2;
+          const y = node.position.y + node.height / 2;
+          const zoom = 0.8;
+          setCenter(x, y, { zoom, duration: 500 });
+          if (resolve) resolve();
+        }
+      }, 100);
+    },
+    [inputRef, selected, node, setCenter]
+  );
+
+  useInit(focusOnInput);
+
   return (
     <NodeView selected={selected}>
       <Handle type="target" position={Position.Left} />
@@ -44,7 +75,14 @@ export default React.memo(({ data, selected }: NodeProps) => {
       >
         Plot
       </Typography>
-      <TextField id="standard-basic" variant="outlined" multiline minRows="5" />
+      <TextField
+        id="standard-basic"
+        variant="outlined"
+        multiline
+        minRows="5"
+        inputRef={inputRef}
+        onClick={() => focusOnInput()}
+      />
       <Handle type="source" position={Position.Right} />
     </NodeView>
   );

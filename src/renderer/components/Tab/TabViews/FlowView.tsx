@@ -9,6 +9,7 @@ import ReactFlow, {
   Panel,
 } from 'reactflow';
 import { styled } from '@mui/material/styles';
+import uuidv4 from 'renderer/utils/uuidv4';
 
 import PlotNode from 'renderer/components/Nodes/PlotNode';
 
@@ -79,6 +80,44 @@ export default function FlowView() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
+  const handleKeyPress = React.useCallback(
+    (event: KeyboardEvent) => {
+      if (event.key === 'Enter' && event.ctrlKey) {
+        const selectedNodes = nodes.filter((node) => node.selected);
+        if (selectedNodes.length === 0) return;
+        if (selectedNodes.length > 1) return;
+        const selected = selectedNodes[0];
+        const newNode = {
+          id: uuidv4(),
+          type: 'custom',
+          data: { label: 'node cusds' },
+          position: { x: selected.position.x + 400, y: selected.position.y },
+          selected: true,
+        };
+        selected.selected = false;
+        setNodes((nds) => nds.concat(newNode));
+        setEdges((eds) =>
+          eds.concat({
+            id: uuidv4(),
+            source: selected.id,
+            target: newNode.id,
+          })
+        );
+      }
+    },
+    [nodes, setNodes, setEdges]
+  );
+
+  React.useEffect(() => {
+    // attach the event listener
+    document.addEventListener('keydown', handleKeyPress);
+
+    // remove the event listener
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress);
+    };
+  }, [handleKeyPress]);
+
   const onConnect = React.useCallback(
     (params: any) => setEdges((eds) => addEdge(params, eds)),
     [setEdges]
@@ -93,6 +132,7 @@ export default function FlowView() {
       onConnect={onConnect}
       nodeTypes={nodeTypes}
       proOptions={{ hideAttribution: true }}
+      minZoom={0.1}
       fitView
     >
       <MiniMapStyled ariaLabel="MiniMap" />
