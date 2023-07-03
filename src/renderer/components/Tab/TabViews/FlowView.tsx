@@ -8,6 +8,7 @@ import ReactFlow, {
   addEdge,
   MiniMap,
   Controls,
+  MarkerType,
   Background,
   BackgroundVariant,
 } from 'reactflow';
@@ -40,11 +41,16 @@ const initialNodes = [
   },
 ];
 
+const edgeSharedSettings = {
+  markerEnd: { type: MarkerType.ArrowClosed, width: 6 },
+};
+
 const initialEdges = [
   {
     id: 'e1',
     source: '1',
     target: '2',
+    ...edgeSharedSettings,
   },
 ];
 
@@ -54,6 +60,10 @@ const nodeTypes = {
 
 const ReactFlowStyled = styled(ReactFlow)`
   background-color: ${({ theme }) => theme.palette.background.default};
+  .react-flow__edge-path {
+    stroke: ${({ theme }) => theme.palette.text.primary};
+    stroke-width: 6px;
+  }
 `;
 
 const MiniMapStyled = styled(MiniMap)`
@@ -133,6 +143,7 @@ function Flow() {
               id: uuidv4(),
               source: selected.id,
               target: newNode.id,
+              ...edgeSharedSettings,
             })
           );
         }
