@@ -135,7 +135,6 @@ export default function FlowView() {
       minZoom={0.1}
       fitView
     >
-      <MiniMapStyled ariaLabel="MiniMap" />
       <ControlsStyled />
     </ReactFlowStyled>
   );
