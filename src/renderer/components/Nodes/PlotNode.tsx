@@ -22,7 +22,6 @@ export default React.memo(({ id, data, selected }: NodeProps) => {
         multiline
         minRows="5"
         inputRef={inputRef}
-        onClick={() => focusAndCenter()}
       />
       <Handle type="source" position={Position.Right} />
     </NodeContainer>
