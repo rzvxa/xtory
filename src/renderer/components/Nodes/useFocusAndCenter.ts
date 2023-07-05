@@ -22,6 +22,7 @@ export default function useFocusAndCenter(
           node.width &&
           node.height
         ) {
+          if (!node.data.focusOnInit) return;
           ref.current.focus();
           const x = node.position.x + node.width / 2;
           const y = node.position.y + node.height / 2;

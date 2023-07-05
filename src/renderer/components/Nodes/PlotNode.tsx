@@ -11,7 +11,7 @@ export default React.memo(({ id, data, selected }: NodeProps) => {
   const inputRef = React.useRef<HTMLInputElement>(null);
   const focusAndCenter = useFocusAndCenter(inputRef, id, selected);
 
-  useInit(() => data.focusOnInit && focusAndCenter());
+  useInit(focusAndCenter);
 
   return (
     <NodeContainer title="Plot" selected={selected}>
