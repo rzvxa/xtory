@@ -153,7 +153,7 @@ function Flow() {
           )?.connections;
           const newNode = {
             id: uuidv4(),
-            type: 'Plot',
+            type: selected.type,
             data: { label: 'node cusds', focusOnInit: true },
             position: { x: selected.position.x + 400, y: selected.position.y },
             selected: true,
