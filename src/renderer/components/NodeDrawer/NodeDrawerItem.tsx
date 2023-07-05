@@ -1,21 +1,20 @@
 import React from 'react';
-import MenuItem from '@mui/material/MenuItem';
+import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
-import Typography from '@mui/material/Typography';
 
-export interface ContextMenuItemProps {
+export interface NodeDrawerItemProps {
   label: string;
-  shortcut?: string | undefined;
+  selected: boolean;
   onClick?: () => void | undefined;
   onClose?: (event: React.MouseEvent) => void | undefined;
 }
 
-export default function ContextMenuItem({
+export default function NodeDrawerItem({
   label,
-  shortcut = undefined,
+  selected,
   onClick = undefined,
   onClose = undefined,
-}: ContextMenuItemProps) {
+}: NodeDrawerItemProps) {
   const clickHandler = (event: React.MouseEvent) => {
     if (onClose) {
       onClose(event);
@@ -25,11 +24,8 @@ export default function ContextMenuItem({
     }
   };
   return (
-    <MenuItem onClick={clickHandler}>
+    <ListItemButton onClick={clickHandler} selected={selected}>
       <ListItemText>{label}</ListItemText>
-      <Typography variant="body2" color="text.secondary">
-        {shortcut}
-      </Typography>
-    </MenuItem>
+    </ListItemButton>
   );
 }

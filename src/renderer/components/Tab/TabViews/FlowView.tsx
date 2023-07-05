@@ -15,12 +15,14 @@ import ReactFlow, {
 
 import { styled } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
-import MenuItem from '@mui/material/MenuItem';
 
 import uuidv4 from 'renderer/utils/uuidv4';
-import { rendererPointToPoint } from 'renderer/utils/flowUtils';
+import {
+  rendererPointToPoint,
+  pointToRendererPoint,
+} from 'renderer/utils/flowUtils';
 
-import { ContextMenu, ContextMenuItem } from 'renderer/components/ContextMenu';
+import { NodeDrawer, NodeDrawerItem } from 'renderer/components/NodeDrawer';
 
 import PlotNode from 'renderer/components/Nodes/PlotNode';
 
@@ -105,8 +107,8 @@ function Flow() {
   const [contextMenu, setContextMenu] = React.useState<{
     x: number;
     y: number;
+    type: 'rclick' | 'extend';
   } | null>(null);
-  const [searchText, setSearchText] = React.useState<string>('');
 
   const handleKeyPress = React.useCallback(
     (event: KeyboardEvent) => {
@@ -125,8 +127,9 @@ function Flow() {
           ]);
 
           setContextMenu({
-            x: left + transformedPos.x - (selected.width! / 2) * zoom,
+            x: left + transformedPos.x,
             y: top + transformedPos.y,
+            type: 'extend',
           });
         } else {
           const newNode = {
@@ -167,21 +170,57 @@ function Flow() {
     [setEdges]
   );
 
-  const focusOnContextSearch = React.useCallback((input: HTMLInputElement) => {
-    if (input) {
-      input.blur();
-      setTimeout(() => input && input.focus());
-    }
-    console.log('he', input);
-  }, []);
+  const onNodeDrawerItemSelected = React.useCallback(
+    (item: string) => {
+      if (!contextMenu) return;
+      const selectedNodes = nodes.filter((node) => node.selected);
+      const prevNode = selectedNodes.length === 1 ? selectedNodes[0] : null;
+      const { top, left } = reactFlowRef.current!.getBoundingClientRect();
+      const { x, y, zoom } = viewport;
+      const screenPosition = {
+        x: contextMenu.x - left,
+        y: contextMenu.y - top,
+      };
+      const position = pointToRendererPoint(
+        screenPosition,
+        [x, y, zoom],
+        false,
+        [0, 0]
+      );
+      position.x += 400;
+      const newNode = {
+        id: uuidv4(),
+        type: 'custom',
+        data: { label: 'node cusds' },
+        position,
+        selected: true,
+      };
+      selectedNodes.forEach((node) => {
+        node.selected = false;
+      });
+      setNodes((nds) => nds.concat(newNode));
+      if (contextMenu.type === 'extend') {
+        setEdges((eds) =>
+          eds.concat({
+            id: uuidv4(),
+            source: prevNode?.id,
+            target: prevNode ? newNode.id : '',
+            ...edgeSharedSettings,
+          })
+        );
+      }
+    },
+    [contextMenu, nodes, setNodes, setEdges, viewport]
+  );
 
   const handleContextMenu = (event: React.MouseEvent) => {
     event.preventDefault();
     setContextMenu(
       contextMenu === null
         ? {
-            x: event.clientX - 200,
-            y: event.clientY - 60,
+            x: event.clientX,
+            y: event.clientY,
+            type: 'rclick',
           }
         : null
     );
@@ -225,36 +264,17 @@ function Flow() {
         color="#ccc"
         variant={BackgroundVariant.Lines}
       />
-      <ContextMenu
+      <NodeDrawer
+        items={items}
         open={contextMenu !== null}
-        onClose={() => {
-          setContextMenu(null);
-          setSearchText('');
-        }}
+        onClose={() => setContextMenu(null)}
+        onItemSelected={onNodeDrawerItemSelected}
         anchorPosition={
           contextMenu !== null
             ? { top: contextMenu.y, left: contextMenu.x }
             : undefined
         }
-        variant="menu"
-      >
-        <TextField
-          placeholder="Search for node..."
-          autoFocus
-          inputRef={focusOnContextSearch}
-          value={searchText}
-          onChange={(e) => setSearchText(e.target.value)}
-          sx={{ width: '100%', padding: 1 }}
-          onKeyDown={(e) => {
-            if (e.key !== 'Escape') e.stopPropagation();
-          }}
-        />
-        {items
-          .filter((i) => i.toLowerCase().includes(searchText.toLowerCase()))
-          .map((i) => (
-            <ContextMenuItem label={i} />
-          ))}
-      </ContextMenu>
+      />
       <ControlsStyled />
     </ReactFlowStyled>
   );
