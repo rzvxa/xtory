@@ -58,7 +58,6 @@ export default function NodeDrawer({
         } else if (direction === 'Down') {
           newIndex += 1;
         }
-        console.log(selectedNodeIndex, newIndex);
 
         if (newIndex !== selectedNodeIndex) {
           event.preventDefault();
