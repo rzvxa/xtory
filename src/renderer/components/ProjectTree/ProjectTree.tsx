@@ -27,6 +27,7 @@ import {
 } from 'renderer/state/store/filesTool';
 
 import useGuid from 'renderer/utils/useGuid';
+import useInit from 'renderer/utils/useInit';
 
 import TreeItem from './TreeItem';
 
@@ -305,6 +306,24 @@ export default function ProjectTree() {
   const projectTreeStates: ProjectTreeNodeStates = useAppSelector(
     (state) => state.filesToolState.projectTreeNodeStates
   );
+
+  const extendRootOnLoad = React.useCallback(
+    (resolve: () => void) => {
+      console.log(projectTree, projectTreeStates);
+      if (projectTree) {
+        dispatch(
+          setProjectTreeNodeState({
+            nodeId: projectTree.path,
+            isExpanded: true,
+          })
+        );
+        resolve();
+      }
+    },
+    [projectTree]
+  );
+
+  useInit(extendRootOnLoad);
 
   const onFocus = () => {
     dispatch(setIsProjectTreeFocus(true));
