@@ -58,8 +58,9 @@ export default function NodeDrawer({
         } else if (direction === 'Down') {
           newIndex += 1;
         }
+        console.log(selectedNodeIndex, newIndex);
 
-        if (newIndex !== 0) {
+        if (newIndex !== selectedNodeIndex) {
           event.preventDefault();
           setSelectedNodeIndex(clamp(newIndex, 0, filteredItems.length - 1));
         }
@@ -115,6 +116,7 @@ export default function NodeDrawer({
           />
           {filteredItems.map((node, index) => (
             <NodeDrawerItem
+              key={node}
               label={node}
               selected={selectedNodeIndex === index}
               onClose={(event: React.MouseEvent) => {

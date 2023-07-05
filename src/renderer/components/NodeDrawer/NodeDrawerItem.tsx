@@ -3,6 +3,7 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemText from '@mui/material/ListItemText';
 
 export interface NodeDrawerItemProps {
+  key: string;
   label: string;
   selected: boolean;
   onClick?: () => void | undefined;
@@ -10,6 +11,7 @@ export interface NodeDrawerItemProps {
 }
 
 export default function NodeDrawerItem({
+  key,
   label,
   selected,
   onClick = undefined,
@@ -24,7 +26,7 @@ export default function NodeDrawerItem({
     }
   };
   return (
-    <ListItemButton onClick={clickHandler} selected={selected}>
+    <ListItemButton key={key} onClick={clickHandler} selected={selected}>
       <ListItemText>{label}</ListItemText>
     </ListItemButton>
   );
