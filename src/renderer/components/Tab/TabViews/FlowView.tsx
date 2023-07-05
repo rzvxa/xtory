@@ -24,19 +24,20 @@ import {
 import { NodeDrawer } from 'renderer/components/NodeDrawer';
 
 import PlotNode from 'renderer/components/Nodes/PlotNode';
+import NoteNode from 'renderer/components/Nodes/NoteNode';
 
 import 'reactflow/dist/style.css';
 
 const initialNodes = [
   {
     id: '1',
-    type: 'custom',
+    type: 'Plot',
     data: { label: 'Node 1' },
     position: { x: 0, y: 0 },
   },
   {
     id: '2',
-    type: 'custom',
+    type: 'Plot',
     data: { label: 'Node 2' },
     position: { x: 400, y: 0 },
   },
@@ -55,8 +56,19 @@ const initialEdges = [
   },
 ];
 
+const nodeConfigs = [
+  {
+    type: 'Plot',
+    connections: [1, 1],
+  },
+  {
+    type: 'Note',
+  },
+];
+
 const nodeTypes = {
-  custom: PlotNode,
+  Plot: PlotNode,
+  Note: NoteNode,
 };
 
 const ReactFlowStyled = styled(ReactFlow)`
@@ -130,23 +142,28 @@ function Flow() {
             type: 'extend',
           });
         } else if (selected) {
+          const connections = nodeConfigs.find(
+            (node) => node.type === selected.type
+          )?.connections;
           const newNode = {
             id: uuidv4(),
-            type: 'custom',
+            type: 'Plot',
             data: { label: 'node cusds', focusOnInit: true },
             position: { x: selected.position.x + 400, y: selected.position.y },
             selected: true,
           };
           selected.selected = false;
           setNodes((nds) => nds.concat(newNode));
-          setEdges((eds) =>
-            eds.concat({
-              id: uuidv4(),
-              source: selected.id,
-              target: newNode.id,
-              ...edgeSharedSettings,
-            })
-          );
+          if (connections) {
+            setEdges((eds) =>
+              eds.concat({
+                id: uuidv4(),
+                source: selected.id,
+                target: newNode.id,
+                ...edgeSharedSettings,
+              })
+            );
+          }
         }
       }
     },
@@ -174,6 +191,9 @@ function Flow() {
       const selectedNodes = nodes.filter((node) => node.selected);
       const prevNode = selectedNodes.length === 1 ? selectedNodes[0] : null;
       const extend = contextMenu.type === 'extend';
+      const connections = nodeConfigs.find(
+        (node) => node.type === item
+      )?.connections;
       const { top, left } = reactFlowRef.current!.getBoundingClientRect();
       const { x, y, zoom } = viewport;
       const screenPosition = {
@@ -191,7 +211,7 @@ function Flow() {
       }
       const newNode = {
         id: uuidv4(),
-        type: 'custom',
+        type: item,
         data: { label: 'node cusds', focusOnInit: extend },
         position,
         selected: true,
@@ -200,7 +220,7 @@ function Flow() {
         node.selected = false;
       });
       setNodes((nds) => nds.concat(newNode));
-      if (extend && prevNode) {
+      if (extend && prevNode && connections) {
         setEdges((eds) =>
           eds.concat({
             id: uuidv4(),
@@ -226,16 +246,7 @@ function Flow() {
         : null
     );
   };
-  const items = [
-    'Plot',
-    'Conversation',
-    'Node',
-    'Banana',
-    'Pie',
-    'WOwe2',
-    'Test',
-    'Note',
-  ];
+  const items = ['Plot', 'Note'];
 
   return (
     <ReactFlowStyled
