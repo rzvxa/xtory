@@ -14,7 +14,6 @@ import ReactFlow, {
 } from 'reactflow';
 
 import { styled } from '@mui/material/styles';
-import TextField from '@mui/material/TextField';
 
 import uuidv4 from 'renderer/utils/uuidv4';
 import {
@@ -22,7 +21,7 @@ import {
   pointToRendererPoint,
 } from 'renderer/utils/flowUtils';
 
-import { NodeDrawer, NodeDrawerItem } from 'renderer/components/NodeDrawer';
+import { NodeDrawer } from 'renderer/components/NodeDrawer';
 
 import PlotNode from 'renderer/components/Nodes/PlotNode';
 
@@ -201,12 +200,12 @@ function Flow() {
         node.selected = false;
       });
       setNodes((nds) => nds.concat(newNode));
-      if (extend) {
+      if (extend && prevNode) {
         setEdges((eds) =>
           eds.concat({
             id: uuidv4(),
-            source: prevNode?.id,
-            target: prevNode ? newNode.id : '',
+            source: prevNode.id,
+            target: newNode.id,
             ...edgeSharedSettings,
           })
         );
