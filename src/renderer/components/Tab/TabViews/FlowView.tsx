@@ -135,7 +135,7 @@ function Flow() {
           const newNode = {
             id: uuidv4(),
             type: 'custom',
-            data: { label: 'node cusds' },
+            data: { label: 'node cusds', focusOnInit: true },
             position: { x: selected.position.x + 400, y: selected.position.y },
             selected: true,
           };
@@ -175,6 +175,7 @@ function Flow() {
       if (!contextMenu) return;
       const selectedNodes = nodes.filter((node) => node.selected);
       const prevNode = selectedNodes.length === 1 ? selectedNodes[0] : null;
+      const extend = contextMenu.type === 'extend';
       const { top, left } = reactFlowRef.current!.getBoundingClientRect();
       const { x, y, zoom } = viewport;
       const screenPosition = {
@@ -187,11 +188,13 @@ function Flow() {
         false,
         [0, 0]
       );
-      position.x += 400;
+      if (extend) {
+        position.x += 400;
+      }
       const newNode = {
         id: uuidv4(),
         type: 'custom',
-        data: { label: 'node cusds' },
+        data: { label: 'node cusds', focusOnInit: extend },
         position,
         selected: true,
       };
@@ -199,7 +202,7 @@ function Flow() {
         node.selected = false;
       });
       setNodes((nds) => nds.concat(newNode));
-      if (contextMenu.type === 'extend') {
+      if (extend) {
         setEdges((eds) =>
           eds.concat({
             id: uuidv4(),
