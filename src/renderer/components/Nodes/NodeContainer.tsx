@@ -27,21 +27,15 @@ const NodeView = styled(Box)<NodeViewProps>`
 `;
 
 export interface NodeContainerProps {
-  containerRef: React.RefObject<HTMLElement> | undefined;
   title: string;
   selected: boolean;
   children: React.ReactNode;
 }
 
 export default React.memo(
-  ({
-    containerRef = undefined,
-    title,
-    selected,
-    children,
-  }: NodeContainerProps) => {
+  ({ title, selected, children }: NodeContainerProps) => {
     return (
-      <NodeView ref={containerRef} selected={selected}>
+      <NodeView selected={selected}>
         <Paper sx={{ padding: 1 }}>
           <Typography variant="body2">{title}</Typography>
         </Paper>

@@ -23,11 +23,11 @@ export default function useFocusAndCenter(
           node.height
         ) {
           if (!node.data.focusOnInit) return;
-          ref.current.focus();
           const x = node.position.x + node.width / 2;
           const y = node.position.y + node.height / 2;
           const zoom = 0.8;
           setCenter(x, y, { zoom, duration: 500 });
+          ref.current.focus();
           if (resolve) resolve();
         }
       }, 100);

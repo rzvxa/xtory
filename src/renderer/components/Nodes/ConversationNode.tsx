@@ -142,11 +142,7 @@ export default React.memo(({ id, data, selected }: NodeProps) => {
   useInit(focusAndCenter);
 
   return (
-    <NodeContainer
-      containerRef={undefined}
-      title="Conversation"
-      selected={selected}
-    >
+    <NodeContainer title="Conversation" selected={selected}>
       <Handle type="target" position={Position.Left} />
       <Autocomplete
         clearOnEscape
@@ -156,8 +152,10 @@ export default React.memo(({ id, data, selected }: NodeProps) => {
           <TextField
             // eslint-disable-next-line react/jsx-props-no-spreading
             {...params}
+            id="standard-basic"
+            variant="outlined"
+            multiline
             inputRef={ref}
-            label="Select a conversation..."
           />
         )}
       />
