@@ -114,24 +114,23 @@ function Flow() {
     (event: KeyboardEvent) => {
       if (event.key === 'Enter' && event.ctrlKey) {
         const selectedNodes = nodes.filter((node) => node.selected);
-        if (selectedNodes.length === 0) return;
+        // if (selectedNodes.length === 0) return;
         if (selectedNodes.length > 1) return;
-        const selected = selectedNodes[0];
+        const selected = selectedNodes.length === 0 ? null : selectedNodes[0];
         if (event.shiftKey) {
           const { x, y, zoom } = viewport;
-          const { top, left } = reactFlowRef.current!.getBoundingClientRect();
-          const transformedPos = rendererPointToPoint(selected.position, [
-            x,
-            y,
-            zoom,
-          ]);
+          const { top, left, width, height } =
+            reactFlowRef.current!.getBoundingClientRect();
+          const transformedPos = selected
+            ? rendererPointToPoint(selected.position, [x, y, zoom])
+            : { x: width / 2, y: height / 2 };
 
           setContextMenu({
             x: left + transformedPos.x,
             y: top + transformedPos.y,
             type: 'extend',
           });
-        } else {
+        } else if (selected) {
           const newNode = {
             id: uuidv4(),
             type: 'custom',
@@ -188,7 +187,7 @@ function Flow() {
         false,
         [0, 0]
       );
-      if (extend) {
+      if (extend && prevNode) {
         position.x += 400;
       }
       const newNode = {
