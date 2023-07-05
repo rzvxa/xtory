@@ -115,17 +115,37 @@ const ControlsStyled = styled(Controls)`
   }
 `;
 
+type NodeDrawerOpenType = 'rclick' | 'extend' | 'edge';
+
 function Flow() {
   const viewport = useViewport();
 
   const reactFlowRef = React.useRef<HTMLDivElement>(null);
+  const [connectingNodeId, setConnectingId] = React.useState<string | null>();
+
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const [contextMenu, setContextMenu] = React.useState<{
     x: number;
     y: number;
-    type: 'rclick' | 'extend';
+    type: NodeDrawerOpenType;
   } | null>(null);
+
+  const handleContextMenu = React.useCallback(
+    (event: React.MouseEvent, type: NodeDrawerOpenType = 'rclick') => {
+      event.preventDefault();
+      setContextMenu(
+        contextMenu === null
+          ? {
+              x: event.clientX,
+              y: event.clientY,
+              type,
+            }
+          : null
+      );
+    },
+    [contextMenu]
+  );
 
   const handleKeyPress = React.useCallback(
     (event: KeyboardEvent) => {
@@ -191,12 +211,31 @@ function Flow() {
     [setEdges]
   );
 
+  const onConnectStart = React.useCallback(
+    (_: unknown, { nodeId }: { nodeId: string | null }) => {
+      setConnectingId(nodeId);
+    },
+    []
+  );
+
+  const onConnectEnd = React.useCallback(
+    (event: any) => {
+      const targetIsPane = event.target.classList.contains('react-flow__pane');
+
+      if (targetIsPane) {
+        handleContextMenu(event, 'edge');
+      }
+    },
+    [handleContextMenu]
+  );
+
   const onNodeDrawerItemSelected = React.useCallback(
     (item: string) => {
       if (!contextMenu) return;
       const selectedNodes = nodes.filter((node) => node.selected);
       const prevNode = selectedNodes.length === 1 ? selectedNodes[0] : null;
-      const extend = contextMenu.type === 'extend';
+      const connectionSource = prevNode?.id || connectingNodeId;
+      const rclick = contextMenu.type === 'rclick';
       const connections = nodeConfigs.find(
         (node) => node.type === item
       )?.connections;
@@ -212,13 +251,13 @@ function Flow() {
         false,
         [0, 0]
       );
-      if (extend && prevNode) {
+      if (!rclick && prevNode) {
         position.x += 400;
       }
       const newNode = {
         id: uuidv4(),
         type: item,
-        data: { label: 'node cusds', focusOnInit: extend },
+        data: { label: 'node cusds', focusOnInit: !rclick },
         position,
         selected: true,
       };
@@ -226,32 +265,20 @@ function Flow() {
         node.selected = false;
       });
       setNodes((nds) => nds.concat(newNode));
-      if (extend && prevNode && connections) {
+      if (!rclick && connectionSource && connections) {
         setEdges((eds) =>
           eds.concat({
             id: uuidv4(),
-            source: prevNode.id,
+            source: connectionSource,
             target: newNode.id,
             ...edgeSharedSettings,
           })
         );
       }
     },
-    [contextMenu, nodes, setNodes, setEdges, viewport]
+    [contextMenu, nodes, setNodes, setEdges, viewport, connectingNodeId]
   );
 
-  const handleContextMenu = (event: React.MouseEvent) => {
-    event.preventDefault();
-    setContextMenu(
-      contextMenu === null
-        ? {
-            x: event.clientX,
-            y: event.clientY,
-            type: 'rclick',
-          }
-        : null
-    );
-  };
   const items = ['Plot', 'Note', 'Conversation'];
 
   return (
@@ -262,6 +289,8 @@ function Flow() {
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
       onConnect={onConnect}
+      onConnectStart={onConnectStart}
+      onConnectEnd={onConnectEnd}
       nodeTypes={nodeTypes}
       proOptions={{ hideAttribution: true }}
       minZoom={0.1}
