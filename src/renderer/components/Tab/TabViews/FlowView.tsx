@@ -25,6 +25,7 @@ import { NodeDrawer } from 'renderer/components/NodeDrawer';
 
 import PlotNode from 'renderer/components/Nodes/PlotNode';
 import NoteNode from 'renderer/components/Nodes/NoteNode';
+import ConversationNode from 'renderer/components/Nodes/ConversationNode';
 
 import 'reactflow/dist/style.css';
 
@@ -64,11 +65,16 @@ const nodeConfigs = [
   {
     type: 'Note',
   },
+  {
+    type: 'Conversation',
+    connections: [1, 1],
+  },
 ];
 
 const nodeTypes = {
   Plot: PlotNode,
   Note: NoteNode,
+  Conversation: ConversationNode,
 };
 
 const ReactFlowStyled = styled(ReactFlow)`
@@ -246,7 +252,7 @@ function Flow() {
         : null
     );
   };
-  const items = ['Plot', 'Note'];
+  const items = ['Plot', 'Note', 'Conversation'];
 
   return (
     <ReactFlowStyled

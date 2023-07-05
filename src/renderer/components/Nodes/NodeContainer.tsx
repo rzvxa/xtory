@@ -3,6 +3,7 @@ import React from 'react';
 import { styled } from '@mui/material/styles';
 
 import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 
 type NodeViewProps = {
@@ -10,7 +11,6 @@ type NodeViewProps = {
 };
 
 const NodeView = styled(Box)<NodeViewProps>`
-  padding: 10px 20px;
   border-radius: 5px;
   background: ${({ theme }) => theme.palette.background.paper};
   color: ${({ theme }) => theme.palette.text.primary};
@@ -27,28 +27,25 @@ const NodeView = styled(Box)<NodeViewProps>`
 `;
 
 export interface NodeContainerProps {
+  containerRef: React.RefObject<HTMLElement> | undefined;
   title: string;
   selected: boolean;
   children: React.ReactNode;
 }
 
 export default React.memo(
-  ({ title, selected, children }: NodeContainerProps) => {
+  ({
+    containerRef = undefined,
+    title,
+    selected,
+    children,
+  }: NodeContainerProps) => {
     return (
-      <NodeView selected={selected}>
-        <Typography
-          variant="body2"
-          sx={{
-            width: 'fit-content',
-            color: (theme) => theme.palette.text.disabled,
-            backgroundColor: (theme) => theme.palette.background.paper,
-            marginTop: -0.5,
-            marginLeft: -1,
-          }}
-        >
-          {title}
-        </Typography>
-        {children}
+      <NodeView ref={containerRef} selected={selected}>
+        <Paper sx={{ padding: 1 }}>
+          <Typography variant="body2">{title}</Typography>
+        </Paper>
+        <Box sx={{ padding: 1 }}>{children}</Box>
       </NodeView>
     );
   }
