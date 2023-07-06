@@ -15,6 +15,7 @@ import ReactFlow, {
 
 import { styled } from '@mui/material/styles';
 
+import useUndoRedo from 'renderer/hooks/useUndoRedo';
 import uuidv4 from 'renderer/utils/uuidv4';
 import {
   rendererPointToPoint,
@@ -123,8 +124,10 @@ function Flow() {
   const reactFlowRef = React.useRef<HTMLDivElement>(null);
   const [connectingNodeId, setConnectingId] = React.useState<string | null>();
 
+  const { undo, redo, canUndo, canRedo, takeSnapshot } = useUndoRedo();
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
   const [contextMenu, setContextMenu] = React.useState<{
     x: number;
     y: number;
@@ -179,6 +182,7 @@ function Flow() {
             selected: true,
           };
           selected.selected = false;
+          takeSnapshot();
           setNodes((nds) => nds.concat(newNode));
           if (connections) {
             setEdges((eds) =>
@@ -229,6 +233,22 @@ function Flow() {
     [handleContextMenu]
   );
 
+  const onNodeDragStart = React.useCallback(() => {
+    takeSnapshot();
+  }, [takeSnapshot]);
+
+  const onSelectionDragStart = React.useCallback(() => {
+    takeSnapshot();
+  }, [takeSnapshot]);
+
+  const onNodesDelete = React.useCallback(() => {
+    takeSnapshot();
+  }, [takeSnapshot]);
+
+  const onEdgesDelete = React.useCallback(() => {
+    takeSnapshot();
+  }, [takeSnapshot]);
+
   const onNodeDrawerItemSelected = React.useCallback(
     (item: string) => {
       if (!contextMenu) return;
@@ -264,6 +284,7 @@ function Flow() {
       selectedNodes.forEach((node) => {
         node.selected = false;
       });
+      takeSnapshot();
       setNodes((nds) => nds.concat(newNode));
       if (!rclick && connectionSource && connections) {
         setEdges((eds) =>
@@ -291,6 +312,10 @@ function Flow() {
       onConnect={onConnect}
       onConnectStart={onConnectStart}
       onConnectEnd={onConnectEnd}
+      onNodeDragStart={onNodeDragStart}
+      onSelectionDragStart={onSelectionDragStart}
+      onNodesDelete={onNodesDelete}
+      onEdgesDelete={onEdgesDelete}
       nodeTypes={nodeTypes}
       proOptions={{ hideAttribution: true }}
       minZoom={0.1}
