@@ -152,7 +152,7 @@ function Flow() {
 
   const handleKeyPress = React.useCallback(
     (event: KeyboardEvent) => {
-      if (event.key === 'Enter' && event.ctrlKey) {
+      if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
         const selectedNodes = nodes.filter((node) => node.selected);
         // if (selectedNodes.length === 0) return;
         if (selectedNodes.length > 1) return;
