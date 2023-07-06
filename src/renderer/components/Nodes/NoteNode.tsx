@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Handle, Position, NodeProps } from 'reactflow';
 import TextField from '@mui/material/TextField';
-import useInit from 'renderer/utils/useInit';
+import useInit from 'renderer/hooks/useInit';
 
 import NodeContainer from './NodeContainer';
 import useFocusAndCenter from './useFocusAndCenter';

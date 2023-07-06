@@ -26,7 +26,7 @@ import {
   setSelectedNode,
 } from 'renderer/state/store/filesTool';
 
-import useGuid from 'renderer/utils/useGuid';
+import useGuid from 'renderer/hooks/useGuid';
 
 import TreeItem from './TreeItem';
 
