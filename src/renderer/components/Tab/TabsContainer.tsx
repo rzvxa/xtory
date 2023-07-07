@@ -73,6 +73,14 @@ export default function TabsContainer() {
 
   const activeTabId = useAppSelector((state) => state.tabsState.activeTabId);
   const tabs = useAppSelector((state) => state.tabsState.tabs);
+  const tabRefs = React.useRef<HTMLDivElement[]>([]);
+
+  React.useEffect(() => {
+    const activeTabIndex = tabs.findIndex((t: Tab) => t.id === activeTabId);
+    if (tabRefs && tabRefs.current && tabRefs.current[activeTabIndex]) {
+      tabRefs?.current[activeTabIndex].scrollIntoView({ behavior: 'smooth' });
+    }
+  }, [tabs, activeTabId]);
 
   const onDragEnd = (result: DropResult) => {
     // dropped outside the list
@@ -118,9 +126,12 @@ export default function TabsContainer() {
                 <Draggable key={item.id} draggableId={item.id} index={index}>
                   {(provided: any, snapshot: any) => (
                     <Paper
+                      ref={(el: HTMLDivElement) => {
+                        tabRefs.current[index] = el;
+                        provided.innerRef(el);
+                      }}
                       onMouseDown={() => handleTabClick(index)}
                       onAuxClick={() => handleTabClose(index, item.id)}
-                      ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
                       style={getItemStyle(
