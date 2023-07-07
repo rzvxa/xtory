@@ -119,7 +119,7 @@ export default function TabsContainer() {
                   {(provided: any, snapshot: any) => (
                     <Paper
                       onMouseDown={() => handleTabClick(index)}
-                      onAuxClick={() => handleTabClose(index, item.id) }
+                      onAuxClick={() => handleTabClose(index, item.id)}
                       ref={provided.innerRef}
                       {...provided.draggableProps}
                       {...provided.dragHandleProps}
@@ -134,6 +134,7 @@ export default function TabsContainer() {
                       <Typography sx={{ width: 'max-content' }}>
                         {item.title}
                       </Typography>
+                      {item.isDirty && <Typography>*</Typography>}
                       <IconButton
                         sx={{
                           borderRadius: '5px',

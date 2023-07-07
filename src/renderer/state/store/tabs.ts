@@ -10,6 +10,7 @@ const getItems = (count: any): TabState[] =>
     id: `tab-${k}`,
     title: `Conversation-${k}.xconv`,
     tabType: TabType.instance,
+    isDirty: false,
     tabData: 'extra',
   }));
 
@@ -49,19 +50,35 @@ const tabs: any = createSlice({
     removeTab: (state: TabsState, { payload }: PayloadAction<string>) => {
       state.tabs = state.tabs.filter((tab) => tab.id !== payload);
     },
-    changeTab: (
+    setTabData: (
       state: TabsState,
-      { payload }: PayloadAction<{ id: string; tabData: object }>
+      { payload }: PayloadAction<{ id: string; tabData: any }>
     ) => {
       const tabIndex = state.tabs.findIndex(
         (tab: TabState) => tab.id === payload.id
       );
       state.tabs[tabIndex].tabData = payload.tabData;
     },
+    setTabIsDirty: (
+      state: TabsState,
+      { payload }: PayloadAction<{ id: string; isDirty: boolean }>
+    ) => {
+      const tabIndex = state.tabs.findIndex(
+        (tab: TabState) => tab.id === payload.id
+      );
+      state.tabs[tabIndex].isDirty = payload.isDirty;
+    },
     setState: setStateReducer<TabsState>(),
   },
 });
 
-export const { setActiveTabId, setTabs, addTab, removeTab, changeTab, setState } =
-  tabs.actions;
+export const {
+  setActiveTabId,
+  setTabs,
+  addTab,
+  removeTab,
+  setTabData,
+  setTabIsDirty,
+  setState,
+} = tabs.actions;
 export default tabs.reducer;

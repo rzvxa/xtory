@@ -4,8 +4,11 @@ import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 
 import { useAppDispatch } from 'renderer/state/store/index';
+import {
+  setTabData,
+  setTabIsDirty as setTabIsDirtyReducer,
+} from 'renderer/state/store/tabs';
 
-import { changeTab } from 'renderer/state/store/tabs';
 import {
   TabState,
   TabType,
@@ -23,9 +26,15 @@ export interface TabViewProps {
 export default function TabView({ tabId, state }: TabViewProps) {
   const dispatch = useAppDispatch();
   const tabData = state.tabData as FileTabData;
+  const setTabIsDirty = React.useCallback(
+    (isDirty: boolean) => {
+      dispatch(setTabIsDirtyReducer({ id: tabId, isDirty }));
+    },
+    [dispatch, tabId]
+  );
   const dispatchFileView = () => {
     if (tabData.extension === 'xtory') {
-      return <FlowView />;
+      return <FlowView setTabIsDirty={setTabIsDirty} />;
     }
     return <DefaultFileView tabData={tabData} />;
   };
@@ -41,7 +50,7 @@ export default function TabView({ tabId, state }: TabViewProps) {
           variant="standard"
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
             dispatch(
-              changeTab({ id: tabId, tabData: { extra: e.target.value } })
+              setTabData({ id: tabId, tabData: { extra: e.target.value } })
             );
           }}
           value={tabData}

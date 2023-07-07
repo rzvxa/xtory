@@ -1,6 +1,7 @@
 import React from 'react';
 
 import ReactFlow, {
+  ReactFlowInstance,
   ReactFlowProvider,
   useViewport,
   useNodesState,
@@ -117,14 +118,27 @@ const ControlsStyled = styled(Controls)`
 `;
 
 type NodeDrawerOpenType = 'rclick' | 'extend' | 'edge';
+type SetIsDirtyCallbackType = (isDirty: boolean) => void;
 
-function Flow() {
+export interface FlowProps {
+  setTabIsDirty: SetIsDirtyCallbackType;
+}
+
+function Flow({ setTabIsDirty }: FlowProps) {
   const viewport = useViewport();
 
   const reactFlowRef = React.useRef<HTMLDivElement>(null);
+  const [reactFlowInstance, setReactFlowInstance] =
+    React.useState<ReactFlowInstance>();
   const [connectingNodeId, setConnectingId] = React.useState<string | null>();
 
-  const { undo, redo, canUndo, canRedo, takeSnapshot } = useUndoRedo();
+  const {
+    undo,
+    redo,
+    canUndo,
+    canRedo,
+    takeSnapshot: takeSnapshotInternal,
+  } = useUndoRedo();
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
@@ -133,6 +147,11 @@ function Flow() {
     y: number;
     type: NodeDrawerOpenType;
   } | null>(null);
+
+  const takeSnapshot = React.useCallback(() => {
+    setTabIsDirty(true);
+    return takeSnapshotInternal();
+  }, [setTabIsDirty, takeSnapshotInternal]);
 
   const handleContextMenu = React.useCallback(
     (event: React.MouseEvent, type: NodeDrawerOpenType = 'rclick') => {
@@ -200,7 +219,7 @@ function Flow() {
         }
       }
     },
-    [nodes, setNodes, setEdges, viewport]
+    [nodes, setNodes, setEdges, viewport, takeSnapshot]
   );
 
   React.useEffect(() => {
@@ -212,6 +231,14 @@ function Flow() {
       document.removeEventListener('keydown', handleKeyPress);
     };
   }, [handleKeyPress]);
+
+  const onSave = React.useCallback(() => {
+    if (reactFlowInstance) {
+      const flow = reactFlowInstance.toObject();
+      const json = JSON.stringify(flow);
+      console.log(json);
+    }
+  }, [reactFlowInstance]);
 
   const onConnect = React.useCallback(
     (params: any) => setEdges((eds) => addEdge(params, eds)),
@@ -319,6 +346,7 @@ function Flow() {
   return (
     <ReactFlowStyled
       ref={reactFlowRef}
+      onInit={setReactFlowInstance}
       nodes={nodes}
       edges={edges}
       onNodesChange={onNodesChange}
@@ -367,10 +395,14 @@ function Flow() {
   );
 }
 
-export default function FlowView() {
+export interface FlowViewProps {
+  setTabIsDirty: SetIsDirtyCallbackType;
+}
+
+export default function FlowView({ setTabIsDirty }: FlowViewProps) {
   return (
     <ReactFlowProvider>
-      <Flow />
+      <Flow setTabIsDirty={setTabIsDirty} />
     </ReactFlowProvider>
   );
 }
