@@ -6,7 +6,6 @@ import { useStore } from 'reactflow';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
-import useDynamicFontSize from './useDynamicFontSize';
 
 type NodeViewProps = {
   selected: boolean;
@@ -34,7 +33,7 @@ export interface NodeContainerProps {
   children: React.ReactNode;
 }
 
-const fontSelector = (s: any) => Math.max(Math.min(1 / s.transform[2], 6), 0.4);
+const fontSelector = (s: any) => Math.max(Math.min(1 / s.transform[2], 3), 0.4);
 
 export default React.memo(
   ({ title, selected, children }: NodeContainerProps) => {
