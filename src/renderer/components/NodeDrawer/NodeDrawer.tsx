@@ -44,7 +44,8 @@ export default function NodeDrawer({
     Math.min(Math.max(index, min), max);
 
   const handleKeyPress = React.useCallback(
-    (event: KeyboardEvent) => {
+    (event: React.KeyboardEvent) => {
+      console.log(event)
       if (event.key === 'Enter' && selectedNodeIndex < filteredItems.length) {
         onItemSelected(filteredItems[selectedNodeIndex]);
         onCloseHandle(event);
@@ -74,15 +75,15 @@ export default function NodeDrawer({
     ]
   );
 
-  React.useEffect(() => {
-    // attach the event listener
-    document.addEventListener('keydown', handleKeyPress);
-
-    // remove the event listener
-    return () => {
-      document.removeEventListener('keydown', handleKeyPress);
-    };
-  }, [handleKeyPress]);
+  // React.useEffect(() => {
+  //   // attach the event listener
+  //   document.addEventListener('keydown', handleKeyPress);
+  //
+  //   // remove the event listener
+  //   return () => {
+  //     document.removeEventListener('keydown', handleKeyPress);
+  //   };
+  // }, [handleKeyPress]);
 
   React.useEffect(() => {
     setFilteredItems(
@@ -111,6 +112,7 @@ export default function NodeDrawer({
             inputRef={focusOnContextSearch}
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
+            onKeyDown={handleKeyPress}
             sx={{ width: '100%', padding: 1 }}
           />
           {filteredItems.map((node, index) => (

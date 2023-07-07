@@ -1,11 +1,11 @@
 import React from 'react';
 
-import { Handle, Position, NodeProps } from 'reactflow';
-import TextField from '@mui/material/TextField';
+import { NodeProps } from 'reactflow';
 import useInit from 'renderer/hooks/useInit';
 
 import NodeContainer from './NodeContainer';
 import useFocusAndCenter from './useFocusAndCenter';
+import TextArea from './ContextualComponents/TextArea';
 
 export default React.memo(({ id, data, selected }: NodeProps) => {
   const inputRef = React.useRef<HTMLInputElement>(null);
@@ -15,13 +15,7 @@ export default React.memo(({ id, data, selected }: NodeProps) => {
 
   return (
     <NodeContainer title="Note" selected={selected}>
-      <TextField
-        id="standard-basic"
-        variant="outlined"
-        multiline
-        minRows="5"
-        inputRef={inputRef}
-      />
+      <TextArea variant="outlined" multiline minRows="5" inputRef={inputRef} />
     </NodeContainer>
   );
 });

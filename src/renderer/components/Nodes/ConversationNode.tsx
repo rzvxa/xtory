@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { Handle, Position, NodeProps } from 'reactflow';
-import TextField from '@mui/material/TextField';
+import { useStore, Handle, Position, NodeProps } from 'reactflow';
+import TextArea from './ContextualComponents/TextArea';
 import Autocomplete from '@mui/material/Autocomplete';
 import useInit from 'renderer/hooks/useInit';
 
@@ -138,6 +138,8 @@ const tempData = [
 export default React.memo(({ id, data, selected }: NodeProps) => {
   const ref = React.useRef(null);
   const focusAndCenter = useFocusAndCenter(ref, id, selected);
+  const zoomSize = useStore((s: any) => s.transform[2]);
+  const preview = zoomSize < 0.5;
 
   useInit(focusAndCenter);
 
@@ -149,7 +151,7 @@ export default React.memo(({ id, data, selected }: NodeProps) => {
         options={tempData}
         sx={{ width: 200 }}
         renderInput={(params) => (
-          <TextField
+          <TextArea
             // eslint-disable-next-line react/jsx-props-no-spreading
             {...params}
             id="standard-basic"

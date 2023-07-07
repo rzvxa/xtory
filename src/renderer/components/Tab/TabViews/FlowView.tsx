@@ -174,6 +174,9 @@ function Flow() {
           const connections = nodeConfigs.find(
             (node) => node.type === selected.type
           )?.connections;
+          const selectedNodeConnections = nodeConfigs.find(
+            (node) => node.type === selected.type
+          )?.connections;
           const newNode = {
             id: uuidv4(),
             type: selected.type,
@@ -184,7 +187,7 @@ function Flow() {
           selected.selected = false;
           takeSnapshot();
           setNodes((nds) => nds.concat(newNode));
-          if (connections) {
+          if (connections && selectedNodeConnections) {
             setEdges((eds) =>
               eds.concat({
                 id: uuidv4(),
@@ -259,6 +262,9 @@ function Flow() {
       const connections = nodeConfigs.find(
         (node) => node.type === item
       )?.connections;
+      const prevNodeConnections = nodeConfigs.find(
+        (node) => node.type === prevNode?.type
+      )?.connections;
       const { top, left } = reactFlowRef.current!.getBoundingClientRect();
       const { x, y, zoom } = viewport;
       const screenPosition = {
@@ -286,7 +292,7 @@ function Flow() {
       });
       takeSnapshot();
       setNodes((nds) => nds.concat(newNode));
-      if (!rclick && connectionSource && connections) {
+      if (!rclick && connectionSource && connections && prevNodeConnections) {
         setEdges((eds) =>
           eds.concat({
             id: uuidv4(),
@@ -297,7 +303,15 @@ function Flow() {
         );
       }
     },
-    [contextMenu, nodes, setNodes, setEdges, viewport, connectingNodeId]
+    [
+      contextMenu,
+      nodes,
+      setNodes,
+      setEdges,
+      viewport,
+      connectingNodeId,
+      takeSnapshot,
+    ]
   );
 
   const items = ['Plot', 'Note', 'Conversation'];
@@ -318,6 +332,7 @@ function Flow() {
       onEdgesDelete={onEdgesDelete}
       nodeTypes={nodeTypes}
       proOptions={{ hideAttribution: true }}
+      maxZoom={6}
       minZoom={0.1}
       onContextMenu={handleContextMenu}
       fitView

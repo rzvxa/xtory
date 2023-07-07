@@ -28,6 +28,9 @@ export default function useFocusAndCenter(
           const zoom = 0.8;
           setCenter(x, y, { zoom, duration: 500 });
           ref.current.focus();
+          setTimeout(() => {
+            ref?.current?.focus();
+          }, 500);
           if (resolve) resolve();
         }
       }, 100);
