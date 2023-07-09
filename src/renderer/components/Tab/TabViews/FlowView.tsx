@@ -395,6 +395,7 @@ function Flow({ tabId, setTabIsDirty }: FlowProps) {
       viewport,
       connectingNodeId,
       takeSnapshot,
+      centerOnNode,
     ]
   );
 
