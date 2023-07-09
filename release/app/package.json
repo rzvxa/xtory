@@ -1,12 +1,12 @@
 {
-  "name": "electron-react-boilerplate",
-  "version": "4.6.0",
-  "description": "A foundation for scalable desktop apps",
-  "license": "MIT",
+  "name": "Xtory",
+  "version": "0.2.0",
+  "description": "A tool for writing branching nonlinear stories. ",
+  "license": "GPT-3",
   "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
-    "url": "https://github.com/electron-react-boilerplate"
+    "name": "Ali Rezvani",
+    "email": "rzvxa@protonmail.com",
+    "url": "https://github.com/rzvxa/xtory"
   },
   "main": "./dist/main/main.js",
   "scripts": {

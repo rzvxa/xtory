@@ -1,7 +1,7 @@
 {
   "name": "Xtory",
   "version": "0.2.0",
-  "description": "Xtory",
+  "description": "A tool for writing branching nonlinear stories. ",
   "author": "Ali Rezvani <rzvxa@protonmail.com>",
   "repository": {
     "type": "git",
