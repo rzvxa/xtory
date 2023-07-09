@@ -15,9 +15,15 @@ import ReactFlow, {
 } from 'reactflow';
 
 import { styled } from '@mui/material/styles';
+import Box from '@mui/material/Box';
 
+import { ChannelsMain } from 'shared/types';
+
+import { useAppSelector } from 'renderer/state/store/index';
+import { FileTabData } from 'renderer/state/types';
 import useUndoRedo from 'renderer/hooks/useUndoRedo';
 import useInit from 'renderer/hooks/useInit';
+import useCenterOnNode from 'renderer/hooks/useCenterOnNode';
 import uuidv4 from 'renderer/utils/uuidv4';
 import {
   rendererPointToPoint,
@@ -127,6 +133,10 @@ export interface FlowProps {
 }
 
 function Flow({ tabId, setTabIsDirty }: FlowProps) {
+  const tabState = useAppSelector((state) =>
+    state.tabsState.tabs.find((tab) => tab.id === tabId)
+  );
+
   const viewport = useViewport();
 
   const reactFlowRef = React.useRef<HTMLDivElement>(null);
@@ -142,11 +152,49 @@ function Flow({ tabId, setTabIsDirty }: FlowProps) {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
+  const [splash, setSplash] = React.useState<boolean>(true);
   const [contextMenu, setContextMenu] = React.useState<{
     x: number;
     y: number;
     type: NodeDrawerOpenType;
   } | null>(null);
+
+  const centerOnNode = useCenterOnNode();
+
+  const onSave = React.useCallback(() => {
+    if (reactFlowInstance) {
+      const flow = reactFlowInstance.toObject();
+      const json = JSON.stringify(flow);
+      console.log(json, tabState);
+      window.electron.ipcRenderer.invoke(
+        ChannelsMain.fspWriteFile,
+        tabState?.id,
+        json
+      );
+    }
+  }, [reactFlowInstance, tabState]);
+
+  const onReactFlowInit = React.useCallback(
+    (element: ReactFlowInstance) => {
+      const { setViewport } = element;
+      setReactFlowInstance(element);
+      const restore = async () => {
+        const tabData = tabState?.tabData as FileTabData;
+        const flow = JSON.parse(tabData.content);
+
+        if (flow) {
+          const { x = 0, y = 0, zoom = 1 } = flow.viewport;
+          setNodes(flow.nodes || []);
+          setEdges(flow.edges || []);
+          setViewport({ x, y, zoom });
+          setSplash(false);
+        }
+      };
+
+      restore();
+    },
+    [setReactFlowInstance, setNodes, setEdges, tabState, setSplash]
+  );
 
   const handleContextMenu = React.useCallback(
     (event: React.MouseEvent, type: NodeDrawerOpenType = 'rclick') => {
@@ -219,10 +267,23 @@ function Flow({ tabId, setTabIsDirty }: FlowProps) {
               })
             );
           }
+          centerOnNode(newNode.id);
         }
+      } else if (event.code === 'KeyS' && (event.ctrlKey || event.metaKey)) {
+        onSave();
       }
     },
-    [nodes, setNodes, setEdges, viewport, takeSnapshot, undo, redo]
+    [
+      nodes,
+      setNodes,
+      setEdges,
+      viewport,
+      takeSnapshot,
+      undo,
+      redo,
+      onSave,
+      centerOnNode,
+    ]
   );
 
   React.useEffect(() => {
@@ -234,14 +295,6 @@ function Flow({ tabId, setTabIsDirty }: FlowProps) {
       document.removeEventListener('keydown', handleKeyPress);
     };
   }, [handleKeyPress]);
-
-  const onSave = React.useCallback(() => {
-    if (reactFlowInstance) {
-      const flow = reactFlowInstance.toObject();
-      const json = JSON.stringify(flow);
-      console.log(json);
-    }
-  }, [reactFlowInstance]);
 
   const onConnect = React.useCallback(
     (params: any) => setEdges((eds) => addEdge(params, eds)),
@@ -332,6 +385,7 @@ function Flow({ tabId, setTabIsDirty }: FlowProps) {
           })
         );
       }
+      if (!rclick) centerOnNode(newNode.id);
     },
     [
       contextMenu,
@@ -347,54 +401,67 @@ function Flow({ tabId, setTabIsDirty }: FlowProps) {
   const items = ['Plot', 'Note', 'Conversation'];
 
   return (
-    <ReactFlowStyled
-      ref={reactFlowRef}
-      onInit={setReactFlowInstance}
-      nodes={nodes}
-      edges={edges}
-      onNodesChange={onNodesChange}
-      onEdgesChange={onEdgesChange}
-      onConnect={onConnect}
-      onConnectStart={onConnectStart}
-      onConnectEnd={onConnectEnd}
-      onNodeDragStart={onNodeDragStart}
-      onSelectionDragStart={onSelectionDragStart}
-      onNodesDelete={onNodesDelete}
-      onEdgesDelete={onEdgesDelete}
-      nodeTypes={nodeTypes}
-      proOptions={{ hideAttribution: true }}
-      maxZoom={6}
-      minZoom={0.1}
-      onContextMenu={handleContextMenu}
-      fitView
-    >
-      <Background
-        id="1"
-        gap={100}
-        lineWidth={0.1}
-        color="#f1f1f1"
-        variant={BackgroundVariant.Lines}
+    <Box sx={{ position: 'relative', height: '100%', width: '100%' }}>
+      <ReactFlowStyled
+        ref={reactFlowRef}
+        onInit={onReactFlowInit}
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        onConnectStart={onConnectStart}
+        onConnectEnd={onConnectEnd}
+        onNodeDragStart={onNodeDragStart}
+        onSelectionDragStart={onSelectionDragStart}
+        onNodesDelete={onNodesDelete}
+        onEdgesDelete={onEdgesDelete}
+        nodeTypes={nodeTypes}
+        proOptions={{ hideAttribution: true }}
+        maxZoom={6}
+        minZoom={0.1}
+        onContextMenu={handleContextMenu}
+        fitView
+      >
+        <Background
+          id="1"
+          gap={100}
+          lineWidth={0.1}
+          color="#f1f1f1"
+          variant={BackgroundVariant.Lines}
+        />
+        <Background
+          id="2"
+          gap={1000}
+          offset={1}
+          color="#ccc"
+          variant={BackgroundVariant.Lines}
+        />
+        <NodeDrawer
+          items={items}
+          open={contextMenu !== null}
+          onClose={() => setContextMenu(null)}
+          onItemSelected={onNodeDrawerItemSelected}
+          anchorPosition={
+            contextMenu !== null
+              ? { top: contextMenu.y, left: contextMenu.x }
+              : undefined
+          }
+        />
+        <ControlsStyled />
+      </ReactFlowStyled>
+      <Box
+        sx={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          height: '100%',
+          width: '100%',
+          backgroundColor: (theme) => theme.palette.background.default,
+          display: splash ? 'block' : 'none',
+        }}
       />
-      <Background
-        id="2"
-        gap={1000}
-        offset={1}
-        color="#ccc"
-        variant={BackgroundVariant.Lines}
-      />
-      <NodeDrawer
-        items={items}
-        open={contextMenu !== null}
-        onClose={() => setContextMenu(null)}
-        onItemSelected={onNodeDrawerItemSelected}
-        anchorPosition={
-          contextMenu !== null
-            ? { top: contextMenu.y, left: contextMenu.x }
-            : undefined
-        }
-      />
-      <ControlsStyled />
-    </ReactFlowStyled>
+    </Box>
   );
 }
 

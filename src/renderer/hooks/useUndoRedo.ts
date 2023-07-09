@@ -7,7 +7,7 @@ import {
   setPastHistory,
   setFutureHistory,
 } from 'renderer/state/store/tabs';
-import { HistoryItem, FileTabData } from 'renderer/state/types';
+import { FileTabData } from 'renderer/state/types';
 
 import uuidv4 from 'renderer/utils/uuidv4';
 
