@@ -1,3 +1,7 @@
-import { FilesToolState, ProjectTreeNodeState, ProjectTreeNodeStates } from './filesToolState';
+import {
+  FilesToolState,
+  ProjectTreeNodeState,
+  ProjectTreeNodeStates,
+} from './filesToolState';
 
 export type { FilesToolState, ProjectTreeNodeState, ProjectTreeNodeStates };
