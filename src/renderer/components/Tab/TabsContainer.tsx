@@ -78,7 +78,7 @@ export default function TabsContainer() {
   React.useEffect(() => {
     const activeTabIndex = tabs.findIndex((t: Tab) => t.id === activeTabId);
     if (tabRefs && tabRefs.current && tabRefs.current[activeTabIndex]) {
-      tabRefs?.current[activeTabIndex].scrollIntoView(/* { behavior: 'smooth' } */);
+      tabRefs?.current[activeTabIndex].scrollIntoView();
     }
   }, [tabs, activeTabId]);
 
@@ -169,7 +169,7 @@ export default function TabsContainer() {
       </DragDropContext>
       <Divider />
       {/* body over here */}
-      {activeTabId && <TabView tabId={activeTabId!} state={activeTab} />}
+      {activeTabId && <TabView tabId={activeTabId!} />}
     </>
   );
 }

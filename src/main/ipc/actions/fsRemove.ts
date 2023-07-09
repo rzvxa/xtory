@@ -1,5 +1,5 @@
 import { IpcEvent, ChannelsRenderer } from 'shared/types';
-import { rimraf } from 'rimraf'
+import { rimraf } from 'rimraf';
 
 export default async function remove({ sender }: IpcEvent, path: string) {
   try {

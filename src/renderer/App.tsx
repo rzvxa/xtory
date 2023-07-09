@@ -1,20 +1,24 @@
 import React from 'react';
+
 import CssBaseline from '@mui/material/CssBaseline';
 import GlobalStyles from '@mui/material/GlobalStyles';
 import { ThemeProvider } from '@mui/material/styles';
+
+import { Provider as ReduxProvider } from 'react-redux';
+
+import { store, useAppSelector } from './state/store/index';
+
 import SnackbarProvider from './components/SnackbarProvider';
 
 import StartPage from './components/StartPage';
 import Layout from './components/Layout';
-
-import { useAppSelector } from './state/store/index';
 
 import './ipc';
 
 import darkTheme from './styles/dark.theme';
 import './styles/Global.scss';
 
-export default function App() {
+function AppView() {
   const projectPath = useAppSelector((state) => state.projectState.projectPath);
   React.useEffect(() => {
     const handleAuxClick = (event: MouseEvent) => {
@@ -29,20 +33,26 @@ export default function App() {
     };
   }, []);
 
+  return projectPath ? <Layout /> : <StartPage />;
+}
+
+export default function App() {
   return (
-    <ThemeProvider theme={darkTheme}>
-      <GlobalStyles
-        styles={(theme) => ({
-          '::selection': {
-            background: theme.palette.primary.main,
-            color: theme.palette.background.paper,
-          },
-        })}
-      />
-      <CssBaseline />
-      <SnackbarProvider>
-        {projectPath ? <Layout /> : <StartPage />}
-      </SnackbarProvider>
-    </ThemeProvider>
+    <ReduxProvider store={store}>
+      <ThemeProvider theme={darkTheme}>
+        <GlobalStyles
+          styles={(theme) => ({
+            '::selection': {
+              background: theme.palette.primary.main,
+              color: theme.palette.background.paper,
+            },
+          })}
+        />
+        <CssBaseline />
+        <SnackbarProvider>
+          <AppView />
+        </SnackbarProvider>
+      </ThemeProvider>
+    </ReduxProvider>
   );
 }

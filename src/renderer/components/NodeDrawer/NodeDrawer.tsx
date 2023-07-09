@@ -8,9 +8,9 @@ import NodeDrawerItem from './NodeDrawerItem';
 export interface NodeDrawerProps {
   items: string[];
   open: boolean;
-  onClose: (event: React.MouseEvent | KeyboardEvent) => void;
+  onClose: (event: React.MouseEvent | React.KeyboardEvent) => void;
   anchorPosition: { left: number; top: number } | undefined;
-  onItemSelected: (string) => void;
+  onItemSelected: (selectedItem: string) => void;
 }
 
 export default function NodeDrawer({
@@ -25,7 +25,7 @@ export default function NodeDrawer({
   const [filteredItems, setFilteredItems] = React.useState<string[]>([]);
 
   const onCloseHandle = React.useCallback(
-    (event: React.MouseEvent | KeyboardEvent) => {
+    (event: React.MouseEvent | React.KeyboardEvent) => {
       setSearchText('');
       setSelectedNodeIndex(0);
       onClose(event);
@@ -45,7 +45,6 @@ export default function NodeDrawer({
 
   const handleKeyPress = React.useCallback(
     (event: React.KeyboardEvent) => {
-      console.log(event)
       if (event.key === 'Enter' && selectedNodeIndex < filteredItems.length) {
         onItemSelected(filteredItems[selectedNodeIndex]);
         onCloseHandle(event);

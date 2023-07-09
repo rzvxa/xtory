@@ -194,7 +194,9 @@ export function NewProjectModal({
     const result = await onCreate(model);
 
     if (!result.created) {
-      setErrorMessage(result.errorMessage);
+      if (result.errorMessage) {
+        setErrorMessage(result.errorMessage);
+      }
       setProjectName(projectName);
     }
   };

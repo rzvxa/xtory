@@ -166,9 +166,9 @@ class ProjectWatchService {
     this.#removeNode(_path);
   }
 
-  #onChange(_path: string) {
+  #onChange = (_path: string) => {
     // ignore for now
-  }
+  };
 }
 
 const projectWatchService = new ProjectWatchService();

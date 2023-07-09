@@ -45,7 +45,6 @@ export default function StartPage() {
     if (result.status === IpcResultStatus.error) {
       toaster.error(result.errorMessage);
     }
-
   };
 
   const onNewProjectButtonClick = () => {

@@ -1,12 +1,14 @@
 import React from 'react';
 
 import { useStore, Handle, Position, NodeProps } from 'reactflow';
-import TextArea from './ContextualComponents/TextArea';
 import Autocomplete from '@mui/material/Autocomplete';
+
 import useInit from 'renderer/hooks/useInit';
 
+import TextArea from './ContextualComponents/TextArea';
 import NodeContainer from './NodeContainer';
 import useFocusAndCenter from './useFocusAndCenter';
+
 const tempData = [
   { label: 'The Shawshank Redemption', year: 1994 },
   { label: 'The Godfather', year: 1972 },

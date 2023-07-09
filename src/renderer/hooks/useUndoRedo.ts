@@ -27,7 +27,7 @@ type UseUndoRedo = (options: UseUndoRedoOptions) => {
   canRedo: boolean;
 };
 
-export const useUndoRedo: UseUndoRedo = ({
+const useUndoRedo: UseUndoRedo = ({
   tabId,
   setIsDirty,
   maxHistorySize,

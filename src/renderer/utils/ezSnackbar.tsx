@@ -1,14 +1,24 @@
-/* eslint-disable import/prefer-default-export */
 import {
   useSnackbar,
   closeSnackbar,
   SnackbarKey,
-  WithSnackbarProps,
+  ProviderContext,
 } from 'notistack';
 import IconButton from '@mui/material/IconButton';
 import CloseIcon from '@mui/icons-material/Close';
 
 export type SnackVariant = 'error' | 'success' | 'warning' | 'info';
+export type ToasterFunction = (message: string) => void;
+
+export interface EzSnackbarContext extends ProviderContext {
+  toast: (message: string, variant: SnackVariant) => void;
+  toaster: {
+    info: ToasterFunction;
+    warning: ToasterFunction;
+    error: ToasterFunction;
+    success: ToasterFunction;
+  };
+}
 
 const action = (snackbarId: SnackbarKey) => (
   <IconButton onClick={() => closeSnackbar(snackbarId)}>
@@ -35,7 +45,7 @@ export function useEzSnackbar() {
   };
 }
 
-let ezSnackbarGlobalRef: WithSnackbarProps;
+let ezSnackbarGlobalRef: EzSnackbarContext;
 
 export function EzSnackbarGlobalRef() {
   ezSnackbarGlobalRef = useEzSnackbar();
@@ -49,15 +59,15 @@ export const EzSnackbarRef = {
     ezSnackbarGlobalRef.toast(message, variant);
   },
   info(message: string) {
-    ezSnackbarGlobalRef.info(message);
+    ezSnackbarGlobalRef.toaster.info(message);
   },
   warning(message: string) {
-    ezSnackbarGlobalRef.warning(message);
+    ezSnackbarGlobalRef.toaster.warning(message);
   },
   error(message: string) {
-    ezSnackbarGlobalRef.error(message);
+    ezSnackbarGlobalRef.toaster.error(message);
   },
   success(message: string) {
-    ezSnackbarGlobalRef.success(message);
+    ezSnackbarGlobalRef.toaster.success(message);
   },
 };

@@ -21,9 +21,10 @@ import { ChannelsMain } from 'shared/types';
 
 import { useAppSelector } from 'renderer/state/store/index';
 import { FileTabData } from 'renderer/state/types';
+
 import useUndoRedo from 'renderer/hooks/useUndoRedo';
-import useInit from 'renderer/hooks/useInit';
 import useCenterOnNode from 'renderer/hooks/useCenterOnNode';
+
 import uuidv4 from 'renderer/utils/uuidv4';
 import {
   rendererPointToPoint,
