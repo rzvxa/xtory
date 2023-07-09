@@ -1,30 +1,37 @@
-
 # Xtory
 
-A tool for writing branching nonlinear stories.
-It is based on [Dialogger](https://github.com/etodd/dialogger) from [Evan Todd](https://github.com/etodd).
-## Features
+#### Please note that Xtory is early in the development stages, and it is not recommended to use it for any actual production till it reaches the first stable version release.
 
- - Node base story editor
- -  Writing story and conversations all in one tool
- - Adding notes for specefic parts of story
- - Can save variables, read them or call functions in engine
- - Exporting conversations for using in your game engine dialogue system
- - Highly customizable code
- - Built-in localization tool
- ## How to use it
- I think there is no need for a documentation on this subject, so i will just explain nodes.
+## What is Xtory?
+It's a tool for writing non-linear stories using flows and nodes.
+Xtory can export all of its story flow files into compact binary, JSON, or with the use of plugins, any other format for you to use in your games and pipeline however you like.
+
+## Why is Xtory?
+I'm a game developer with a passion for games with good stories; Maybe you, too, always thought writing dialogue options should be done as a dialogue tree, and basically, word or traditional screenplay writing tools doesn't cut the job.
+
+## When is Xtory?
+ Near 5 years ago, I started this project as a fork of [Dialogger](https://github.com/etodd/dialogger) which I then modified with custom nodes for function calls to the engine, conditional options(based on game state), and localization. This version can be found [here](https://github.com/rzvxa/xtory/releases/tag/legacy-version). For many years I've tried to rewrite this project with extendability as a general-purpose tool, But I tend to stop everything and start from scratch. I've restarted this project many times with many stacks such as [Qt](https://www.qt.io/), [AvaloniaUI](https://avaloniaui.net/), [GTK](https://www.gtk.org/), and even good old [ImGUI](https://github.com/ocornut/imgui).
  
- - **Plot**:  This node contains story parts and wont be in game exports, plot node can connect to one Plot or Start-Conversation.
- - **Note**: Note contains notes for any node and can connect to one or more entity of any type.
- - **Start-Conversation**: Marks start of a conversation and can connect to one Node, Text, Choice,Random, Function, Branch or Set.
- - **End-Conversation**: Marks end of a conversation and can connect to one Plot.
- - **Text**: Shows a message from the NPC and can connect to one End-Conversation, Text, Node,Random, Function, Set, or Branch, or to one or more Choices.
- - **Node**:Does nothing. Can connect to one Text, Node,Random, Function, Set, or Branch, or to one or more Choices.
- - **Choice**:Presents a choice to the player. Can connect to one End-Conversation, Text, Node, Random, Function, Set, or Branch.
- - **Set**:Sets a variable to a value. Can connect to one End-Conversation, Text, Node, Random, Function, Set, or Branch.
- - **Branch**:Takes one of several paths based on the value of a variable. Each port can connect to one Text, Node, Random, Function, Set, or Branch.
- - **Random**:Will choose one of cells it connected to. Can connect to one or more Text or Choice but you can't connect to both types at the same time.
- - **Function**:It will call a function with selected input(default is void/nothing). Can connect to one End-Conversation, Text, Choice, Node, Random, Function, Set or Branch.
+ ## Choice of Stack
+ In the end, I've chosen the slowest option, which is a react app wrapped in an Electron layer. But to be honest, The problem with many of the greatest Open Source software is poor UI design which prevents them from appealing to a wider audience, [Blender](https://www.blender.org/) transition from 2.7x to 2.8x and [Musescore](https://musescore.org/en) version 3.xx to 4.xx shows this in practice. So With the help of react, Using a web approach to design and borrowing heavily from VSCode UI/UX (which I've wanted to make this project as an extension for it, but that wasn't feasible enough at the time), I hope it's easier to make a clean and usable UI with much more manageable development effort.
 
+# Features
 
+* Intuitive **Node** base approach to writing non-linear stories.
+* Writing **Conversations** using nodes, With dialogue options and conditional scenarios.
+* **Character creator** with back story and conversation tracking for writing better characters, NPCs, and stories.
+* Xtory is **Cross-Platform**!
+* It comes with `xtory-parser`, An open source **C++ story parser** for implementing xtory stories in your game engine.
+* **Unity3D** Open Source Package(via `xtory-parser`)
+* **Extendable** with plugins
+* **Open source** and free to use for writing stories, Both in commercial and personal projects.
+* Easy to **version control** project structure, With a heavy emphasis on breaking down flows into sub-flows to enable teams to work on different parts of the story simultaneously.
+
+## Roadmap
+
+Right now, there is no Roadmap for the project, But it's under heavy development.
+
+Both xtory-parser and Unity3D package are non-existance at the moment And will be shipped with the first production release(version 1.0.0).
+
+### Contribution
+Feel free to make issues and/or help with the development.
