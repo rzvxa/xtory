@@ -55,7 +55,9 @@
     "setupFiles": [
       "./.erb/scripts/check-build-exists.ts"
     ],
-    "setupFilesAfterEnv": ["<rootDir>/setup-jest.ts"],
+    "setupFilesAfterEnv": [
+      "<rootDir>/setup-jest.ts"
+    ],
     "testEnvironment": "jsdom",
     "testEnvironmentOptions": {
       "url": "http://localhost/"
@@ -98,9 +100,9 @@
     "@types/fs-extra": "^11.0.1",
     "@types/jest": "^29.4.0",
     "@types/node": "18.13.0",
-    "@types/react": "^18.0.27",
+    "@types/react": "^18.2.14",
     "@types/react-beautiful-dnd": "^13.1.4",
-    "@types/react-dom": "^18.0.10",
+    "@types/react-dom": "^18.2.6",
     "@types/react-test-renderer": "^18.0.0",
     "@types/terser-webpack-plugin": "^5.0.4",
     "@types/webpack-bundle-analyzer": "^4.6.0",
