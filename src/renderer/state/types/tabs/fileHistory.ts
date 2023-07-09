@@ -1,7 +1,7 @@
 import { HistoryItem } from './historyItem';
 
 export interface FileHistory {
-  now: HistoryItem | null;
+  activeHistory: HistoryItem;
   past: HistoryItem[];
   future: HistoryItem[];
 }

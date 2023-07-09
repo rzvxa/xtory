@@ -11,6 +11,7 @@ import {
 import { XTORY_TABS_STATE } from './constants';
 
 type TabId = string;
+type ActiveHistoryId = string | null;
 
 // fake data generator
 const getItems = (count: any): TabState[] =>
@@ -67,29 +68,20 @@ const tabs: any = createSlice({
       );
       state.tabs[tabIndex].tabData = payload.tabData;
     },
-    pushHistorySnapshot: (
+    setActiveHistory: (
       state: TabsState,
       {
         payload,
       }: PayloadAction<{
         id: TabId;
-        snapshot: HistoryItem;
-        maxHistorySize: number;
+        activeHistory: HistoryItem;
       }>
     ) => {
-      console.log('snapshot');
       const tabIndex = state.tabs.findIndex((tab) => tab.id === payload.id)!;
       const tabState = state.tabs[tabIndex];
       const { history } = tabState.tabData as FileTabData;
-      const { past } = history;
 
-      history.past = [
-        ...past.slice(past.length - payload.maxHistorySize + 1, past.length),
-        payload.snapshot,
-      ];
-      history.future = [];
-
-      history.now = payload.snapshot;
+      history.activeHistory = payload.activeHistory;
     },
     setPastHistory: (
       state: TabsState,
@@ -128,7 +120,7 @@ export const {
   addTab,
   removeTab,
   setTabData,
-  pushHistorySnapshot,
+  setActiveHistory,
   setPastHistory,
   setFutureHistory,
   setTabIsDirty,
