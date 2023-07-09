@@ -6,11 +6,11 @@ Object.defineProperty(window, 'electron', {
       on: jest.fn(),
       once: jest.fn(),
       sendMessage: jest.fn(),
-      invoke: jest.fn(async (channel) => {
+      invoke: jest.fn(async (channel): Promise<unknown> => {
         if (channel === 'getXtoryTemplates') {
           return ['Test'];
         }
-        return;
+        return undefined;
       }),
     },
   },

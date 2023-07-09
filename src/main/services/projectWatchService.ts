@@ -49,7 +49,9 @@ class ProjectWatchService {
       .on('addDir', (_path) => this.#onAddDir(_path))
       .on('unlinkDir', (_path) => this.#onUnlinkDir(_path))
       .on('add', (_path) => this.#onAdd(_path))
-      .on('change', (_path) => this.#onChange(_path))
+      .on('change', (_path) => {
+        /* ignore for now */
+      })
       .on('unlink', (_path) => this.#onUnlink(_path))
       .on('error', (error) => {
         console.error('Error happened', error);
@@ -165,10 +167,6 @@ class ProjectWatchService {
   #onUnlink(_path: string) {
     this.#removeNode(_path);
   }
-
-  #onChange = (_path: string) => {
-    // ignore for now
-  };
 }
 
 const projectWatchService = new ProjectWatchService();
