@@ -32,7 +32,7 @@ export default function TabView({ tabId }: TabViewProps) {
     [dispatch, tabId]
   );
   const dispatchFileView = () => {
-    if (tabData.extension === 'xtory') {
+    if (tabData.extension === 'xflow') {
       return <FlowView tabId={tabId} setTabIsDirty={setTabIsDirty} />;
     }
     return <DefaultFileView tabData={tabData} />;

@@ -222,7 +222,7 @@ function TreeNode({ treeData, root = false }: TreeNodeProps) {
       key={useGuid()}
       label="New Sub Story"
       onClick={() => {
-        onNewFile('xtory', 'New Sub Story');
+        onNewFile('xflow', 'New Sub Story');
       }}
     />,
   ];
