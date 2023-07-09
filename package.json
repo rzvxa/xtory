@@ -1,5 +1,8 @@
 {
+  "name": "Xtory",
+  "version": "0.2.0",
   "description": "Xtory",
+  "author": "Ali Rezvani <rzvxa@protonmail.com>",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/rzvxa/xtory.git"
