@@ -1,6 +1,6 @@
 # Xtory
 
-![Xtory](https://raw.githubusercontent.com/rzvxa/xtory/development/ScreenShots/screenshot1.png)
+![Xtory](https://raw.githubusercontent.com/rzvxa/xtory/master/ScreenShots/screenshot1.png)
 
 #### Please note that Xtory is early in the development stages, and it is not recommended to use it for any actual production till it reaches the first stable version release.
 
