@@ -21,6 +21,11 @@ export default function onOpenFileAsTab(
         name,
         extension,
         content,
+        history: {
+          now: null,
+          past: [],
+          future: [],
+        },
       },
     })
   );

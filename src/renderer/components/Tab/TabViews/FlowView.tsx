@@ -17,6 +17,7 @@ import ReactFlow, {
 import { styled } from '@mui/material/styles';
 
 import useUndoRedo from 'renderer/hooks/useUndoRedo';
+import useInit from 'renderer/hooks/useInit';
 import uuidv4 from 'renderer/utils/uuidv4';
 import {
   rendererPointToPoint,
@@ -121,10 +122,11 @@ type NodeDrawerOpenType = 'rclick' | 'extend' | 'edge';
 type SetIsDirtyCallbackType = (isDirty: boolean) => void;
 
 export interface FlowProps {
+  tabId: string;
   setTabIsDirty: SetIsDirtyCallbackType;
 }
 
-function Flow({ setTabIsDirty }: FlowProps) {
+function Flow({ tabId, setTabIsDirty }: FlowProps) {
   const viewport = useViewport();
 
   const reactFlowRef = React.useRef<HTMLDivElement>(null);
@@ -132,13 +134,11 @@ function Flow({ setTabIsDirty }: FlowProps) {
     React.useState<ReactFlowInstance>();
   const [connectingNodeId, setConnectingId] = React.useState<string | null>();
 
-  const {
-    undo,
-    redo,
-    canUndo,
-    canRedo,
-    takeSnapshot: takeSnapshotInternal,
-  } = useUndoRedo();
+  const { undo, redo, canUndo, canRedo, takeSnapshot } = useUndoRedo({
+    tabId,
+    setIsDirty: setTabIsDirty,
+    maxHistorySize: 100,
+  });
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
@@ -147,11 +147,6 @@ function Flow({ setTabIsDirty }: FlowProps) {
     y: number;
     type: NodeDrawerOpenType;
   } | null>(null);
-
-  const takeSnapshot = React.useCallback(() => {
-    setTabIsDirty(true);
-    return takeSnapshotInternal();
-  }, [setTabIsDirty, takeSnapshotInternal]);
 
   const handleContextMenu = React.useCallback(
     (event: React.MouseEvent, type: NodeDrawerOpenType = 'rclick') => {
@@ -171,7 +166,15 @@ function Flow({ setTabIsDirty }: FlowProps) {
 
   const handleKeyPress = React.useCallback(
     (event: KeyboardEvent) => {
-      if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
+      if (
+        event.code === 'KeyZ' &&
+        (event.ctrlKey || event.metaKey) &&
+        event.shiftKey
+      ) {
+        redo();
+      } else if (event.code === 'KeyZ' && (event.ctrlKey || event.metaKey)) {
+        undo();
+      } else if (event.key === 'Enter' && (event.ctrlKey || event.metaKey)) {
         const selectedNodes = nodes.filter((node) => node.selected);
         // if (selectedNodes.length === 0) return;
         if (selectedNodes.length > 1) return;
@@ -219,7 +222,7 @@ function Flow({ setTabIsDirty }: FlowProps) {
         }
       }
     },
-    [nodes, setNodes, setEdges, viewport, takeSnapshot]
+    [nodes, setNodes, setEdges, viewport, takeSnapshot, undo, redo]
   );
 
   React.useEffect(() => {
@@ -396,13 +399,14 @@ function Flow({ setTabIsDirty }: FlowProps) {
 }
 
 export interface FlowViewProps {
+  tabId: string;
   setTabIsDirty: SetIsDirtyCallbackType;
 }
 
-export default function FlowView({ setTabIsDirty }: FlowViewProps) {
+export default function FlowView({ tabId, setTabIsDirty }: FlowViewProps) {
   return (
     <ReactFlowProvider>
-      <Flow setTabIsDirty={setTabIsDirty} />
+      <Flow tabId={tabId} setTabIsDirty={setTabIsDirty} />
     </ReactFlowProvider>
   );
 }

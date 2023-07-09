@@ -4,12 +4,14 @@ import {
   ProjectTreeNodeState,
   ProjectTreeNodeStates,
 } from './toolBox';
-import { TabType, TabState, TabsState } from './tabs';
+import { TabType, TabState, TabsState, HistoryItem, FileTabData } from './tabs';
 
 export {
   TabType,
   TabState,
   TabsState,
+  HistoryItem,
+  FileTabData,
   ProjectState,
   FilesToolState,
   ProjectTreeNodeState,
