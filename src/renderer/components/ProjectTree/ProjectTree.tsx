@@ -296,7 +296,7 @@ function TreeNode({ treeData, root = false }: TreeNodeProps) {
             const [bPath, bObject] = b;
             if (!(aObject.isDir && bObject.isDir)) {
               if (aObject.isDir) return -1;
-              else return 1;
+              return 1;
             }
             return aPath.localeCompare(bPath);
           })
