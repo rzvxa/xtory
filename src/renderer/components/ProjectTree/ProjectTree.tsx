@@ -291,7 +291,15 @@ function TreeNode({ treeData, root = false }: TreeNodeProps) {
     >
       {children &&
         Object.entries(children)
-          .sort((a, b) => a[0].localeCompare(b[0]))
+          .sort((a, b) => {
+            const [aPath, aObject] = a;
+            const [bPath, bObject] = b;
+            if (!(aObject.isDir && bObject.isDir)) {
+              if (aObject.isDir) return -1;
+              return 1;
+            }
+            return aPath.localeCompare(bPath);
+          })
           .map(([_, node]) => <TreeNode key={node.path} treeData={node} />)}
     </TreeItem>
   );
