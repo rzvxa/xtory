@@ -10,6 +10,7 @@ import { CreateNewProjectResult } from './createNewProjectResult';
 import { BrowseFileSystemResult } from './browseFileSystemResult';
 import { OpenProjectResult } from './openProjectResult';
 import { ProjectTreeNode, ProjectTree } from './projectTree';
+import PluginConfig from './pluginConfig';
 
 export { Platform, ChannelsMain, ChannelsRenderer, IpcResultStatus };
 
@@ -25,4 +26,5 @@ export type {
   OpenProjectResult,
   ProjectTreeNode,
   ProjectTree,
+  PluginConfig
 };

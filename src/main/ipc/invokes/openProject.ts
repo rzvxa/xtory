@@ -12,6 +12,7 @@ import {
 } from 'shared/types';
 
 import projectWatchService from 'main/services/projectWatchService';
+import pluginsService from 'main/services/pluginsService';
 
 export default async function openProject(
   { sender }: IpcMainInvokeEvent,
@@ -43,9 +44,12 @@ export default async function openProject(
     };
   }
 
-  projectWatchService.watch(projectPath, (channel, ...args) =>
-    sender.send(channel, ...args)
-  );
+  const messageBroker = (channel: string, ...args: unknown[]) =>
+    sender.send(channel, ...args);
+
+  projectWatchService.watchProject(projectPath, messageBroker);
+
+  pluginsService.loadPlugins(`${projectPath}/plugins`, messageBroker);
 
   sender.send(ChannelsRenderer.onProjectOpened, projectPath);
   return { status: IpcResultStatus.ok };

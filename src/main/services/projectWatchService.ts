@@ -27,11 +27,11 @@ class ProjectWatchService {
     return !!this.watcher;
   }
 
-  watch(
+  watchProject(
     projectPath: string,
     messageBroker: ProjectWatchServiceMessageBroker
   ): void {
-    this.unwatch();
+    this.unwatchProject();
     this.messageBroker = messageBroker;
     this.projectPath = sanitizePath(projectPath);
     const name = this.projectPath.split('/').pop() || '';
@@ -60,7 +60,7 @@ class ProjectWatchService {
     this.worker = setInterval(() => this.#worker(), FlushInterval);
   }
 
-  unwatch(): void {
+  unwatchProject(): void {
     if (!this.isWatching) return;
 
     clearInterval(this.worker!);
