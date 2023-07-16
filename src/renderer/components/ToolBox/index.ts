@@ -2,5 +2,6 @@ import FilesTool from './FilesTool';
 import FindTool from './FindTool';
 import NpcsTool from './NpcsTool';
 import VariablesTool from './VariablesTool';
+import ConsoleTool from './ConsoleTool';
 
-export { FilesTool, FindTool, NpcsTool, VariablesTool };
+export { FilesTool, FindTool, NpcsTool, VariablesTool, ConsoleTool };

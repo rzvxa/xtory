@@ -3,6 +3,7 @@ import React from 'react';
 import MuiDrawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
+import Typography from '@mui/material/Typography';
 import List from '@mui/material/List';
 import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -13,9 +14,16 @@ import SnippetFolderIcon from '@mui/icons-material/SnippetFolder';
 import SearchIcon from '@mui/icons-material/Search';
 import GroupIcon from '@mui/icons-material/Group';
 import DataObjectIcon from '@mui/icons-material/DataObject';
+import TerminalIcon from '@mui/icons-material/Terminal';
 
 import TabsContainer from './Tab/TabsContainer';
-import { FilesTool, FindTool, NpcsTool, VariablesTool } from './ToolBox/index';
+import {
+  FilesTool,
+  FindTool,
+  NpcsTool,
+  VariablesTool,
+  ConsoleTool,
+} from './ToolBox/index';
 
 interface ToolBoxProps {
   activeIndex: number;
@@ -35,6 +43,14 @@ interface QuickAccessItemProps {
   text: string;
   onClick: React.MouseEventHandler<HTMLDivElement>;
   isActive: boolean;
+}
+
+interface StatusBarItemProps {
+  icon: React.ReactNode;
+  text: string;
+  onClick: React.MouseEventHandler<HTMLDivElement>;
+  isActive: boolean;
+  height: string;
 }
 
 function ToolBox({
@@ -106,73 +122,150 @@ function QuickAccessItem({
   );
 }
 
+function StatusBarItem({
+  icon,
+  text,
+  onClick,
+  isActive,
+  height,
+}: StatusBarItemProps) {
+  return (
+    <Box key={text} sx={{ height }}>
+      <Tooltip title={text} placement="top" arrow>
+        <Box
+          onClick={onClick}
+          sx={{
+            height,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            paddingRight: 1,
+            bgcolor: (theme) =>
+              isActive ? theme.palette.background.paper : null!,
+            color: (theme) => (isActive ? theme.palette.primary.main : null!),
+          }}
+        >
+          {icon}
+          <Typography variant="caption" sx={{ paddingLeft: 1 }}>
+            {text}
+          </Typography>
+        </Box>
+      </Tooltip>
+    </Box>
+  );
+}
+
 export default function Layout() {
   const quickAccessWidth: number = 50;
-  const [toolBoxWidth, setToolBoxWidth] = React.useState<number>(300);
-  const [activeToolIndex, setActiveToolIndex] = React.useState(0);
+  const [primaryToolBoxWidth, setPrimaryToolBoxWidth] =
+    React.useState<number>(300);
+  const [bottomToolBoxWidth, setBottomToolBoxWidth] =
+    React.useState<number>(300);
+  const [activePrimaryToolIndex, setActivePrimaryToolIndex] = React.useState(0);
+  const [activeBottomToolIndex, setActiveBottomToolIndex] = React.useState(0);
+
+  const displayPrimaryToolBox = primaryToolBoxWidth > 0;
+  const displayBottomToolBox = bottomToolBoxWidth > 0;
 
   const handleQuickAccessClick = (index: number) => {
-    if (index === activeToolIndex) {
-      setToolBoxWidth(toolBoxWidth > 0 ? 0 : 300);
+    if (index === activePrimaryToolIndex) {
+      setPrimaryToolBoxWidth(primaryToolBoxWidth > 0 ? 0 : 300);
       return;
     }
-    setActiveToolIndex(index);
-    setToolBoxWidth(300);
+    setActivePrimaryToolIndex(index);
+    setPrimaryToolBoxWidth(300);
+  };
+
+  const handleStatusBarClick = (index: number) => {
+    if (index === activeBottomToolIndex) {
+      setBottomToolBoxWidth(bottomToolBoxWidth > 0 ? 0 : 300);
+      return;
+    }
+    setActiveBottomToolIndex(index);
+    setBottomToolBoxWidth(300);
   };
 
   return (
-    <Box sx={{ display: 'flex', overflow: 'clip', height: '100vh' }}>
-      <Paper
-        sx={{
-          bgcolor: (theme) => theme.palette.background.default,
-        }}
-      >
-        <List sx={{ width: quickAccessWidth }}>
-          {[
-            { text: 'Files', icon: <SnippetFolderIcon /> },
-            { text: 'Find', icon: <SearchIcon /> },
-            { text: 'NPCs', icon: <GroupIcon /> },
-            { text: 'Variables', icon: <DataObjectIcon /> },
-          ].map((item, index) => (
-            <QuickAccessItem
-              key={item.text}
-              text={item.text}
-              icon={item.icon}
-              onClick={() => handleQuickAccessClick(index)}
-              isActive={activeToolIndex === index}
-            />
-          ))}
-        </List>
-      </Paper>
-      <ToolBox
-        activeIndex={activeToolIndex}
-        display={toolBoxWidth > 0}
-        height="100vh"
-        width={toolBoxWidth}
-      >
-        <FilesTool />
-        <FindTool />
-        <NpcsTool />
-        <VariablesTool />
-      </ToolBox>
+    <Box>
       <Box
-        sx={{ width: `calc(100% - ${quickAccessWidth}px - ${toolBoxWidth}px)` }}
+        sx={{ display: 'flex', overflow: 'clip', height: 'calc(100vh - 20px)' }}
       >
-        <MainBox height="calc(100% - 200px)">
-          <TabsContainer />
-        </MainBox>
+        <Paper
+          sx={{
+            bgcolor: (theme) => theme.palette.background.default,
+          }}
+        >
+          <List sx={{ width: quickAccessWidth }}>
+            {[
+              { text: 'Files', icon: <SnippetFolderIcon /> },
+              { text: 'Find', icon: <SearchIcon /> },
+              { text: 'NPCs', icon: <GroupIcon /> },
+              { text: 'Variables', icon: <DataObjectIcon /> },
+            ].map((item, index) => (
+              <QuickAccessItem
+                key={item.text}
+                text={item.text}
+                icon={item.icon}
+                onClick={() => handleQuickAccessClick(index)}
+                isActive={
+                  displayPrimaryToolBox && activePrimaryToolIndex === index
+                }
+              />
+            ))}
+          </List>
+        </Paper>
         <ToolBox
-          activeIndex={activeToolIndex}
-          display={true}
-          height="200px"
-          width="100%"
+          activeIndex={activePrimaryToolIndex}
+          display={displayPrimaryToolBox}
+          height="100vh"
+          width={primaryToolBoxWidth}
         >
           <FilesTool />
           <FindTool />
           <NpcsTool />
           <VariablesTool />
         </ToolBox>
+        <Box
+          sx={{
+            width: `calc(100% - ${quickAccessWidth}px - ${primaryToolBoxWidth}px)`,
+          }}
+        >
+          <MainBox height={`calc(100% - ${displayBottomToolBox ? 200 : 0}px)`}>
+            <TabsContainer />
+          </MainBox>
+          <ToolBox
+            activeIndex={activeBottomToolIndex}
+            display={displayBottomToolBox}
+            height="200px"
+            width="100%"
+          >
+            <ConsoleTool />
+          </ToolBox>
+        </Box>
       </Box>
+      <Paper
+        sx={{
+          bgcolor: (theme) => theme.palette.background.default,
+        }}
+      >
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+          }}
+        >
+          {[{ text: 'Console', icon: <TerminalIcon /> }].map((item, index) => (
+            <StatusBarItem
+              key={item.text}
+              text={item.text}
+              icon={item.icon}
+              onClick={() => handleStatusBarClick(index)}
+              isActive={displayBottomToolBox && activeBottomToolIndex === index}
+              height="20px"
+            />
+          ))}
+        </Box>
+      </Paper>
     </Box>
   );
 }
