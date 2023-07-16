@@ -17,20 +17,16 @@ import DataObjectIcon from '@mui/icons-material/DataObject';
 import TabsContainer from './Tab/TabsContainer';
 import { FilesTool, FindTool, NpcsTool, VariablesTool } from './ToolBox/index';
 
-interface LayoutProps {
-  children?: React.ReactNode;
-}
-
 interface ToolBoxProps {
   activeIndex: number;
-  width: number;
-  quickAccessWidth: number;
+  display: boolean;
+  height: number | string;
+  width: number | string;
   children: React.ReactNode;
 }
 
 interface MainBoxProps {
-  quickAccessWidth: number;
-  toolBoxWidth: number;
+  height: string;
   children: React.ReactNode;
 }
 
@@ -43,20 +39,19 @@ interface QuickAccessItemProps {
 
 function ToolBox({
   activeIndex,
+  display,
+  height,
   width,
-  quickAccessWidth,
   children,
 }: ToolBoxProps) {
-  const visible = width > 0;
   return (
     <Box
       sx={{
-        display: visible ? 'block' : 'none',
+        display: display ? 'block' : 'none',
         minWidth: `${width}px`,
-        height: '100vh',
+        height,
         '> div': { display: 'none' },
         [`&>*:nth-of-type(${activeIndex + 1})`]: { display: 'block' },
-        ml: `${quickAccessWidth}px`,
       }}
     >
       {children}
@@ -64,13 +59,8 @@ function ToolBox({
   );
 }
 
-function MainBox({ quickAccessWidth, toolBoxWidth, children }: MainBoxProps) {
-  const ml: number = toolBoxWidth <= 0 ? quickAccessWidth : 0;
-  return (
-    <Box sx={{ overflow: 'auto', width: '100%', ml: `${ml}px` }}>
-      {children}
-    </Box>
-  );
+function MainBox({ height, children }: MainBoxProps) {
+  return <Box sx={{ overflow: 'auto', height, width: '100%' }}>{children}</Box>;
 }
 
 function QuickAccessItem({
@@ -116,9 +106,8 @@ function QuickAccessItem({
   );
 }
 
-export default function Layout({ children = null! }: LayoutProps) {
+export default function Layout() {
   const quickAccessWidth: number = 50;
-
   const [toolBoxWidth, setToolBoxWidth] = React.useState<number>(300);
   const [activeToolIndex, setActiveToolIndex] = React.useState(0);
 
@@ -132,13 +121,10 @@ export default function Layout({ children = null! }: LayoutProps) {
   };
 
   return (
-    <Box sx={{ display: 'flex', overflow: 'clip' }}>
-      <MuiDrawer
-        variant="permanent"
+    <Box sx={{ display: 'flex', overflow: 'clip', height: '100vh' }}>
+      <Paper
         sx={{
-          '& .MuiDrawer-paper': {
-            bgcolor: (theme) => theme.palette.background.default,
-          },
+          bgcolor: (theme) => theme.palette.background.default,
         }}
       >
         <List sx={{ width: quickAccessWidth }}>
@@ -157,20 +143,36 @@ export default function Layout({ children = null! }: LayoutProps) {
             />
           ))}
         </List>
-      </MuiDrawer>
+      </Paper>
       <ToolBox
         activeIndex={activeToolIndex}
+        display={toolBoxWidth > 0}
+        height="100vh"
         width={toolBoxWidth}
-        quickAccessWidth={quickAccessWidth}
       >
         <FilesTool />
         <FindTool />
         <NpcsTool />
         <VariablesTool />
       </ToolBox>
-      <MainBox quickAccessWidth={quickAccessWidth} toolBoxWidth={toolBoxWidth}>
-        <TabsContainer />
-      </MainBox>
+      <Box
+        sx={{ width: `calc(100% - ${quickAccessWidth}px - ${toolBoxWidth}px)` }}
+      >
+        <MainBox height="calc(100% - 200px)">
+          <TabsContainer />
+        </MainBox>
+        <ToolBox
+          activeIndex={activeToolIndex}
+          display={true}
+          height="200px"
+          width="100%"
+        >
+          <FilesTool />
+          <FindTool />
+          <NpcsTool />
+          <VariablesTool />
+        </ToolBox>
+      </Box>
     </Box>
   );
 }
