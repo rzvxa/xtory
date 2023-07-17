@@ -1,6 +1,7 @@
 import { luaconf, lua, lauxlib, lualib, to_luastring } from 'fengari';
 
 import { readFile, readdir } from 'fs/promises';
+import xtoryOpenLibs, { LuaState } from 'main/lua';
 import { fsUtils } from 'main/utils';
 
 import { ChannelsRenderer, PluginConfig } from 'shared/types';
@@ -25,16 +26,9 @@ class PluginsService {
     this.unloadPlugins();
     this.messageBroker = messageBroker;
     this.pluginsFolder = sanitizePath(pluginsFolder);
-
-    // initializing lua state
     this.lua = lauxlib.luaL_newstate();
-    lualib.luaL_openlibs(this.lua);
-    console.log(
-      lauxlib.luaL_dostring(
-        this.lua,
-        to_luastring(`package.path = package.path .. ';${pluginsFolder}/?.lua'`)
-      )
-    );
+
+    this.#initializeLuaState();
 
     const plugins = (
       await readdir(pluginsFolder, { withFileTypes: true })
@@ -66,6 +60,35 @@ class PluginsService {
     const mainPath = `${pluginPath}/${config.main}`;
     this.#runMainScript(mainPath);
     return true;
+  }
+
+  #initializeLuaState() {
+    // loading lua standard libs
+    lualib.luaL_openlibs(this.lua);
+
+    // adding plugins folder to package path
+    lauxlib.luaL_dostring(
+      this.lua,
+      to_luastring(
+        `package.path = package.path .. ';${this.pluginsFolder}/?.lua'`
+      )
+    );
+    // setting print function
+    lua.lua_pushjsfunction(this.lua, this.#luaPrint);
+    lua.lua_setglobal(this.lua, 'print');
+    // xtory libraries
+    xtoryOpenLibs(this.lua);
+  }
+
+  #luaPrint(L: any) {
+    const n: number = lua.lua_gettop(L); /* number of arguments */
+    const args: unknown[] = [];
+    for (let i = 1; i <= n; i++) {
+      const arg = lua.lua_tojsstring(L, i);
+      args.push(arg);
+    }
+    console.log('print from lua', ...args);
+    return 0;
   }
 
   #runMainScript(scriptPath: string) {
