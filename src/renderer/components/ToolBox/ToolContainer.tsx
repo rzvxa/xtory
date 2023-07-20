@@ -10,12 +10,21 @@ export interface ProjectToolProps {
   children: React.ReactNode;
 }
 
+const toolHeaderHeight = '40px';
+
 export default function ProjectTool({ title, children }: ProjectToolProps) {
   return (
     <Paper sx={{ height: '100%' }}>
-      <ToolHeader title={title} />
+      <ToolHeader title={title} height={toolHeaderHeight} />
 
-      <Box sx={{ height: '100%', flexGrow: 1, overflowY: 'auto' }} pt={0.1}>
+      <Box
+        sx={{
+          height: `calc(100% - ${toolHeaderHeight})`,
+          flexGrow: 1,
+          overflowY: 'auto',
+        }}
+        pt={0.1}
+      >
         {children}
       </Box>
     </Paper>

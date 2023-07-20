@@ -1,6 +1,5 @@
 import React from 'react';
 
-import MuiDrawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
 import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
@@ -18,20 +17,13 @@ import TerminalIcon from '@mui/icons-material/Terminal';
 
 import TabsContainer from './Tab/TabsContainer';
 import {
+  ToolBox,
   FilesTool,
   FindTool,
   NpcsTool,
   VariablesTool,
   ConsoleTool,
 } from './ToolBox/index';
-
-interface ToolBoxProps {
-  activeIndex: number;
-  display: boolean;
-  height: number | string;
-  width: number | string;
-  children: React.ReactNode;
-}
 
 interface MainBoxProps {
   height: string;
@@ -51,28 +43,6 @@ interface StatusBarItemProps {
   onClick: React.MouseEventHandler<HTMLDivElement>;
   isActive: boolean;
   height: string;
-}
-
-function ToolBox({
-  activeIndex,
-  display,
-  height,
-  width,
-  children,
-}: ToolBoxProps) {
-  return (
-    <Box
-      sx={{
-        display: display ? 'block' : 'none',
-        minWidth: `${width}px`,
-        height,
-        '> div': { display: 'none' },
-        [`&>*:nth-of-type(${activeIndex + 1})`]: { display: 'block' },
-      }}
-    >
-      {children}
-    </Box>
-  );
 }
 
 function MainBox({ height, children }: MainBoxProps) {
@@ -159,13 +129,13 @@ export default function Layout() {
   const quickAccessWidth: number = 50;
   const [primaryToolBoxWidth, setPrimaryToolBoxWidth] =
     React.useState<number>(300);
-  const [bottomToolBoxWidth, setBottomToolBoxWidth] =
-    React.useState<number>(300);
+  const [bottomToolBoxHeight, setBottomToolBoxHeight] =
+    React.useState<number>(0);
   const [activePrimaryToolIndex, setActivePrimaryToolIndex] = React.useState(0);
   const [activeBottomToolIndex, setActiveBottomToolIndex] = React.useState(0);
 
   const displayPrimaryToolBox = primaryToolBoxWidth > 0;
-  const displayBottomToolBox = bottomToolBoxWidth > 0;
+  const displayBottomToolBox = bottomToolBoxHeight > 0;
 
   const handleQuickAccessClick = (index: number) => {
     if (index === activePrimaryToolIndex) {
@@ -178,11 +148,11 @@ export default function Layout() {
 
   const handleStatusBarClick = (index: number) => {
     if (index === activeBottomToolIndex) {
-      setBottomToolBoxWidth(bottomToolBoxWidth > 0 ? 0 : 300);
+      setBottomToolBoxHeight(bottomToolBoxHeight > 0 ? 0 : 200);
       return;
     }
     setActiveBottomToolIndex(index);
-    setBottomToolBoxWidth(300);
+    setBottomToolBoxHeight(200);
   };
 
   return (
@@ -219,6 +189,7 @@ export default function Layout() {
           display={displayPrimaryToolBox}
           height="100vh"
           width={primaryToolBoxWidth}
+          onClose={() => setPrimaryToolBoxWidth(0)}
         >
           <FilesTool />
           <FindTool />
@@ -230,14 +201,15 @@ export default function Layout() {
             width: `calc(100% - ${quickAccessWidth}px - ${primaryToolBoxWidth}px)`,
           }}
         >
-          <MainBox height={`calc(100% - ${displayBottomToolBox ? 200 : 0}px)`}>
+          <MainBox height={`calc(100% - ${bottomToolBoxHeight}px)`}>
             <TabsContainer />
           </MainBox>
           <ToolBox
             activeIndex={activeBottomToolIndex}
             display={displayBottomToolBox}
-            height="200px"
+            height={`${bottomToolBoxHeight}px`}
             width="100%"
+            onClose={() => setBottomToolBoxHeight(0)}
           >
             <ConsoleTool />
           </ToolBox>
