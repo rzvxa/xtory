@@ -11,8 +11,10 @@ import { BrowseFileSystemResult } from './browseFileSystemResult';
 import { OpenProjectResult } from './openProjectResult';
 import { ProjectTreeNode, ProjectTree } from './projectTree';
 import PluginConfig from './pluginConfig';
+import Logger from './logger';
+import LogLevel from './logLevel';
 
-export { Platform, ChannelsMain, ChannelsRenderer, IpcResultStatus };
+export { Platform, ChannelsMain, ChannelsRenderer, IpcResultStatus, LogLevel };
 
 export type {
   NewProjectModel,
@@ -26,5 +28,6 @@ export type {
   OpenProjectResult,
   ProjectTreeNode,
   ProjectTree,
-  PluginConfig
+  PluginConfig,
+  Logger,
 };

@@ -1,13 +1,15 @@
-import { resolveHtmlPath } from './utils/resolveHtmlPath';
+import { resolveHtmlPath } from './resolveHtmlPath';
 
-import exists from './utils/fsUtils/exists';
+import exists from './fsUtils/exists';
 
 import {
   appPath,
   resourcesPath,
   assetsPath,
   templatesPath,
-} from './utils/paths';
+} from './paths';
+
+import FileLogger from './fileLogger';
 
 const fsUtils = {
   exists,
@@ -20,4 +22,5 @@ export {
   resourcesPath,
   assetsPath,
   templatesPath,
+  FileLogger,
 };

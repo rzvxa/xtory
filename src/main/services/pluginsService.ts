@@ -1,7 +1,7 @@
 import { luaconf, lua, lauxlib, lualib, to_luastring } from 'fengari';
 
 import { readFile, readdir } from 'fs/promises';
-import xtoryOpenLibs, { LuaState } from 'main/lua';
+import xtoryBindLua from 'main/lua';
 import { fsUtils } from 'main/utils';
 
 import { ChannelsRenderer, PluginConfig } from 'shared/types';
@@ -13,35 +13,32 @@ export type PluginsServiceMessageBroker = (
 ) => void;
 
 class PluginsService {
-  messageBroker: PluginsServiceMessageBroker | null = null;
+  messageBroker: PluginsServiceMessageBroker;
 
-  pluginsFolder: string | null = null;
+  pluginsFolder: string;
 
   lua: any = null;
 
-  async loadPlugins(
+  constructor(
     pluginsFolder: string,
     messageBroker: PluginsServiceMessageBroker
-  ): Promise<void> {
-    this.unloadPlugins();
+  ) {
     this.messageBroker = messageBroker;
     this.pluginsFolder = sanitizePath(pluginsFolder);
     this.lua = lauxlib.luaL_newstate();
 
     this.#initializeLuaState();
+  }
 
+  async loadPlugins(): Promise<void> {
     const plugins = (
-      await readdir(pluginsFolder, { withFileTypes: true })
+      await readdir(this.pluginsFolder, { withFileTypes: true })
     ).filter((dirent) => dirent.isDirectory());
 
     for (let i = 0; i < plugins.length; ++i) {
-      const pluginPath = `${pluginsFolder}/${plugins[i].name}`;
+      const pluginPath = `${this.pluginsFolder}/${plugins[i].name}`;
       this.loadPlugin(pluginPath);
     }
-  }
-
-  unloadPlugins(): void {
-    this.messageBroker = null;
   }
 
   async loadPlugin(pluginPath: string): Promise<boolean> {
@@ -73,22 +70,9 @@ class PluginsService {
         `package.path = package.path .. ';${this.pluginsFolder}/?.lua'`
       )
     );
-    // setting print function
-    lua.lua_pushjsfunction(this.lua, this.#luaPrint);
-    lua.lua_setglobal(this.lua, 'print');
-    // xtory libraries
-    xtoryOpenLibs(this.lua);
-  }
 
-  #luaPrint(L: any) {
-    const n: number = lua.lua_gettop(L); /* number of arguments */
-    const args: unknown[] = [];
-    for (let i = 1; i <= n; i++) {
-      const arg = lua.lua_tojsstring(L, i);
-      args.push(arg);
-    }
-    console.log('print from lua', ...args);
-    return 0;
+    // xtory libraries
+    xtoryBindLua(this.lua);
   }
 
   #runMainScript(scriptPath: string) {
@@ -96,6 +80,4 @@ class PluginsService {
   }
 }
 
-const pluginsService = new PluginsService();
-
-export default pluginsService;
+export default PluginsService;

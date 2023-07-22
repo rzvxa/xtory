@@ -1,3 +1,8 @@
 {
   "name": "{PROJECT_NAME}"
+  "version": "{XTORY_VERSION}",
+  "settings": {
+
+  }
+
 }

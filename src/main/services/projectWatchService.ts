@@ -11,15 +11,15 @@ export type ProjectWatchServiceMessageBroker = (
 const FlushInterval = 300;
 
 class ProjectWatchService {
-  watcher: FSWatcher | null = null;
+  watcher: FSWatcher;
 
-  messageBroker: ProjectWatchServiceMessageBroker | null = null;
+  messageBroker: ProjectWatchServiceMessageBroker;
 
-  projectPath: string | null = null;
+  projectPath: string;
 
-  projectTree: ProjectTree | null = null;
+  projectTree: ProjectTree;
 
-  worker: ReturnType<typeof setInterval> | null = null;
+  worker: ReturnType<typeof setInterval>;
 
   isDirty: boolean = false;
 
@@ -27,11 +27,10 @@ class ProjectWatchService {
     return !!this.watcher;
   }
 
-  watchProject(
+  constructor(
     projectPath: string,
     messageBroker: ProjectWatchServiceMessageBroker
-  ): void {
-    this.unwatchProject();
+  ) {
     this.messageBroker = messageBroker;
     this.projectPath = sanitizePath(projectPath);
     const name = this.projectPath.split('/').pop() || '';
@@ -60,19 +59,6 @@ class ProjectWatchService {
     this.worker = setInterval(() => this.#worker(), FlushInterval);
   }
 
-  unwatchProject(): void {
-    if (!this.isWatching) return;
-
-    clearInterval(this.worker!);
-    this.watcher?.close().catch(console.error);
-
-    this.watcher = null;
-    this.messageBroker = null;
-    this.projectPath = null;
-    this.projectTree = null;
-    this.worker = null;
-  }
-
   #worker() {
     if (!this.isDirty) return;
 
@@ -99,7 +85,7 @@ class ProjectWatchService {
 
   #addNode(_path: string, isDir: boolean) {
     const sanitizedPath = sanitizePath(_path);
-    const rpath = sanitizePath(path.relative(this.projectPath!, sanitizedPath));
+    const rpath = sanitizePath(path.relative(this.projectPath, sanitizedPath));
 
     // Ignore if event fired for the project path
     if (rpath === '') return;
@@ -130,7 +116,7 @@ class ProjectWatchService {
 
   #removeNode(_path: string) {
     const sanitizedPath = sanitizePath(_path);
-    const rpath = sanitizePath(path.relative(this.projectPath!, sanitizedPath));
+    const rpath = sanitizePath(path.relative(this.projectPath, sanitizedPath));
 
     // Ignore if event fired for the project path
     if (rpath === '') return;
@@ -169,6 +155,4 @@ class ProjectWatchService {
   }
 }
 
-const projectWatchService = new ProjectWatchService();
-
-export default projectWatchService;
+export default ProjectWatchService;
