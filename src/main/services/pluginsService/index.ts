@@ -1,3 +1,4 @@
+// eslint-disable-next-line
 import { luaconf, lua, lauxlib, lualib, to_luastring } from 'fengari';
 
 import { readFile, readdir } from 'fs/promises';

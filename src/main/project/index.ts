@@ -1,3 +1,5 @@
+import LoggingService from 'main/services/loggingService';
+
 import Project from './project';
 
 class ProjectManager {

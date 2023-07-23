@@ -8,10 +8,11 @@ export type SettingsServiceMessageBroker = (
 class SettingsService {
   messageBroker: SettingsServiceMessageBroker | null = null;
 
-  async init(settingsPath: string, messageBroker: SettingsServiceMessageBroker): Promise<void> {
+  async init(
+    settingsPath: string,
+    messageBroker: SettingsServiceMessageBroker
+  ): Promise<void> {
     this.messageBroker = messageBroker;
-
-
   }
 }
 

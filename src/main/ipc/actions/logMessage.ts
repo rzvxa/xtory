@@ -8,6 +8,5 @@ export default function logMessage(
   tags: string[],
   ...args: unknown[]
 ) {
-  console.log('adjaodjaoidjoiadjaoid')
   Project.logger.log(logLevel, tags, ...args);
 }
