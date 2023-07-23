@@ -27,13 +27,16 @@ I'm a game developer with a passion for games with good stories; Maybe you, too,
 * **Unity3D** Open Source Package(via `xtory-parser`)
 * **Extendable** with plugins
 * **Open source** and free to use for writing stories, Both in commercial and personal projects.
-* Easy to **version control** project structure, With a heavy emphasis on breaking down flows into sub-flows to enable teams to work on different parts of the story simultaneously.
+* Easy to **version control** project structure, Emphasizing breaking down flows into sub-flows to enable teams to work on different parts of the story simultaneously.
 
 ## Roadmap
 
-Right now, there is no Roadmap for the project, But it's under heavy development.
+Right now, there is a roadmap for the project describing our next few releases.
+[View Roadmap](https://github.com/users/rzvxa/projects/2)
 
-Both xtory-parser and Unity3D package are non-existance at the moment And will be shipped with the first production release(version 1.0.0).
+Xtory gets a new release every 2 weeks, As the project gets more mature we will extend our release windows to a month as I have to delegate time into our C++ library for using Xtory files in game engines.
+
+Both xtory-parser and Unity3D package are non-existent at the moment And will be shipped with the first production release(version 1.0.0).
 
 ### Contribution
 Feel free to make issues and/or help with the development.
