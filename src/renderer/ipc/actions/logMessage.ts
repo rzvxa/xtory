@@ -1,11 +1,8 @@
-import { IpcEvent } from 'shared/types';
-import { EzSnackbarRef, SnackVariant } from 'renderer/utils/ezSnackbar';
+import { IpcEvent, LogMessage } from 'shared/types';
+import { store } from 'renderer/state/store/index';
 
-export default function toastMessage(
-  _: IpcEvent,
-  message: string,
-  variant: SnackVariant
-) {
-  const { toast } = EzSnackbarRef;
-  toast(message, variant);
+import { pushLog } from 'renderer/state/store/console';
+
+export default function logMessage(event: IpcEvent, message: LogMessage) {
+  store.dispatch(pushLog(message));
 }

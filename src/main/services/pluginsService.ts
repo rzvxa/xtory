@@ -3,40 +3,33 @@ import { luaconf, lua, lauxlib, lualib, to_luastring } from 'fengari';
 import { readFile, readdir } from 'fs/promises';
 import xtoryBindLua from 'main/lua';
 import { fsUtils } from 'main/utils';
+import { ProjectMessageBroker } from 'main/project/projectMessageBroker';
 
-import { ChannelsRenderer, PluginConfig } from 'shared/types';
+import { PluginConfig } from 'shared/types';
 import { sanitizePath, tryGetAsync } from 'shared/utils';
 
-export type PluginsServiceMessageBroker = (
-  channel: ChannelsRenderer,
-  ...args: any[]
-) => void;
-
 class PluginsService {
-  messageBroker: PluginsServiceMessageBroker;
+  #messageBroker: ProjectMessageBroker;
 
-  pluginsFolder: string;
+  #pluginsFolder: string;
 
-  lua: any = null;
+  #lua: any = null;
 
-  constructor(
-    pluginsFolder: string,
-    messageBroker: PluginsServiceMessageBroker
-  ) {
-    this.messageBroker = messageBroker;
-    this.pluginsFolder = sanitizePath(pluginsFolder);
-    this.lua = lauxlib.luaL_newstate();
+  constructor(pluginsFolder: string, messageBroker: ProjectMessageBroker) {
+    this.#messageBroker = messageBroker;
+    this.#pluginsFolder = sanitizePath(pluginsFolder);
+    this.#lua = lauxlib.luaL_newstate();
 
     this.#initializeLuaState();
   }
 
   async loadPlugins(): Promise<void> {
     const plugins = (
-      await readdir(this.pluginsFolder, { withFileTypes: true })
+      await readdir(this.#pluginsFolder, { withFileTypes: true })
     ).filter((dirent) => dirent.isDirectory());
 
     for (let i = 0; i < plugins.length; ++i) {
-      const pluginPath = `${this.pluginsFolder}/${plugins[i].name}`;
+      const pluginPath = `${this.#pluginsFolder}/${plugins[i].name}`;
       this.loadPlugin(pluginPath);
     }
   }
@@ -61,22 +54,22 @@ class PluginsService {
 
   #initializeLuaState() {
     // loading lua standard libs
-    lualib.luaL_openlibs(this.lua);
+    lualib.luaL_openlibs(this.#lua);
 
     // adding plugins folder to package path
     lauxlib.luaL_dostring(
-      this.lua,
+      this.#lua,
       to_luastring(
-        `package.path = package.path .. ';${this.pluginsFolder}/?.lua'`
+        `package.path = package.path .. ';${this.#pluginsFolder}/?.lua'`
       )
     );
 
     // xtory libraries
-    xtoryBindLua(this.lua);
+    xtoryBindLua(this.#lua);
   }
 
   #runMainScript(scriptPath: string) {
-    console.log('lua', lauxlib.luaL_dofile(this.lua, scriptPath));
+    console.log('lua', lauxlib.luaL_dofile(this.#lua, scriptPath));
   }
 }
 

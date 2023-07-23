@@ -11,40 +11,36 @@ export type ProjectWatchServiceMessageBroker = (
 const FlushInterval = 300;
 
 class ProjectWatchService {
-  watcher: FSWatcher;
+  #watcher: FSWatcher;
 
-  messageBroker: ProjectWatchServiceMessageBroker;
+  #messageBroker: ProjectWatchServiceMessageBroker;
 
-  projectPath: string;
+  #projectPath: string;
 
-  projectTree: ProjectTree;
+  #projectTree: ProjectTree;
 
-  worker: ReturnType<typeof setInterval>;
+  #workerIdentifier: ReturnType<typeof setInterval>;
 
-  isDirty: boolean = false;
-
-  get isWatching(): boolean {
-    return !!this.watcher;
-  }
+  #isDirty: boolean = false;
 
   constructor(
     projectPath: string,
     messageBroker: ProjectWatchServiceMessageBroker
   ) {
-    this.messageBroker = messageBroker;
-    this.projectPath = sanitizePath(projectPath);
-    const name = this.projectPath.split('/').pop() || '';
-    this.projectTree = {
+    this.#messageBroker = messageBroker;
+    this.#projectPath = sanitizePath(projectPath);
+    const name = this.#projectPath.split('/').pop() || '';
+    this.#projectTree = {
       name,
-      path: this.projectPath,
+      path: this.#projectPath,
       isDir: true,
       children: undefined,
     };
-    this.watcher = watch(this.projectPath, {
+    this.#watcher = watch(this.#projectPath, {
       ignored: /^\./,
       persistent: true,
     });
-    this.watcher
+    this.#watcher
       .on('addDir', (_path) => this.#onAddDir(_path))
       .on('unlinkDir', (_path) => this.#onUnlinkDir(_path))
       .on('add', (_path) => this.#onAdd(_path))
@@ -56,22 +52,22 @@ class ProjectWatchService {
         console.error('Error happened', error);
       });
 
-    this.worker = setInterval(() => this.#worker(), FlushInterval);
+    this.#workerIdentifier = setInterval(() => this.#worker(), FlushInterval);
   }
 
   #worker() {
-    if (!this.isDirty) return;
+    if (!this.#isDirty) return;
 
-    this.messageBroker!(
+    this.#messageBroker(
       ChannelsRenderer.onProjectTreeUpdated,
-      this.projectTree
+      this.#projectTree
     );
 
-    this.isDirty = false;
+    this.#isDirty = false;
   }
 
   #findNodeParent(pathArr: string[]): ProjectTreeNode | null {
-    let parent = this.projectTree!;
+    let parent = this.#projectTree!;
 
     for (let i = 0; i < pathArr.length; i++) {
       if (!parent.children) {
@@ -85,7 +81,7 @@ class ProjectWatchService {
 
   #addNode(_path: string, isDir: boolean) {
     const sanitizedPath = sanitizePath(_path);
-    const rpath = sanitizePath(path.relative(this.projectPath, sanitizedPath));
+    const rpath = sanitizePath(path.relative(this.#projectPath, sanitizedPath));
 
     // Ignore if event fired for the project path
     if (rpath === '') return;
@@ -111,12 +107,12 @@ class ProjectWatchService {
       parent.children = {};
     }
     parent.children![name] = node;
-    this.isDirty = true;
+    this.#isDirty = true;
   }
 
   #removeNode(_path: string) {
     const sanitizedPath = sanitizePath(_path);
-    const rpath = sanitizePath(path.relative(this.projectPath, sanitizedPath));
+    const rpath = sanitizePath(path.relative(this.#projectPath, sanitizedPath));
 
     // Ignore if event fired for the project path
     if (rpath === '') return;
@@ -135,7 +131,7 @@ class ProjectWatchService {
     if (!Object.entries(parent.children).length) {
       delete parent.children;
     }
-    this.isDirty = true;
+    this.#isDirty = true;
   }
 
   #onAddDir(_path: string) {

@@ -7,15 +7,24 @@ import ToolHeader from './ToolHeader';
 
 export interface ProjectToolProps {
   title: string;
+  headerControls?: React.ReactNode | undefined;
   children: React.ReactNode;
 }
 
 const toolHeaderHeight = '40px';
 
-export default function ProjectTool({ title, children }: ProjectToolProps) {
+export default function ProjectTool({
+  title,
+  headerControls = undefined,
+  children,
+}: ProjectToolProps) {
   return (
     <Paper sx={{ height: '100%' }}>
-      <ToolHeader title={title} height={toolHeaderHeight} />
+      <ToolHeader
+        title={title}
+        height={toolHeaderHeight}
+        controls={headerControls}
+      />
 
       <Box
         sx={{

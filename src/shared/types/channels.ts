@@ -14,6 +14,7 @@ export enum ChannelsMain {
 }
 
 export enum ChannelsRenderer {
+  logMessage = 'logMessage',
   toastMessage = 'toastMessage',
   onProjectOpened = 'onProjectOpened',
   onOpenFileAsTab = 'onOpenFileAsTab',

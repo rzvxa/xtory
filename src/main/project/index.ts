@@ -1,9 +1,8 @@
 import { app, WebContents } from 'electron';
-import { readFile, readdir } from 'fs/promises';
-import path from 'path';
 
 import { fsUtils, FileLogger } from 'main/utils';
-import { tryGetAsync } from 'shared/utils';
+
+import { ensureFile } from 'fs-extra';
 
 import {
   ChannelsRenderer,
@@ -25,10 +24,6 @@ class ProjectManager {
     return this.#project !== null;
   }
 
-  get logPath(): string {
-    return `${this.#project?.projectPath}/tmp/logs.txt`;
-  }
-
   async open(
     sender: WebContents,
     projectPath: string
@@ -43,24 +38,15 @@ class ProjectManager {
         errorMessage: `Failed to open "${projectPath}"`,
       };
     }
-    console.log('ds', app.getVersion());
-    const configFile = (await readdir(projectPath, { withFileTypes: true }))
-      .filter((src) => src.isFile)
-      .find((src) => path.extname(src.name) === '.xtory');
-    if (!configFile) {
+
+    // console.log('ds', app.getVersion());
+    const settingsPath = `${projectPath}/xtory.json`;
+    const settingsExists = await fsUtils.exists(settingsPath);
+
+    if (!settingsExists) {
       return {
         status: IpcResultStatus.error,
-        errorMessage: `Given path don't contain a ".xtory" file!`,
-      };
-    }
-
-    const configPath = path.join(projectPath, configFile.name);
-
-    const config = await tryGetAsync(() => readFile(configPath, 'utf8'));
-    if (!config.success) {
-      return {
-        status: IpcResultStatus.error,
-        errorMessage: `Failed to open ${configPath}`,
+        errorMessage: `Given path don't contain a "xtory.json" file!`,
       };
     }
 
@@ -73,15 +59,26 @@ class ProjectManager {
     );
 
     const projectSettingsService = new ProjectSettingsService(
-      configPath,
+      settingsPath,
       projectWatchService,
       messageBroker
     );
 
-    const logger = new FileLogger(this.logPath);
+    try {
+      projectSettingsService.init();
+    } catch (error) {
+      return {
+        status: IpcResultStatus.error,
+        errorMessage: `Failed to load ${settingsPath}, Error: ${error}`,
+      };
+    }
+
+    const logPath = `${projectPath}/tmp/logs.txt`;
+    const logger = new FileLogger(logPath);
 
     try {
-      logger.init();
+      await ensureFile(logPath);
+      await logger.init();
     } catch (error) {
       return {
         status: IpcResultStatus.error,
@@ -107,6 +104,8 @@ class ProjectManager {
       pluginsService,
       projectSettingsService,
     };
+
+    loggingService.trace('Project loaded successfully');
 
     sender.send(ChannelsRenderer.onProjectOpened, projectPath);
     return { status: IpcResultStatus.ok };

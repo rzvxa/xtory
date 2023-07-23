@@ -13,6 +13,7 @@ import { ProjectTreeNode, ProjectTree } from './projectTree';
 import PluginConfig from './pluginConfig';
 import Logger from './logger';
 import LogLevel from './logLevel';
+import LogMessage from './logMessage';
 
 export { Platform, ChannelsMain, ChannelsRenderer, IpcResultStatus, LogLevel };
 
@@ -30,4 +31,5 @@ export type {
   ProjectTree,
   PluginConfig,
   Logger,
+  LogMessage,
 };
