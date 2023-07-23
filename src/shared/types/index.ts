@@ -10,8 +10,19 @@ import { CreateNewProjectResult } from './createNewProjectResult';
 import { BrowseFileSystemResult } from './browseFileSystemResult';
 import { OpenProjectResult } from './openProjectResult';
 import { ProjectTreeNode, ProjectTree } from './projectTree';
+import PluginConfig from './pluginConfig';
+import Logger from './logger';
+import LogLevel from './logLevel';
+import LogMessage, { formatLog } from './logMessage';
 
-export { Platform, ChannelsMain, ChannelsRenderer, IpcResultStatus };
+export {
+  Platform,
+  ChannelsMain,
+  ChannelsRenderer,
+  IpcResultStatus,
+  LogLevel,
+  formatLog,
+};
 
 export type {
   NewProjectModel,
@@ -25,4 +36,7 @@ export type {
   OpenProjectResult,
   ProjectTreeNode,
   ProjectTree,
+  PluginConfig,
+  Logger,
+  LogMessage,
 };

@@ -6,6 +6,7 @@ import fsMoveIpcAction from './actions/fsMove';
 import fsRemoveIpcAction from './actions/fsRemove';
 import openFileAsTabAction from './actions/openFileAsTab';
 import revealPathInOSAction from './actions/revealPathInOS';
+import logMessageAction from './actions/logMessage';
 
 import browseFileSystemIpcInvoke from './invokes/browseFileSystem';
 import createNewProjectIpcInvoke from './invokes/createNewProject';
@@ -27,6 +28,7 @@ on(ChannelsMain.fsMove, fsMoveIpcAction);
 on(ChannelsMain.fsRemove, fsRemoveIpcAction);
 on(ChannelsMain.openFileAsTab, openFileAsTabAction);
 on(ChannelsMain.revealPathInOS, revealPathInOSAction);
+on(ChannelsMain.logMessage, logMessageAction);
 
 handle(ChannelsMain.browseFileSystem, browseFileSystemIpcInvoke);
 handle(ChannelsMain.createNewProject, createNewProjectIpcInvoke);

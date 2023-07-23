@@ -5,6 +5,7 @@ import {
   ProjectTreeNodeStates,
 } from './toolBox';
 import { TabType, TabState, TabsState, HistoryItem, FileTabData } from './tabs';
+import { ConsoleState } from './console';
 
 export {
   TabType,
@@ -16,4 +17,5 @@ export {
   FilesToolState,
   ProjectTreeNodeState,
   ProjectTreeNodeStates,
+  ConsoleState,
 };

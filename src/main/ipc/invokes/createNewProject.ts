@@ -28,8 +28,8 @@ export default async function createNewProject(
   const projectPathExists = await fsUtils.exists(projectPath);
 
   const templatePath = path.join(templatesPath, projectTemplate);
-  const templateConfigPath = path.join(templatePath, 'template.xtory');
-  const projectConfigPath = path.join(projectPath, `${projectName}.xtory`);
+  const templateConfigPath = path.join(templatePath, 'xtory.json');
+  const projectConfigPath = path.join(projectPath, 'xtory.json');
 
   // validation begin
   if (!projectRootExists) {
@@ -83,7 +83,7 @@ export default async function createNewProject(
   try {
     await cp(templatePath, projectPath, {
       recursive: true,
-      filter: (src) => !src.endsWith('template.xtory'),
+      filter: (src) => !src.endsWith('xtory.json'),
     });
   } catch (exception) {
     return {
