@@ -24,6 +24,13 @@ class ProjectManager {
     return this.#project !== null;
   }
 
+  get logger(): LoggingService {
+    if (!this.#project) {
+      throw Error('No Project Is Open!');
+    }
+    return this.#project.loggingService;
+  }
+
   async open(
     sender: WebContents,
     projectPath: string

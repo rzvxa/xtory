@@ -15,6 +15,8 @@ import GroupIcon from '@mui/icons-material/Group';
 import DataObjectIcon from '@mui/icons-material/DataObject';
 import TerminalIcon from '@mui/icons-material/Terminal';
 
+import logger from 'renderer/logger';
+
 import TabsContainer from './Tab/TabsContainer';
 import {
   ToolBox,

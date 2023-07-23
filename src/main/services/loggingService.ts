@@ -1,7 +1,14 @@
 import { readFile, readdir } from 'fs/promises';
 import { fsUtils } from 'main/utils';
 
-import { ChannelsRenderer, Logger, LogLevel } from 'shared/types';
+import {
+  ChannelsRenderer,
+  Logger,
+  LogLevel,
+  LogMessage,
+  formatLog,
+} from 'shared/types';
+import { uuidv4 } from 'shared/utils';
 import { ProjectMessageBroker } from 'main/project/projectMessageBroker';
 
 class LoggingService implements Logger {
@@ -39,19 +46,19 @@ class LoggingService implements Logger {
   }
 
   log(message: string, logLevel: LogLevel) {
-    const fmessage = LoggingService.#formatMessage(message, logLevel);
-    this.#broadcast(fmessage, logLevel);
+    const logMessage = {
+      message,
+      level: logLevel,
+      date: new Date().toLocaleString(),
+      id: uuidv4(),
+    };
+    const fmessage = formatLog(logMessage);
+    this.#broadcast(logMessage);
     this.#logger?.log(fmessage, logLevel);
   }
 
-  #broadcast(message: string, level: LogLevel) {
-    this.#messageBroker(ChannelsRenderer.logMessage, { message, level });
-  }
-
-  static #formatMessage(message: string, logLevel: LogLevel): string {
-    return `[${new Date().toLocaleString()}] [${
-      LogLevel[logLevel]
-    }] : ${message}`;
+  #broadcast(logMessage: LogMessage) {
+    this.#messageBroker(ChannelsRenderer.broadcastLogMessage, logMessage);
   }
 }
 

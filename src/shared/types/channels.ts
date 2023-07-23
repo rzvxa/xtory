@@ -11,10 +11,11 @@ export enum ChannelsMain {
   fsRemove = 'fsRemove',
   revealPathInOS = 'revealPathInOS',
   customIPC = 'customIPC',
+  logMessage = 'logMessage',
 }
 
 export enum ChannelsRenderer {
-  logMessage = 'logMessage',
+  broadcastLogMessage = 'broadcastLogMessage',
   toastMessage = 'toastMessage',
   onProjectOpened = 'onProjectOpened',
   onOpenFileAsTab = 'onOpenFileAsTab',

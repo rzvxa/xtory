@@ -1,6 +1,6 @@
 import React from 'react';
 
-import uuidv4 from 'renderer/utils/uuidv4';
+import { uuidv4 } from 'shared/utils';
 
 export default function useGuid() {
   // eslint-disable-next-line no-unused-vars
