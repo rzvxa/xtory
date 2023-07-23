@@ -14,34 +14,35 @@ export default class FileLogger implements Logger {
     this.fileHandle = await open(this.filePath, 'a');
   }
 
-  trace(message: string) {
-    this.log(message, LogLevel.trace);
+  trace(message: string, tags: string[]) {
+    this.log(LogLevel.trace, tags, message);
   }
 
-  debug(message: string) {
-    this.log(message, LogLevel.debug);
+  debug(message: string, tags: string[]) {
+    this.log(LogLevel.debug, tags, message);
   }
 
-  info(message: string) {
-    this.log(message, LogLevel.info);
+  info(message: string, tags: string[]) {
+    this.log(LogLevel.info, tags, message);
   }
 
-  warning(message: string) {
-    this.log(message, LogLevel.warning);
+  warning(message: string, tags: string[]) {
+    this.log(LogLevel.warning, tags, message);
   }
 
-  error(message: string) {
-    this.log(message, LogLevel.error);
+  error(message: string, tags: string[]) {
+    this.log(LogLevel.error, tags, message);
   }
 
-  fatal(message: string) {
-    this.log(message, LogLevel.fatal);
+  fatal(message: string, tags: string[]) {
+    this.log(LogLevel.fatal, tags, message);
   }
 
-  log(message: string, logLevel: LogLevel) {
+  log(logLevel: LogLevel, tags: string[], ...args: unknown[]) {
+    const message = args.reduce((a, c) => `${a} ${c}`) as string;
     if (!this.fileHandle) {
       throw Error('No FileHandle, Cannot write log!');
     }
-    this.fileHandle?.appendFile(message);
+    this.fileHandle?.appendFile(`${message}\n`);
   }
 }

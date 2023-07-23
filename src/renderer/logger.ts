@@ -1,36 +1,37 @@
 import { ChannelsMain, Logger, LogLevel } from 'shared/types';
 
 class RendererLogger implements Logger {
-  trace(message: string) {
-    this.log(message, LogLevel.trace);
+  trace(message: string, tags: string[] = []) {
+    this.log(LogLevel.trace, tags, message);
   }
 
-  debug(message: string) {
-    this.log(message, LogLevel.debug);
+  debug(message: string, tags: string[] = []) {
+    this.log(LogLevel.debug, tags, message);
   }
 
-  info(message: string) {
-    this.log(message, LogLevel.info);
+  info(message: string, tags: string[] = []) {
+    this.log(LogLevel.info, tags, message);
   }
 
-  warning(message: string) {
-    this.log(message, LogLevel.warning);
+  warning(message: string, tags: string[] = []) {
+    this.log(LogLevel.warning, tags, message);
   }
 
-  error(message: string) {
-    this.log(message, LogLevel.error);
+  error(message: string, tags: string[] = []) {
+    this.log(LogLevel.error, tags, message);
   }
 
-  fatal(message: string) {
-    this.log(message, LogLevel.fatal);
+  fatal(message: string, tags: string[] = []) {
+    this.log(LogLevel.fatal, tags, message);
   }
 
   // eslint-disable-next-line class-methods-use-this
-  log(message: string, level: LogLevel) {
+  log(level: LogLevel, tags: string[], ...args: unknown[]) {
     window.electron.ipcRenderer.sendMessage(
       ChannelsMain.logMessage,
-      message,
-      level
+      level,
+      tags,
+      ...args
     );
   }
 }

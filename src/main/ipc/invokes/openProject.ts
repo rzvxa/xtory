@@ -2,11 +2,11 @@ import { IpcMainInvokeEvent } from 'electron';
 
 import { OpenProjectResult } from 'shared/types';
 
-import project from 'main/project';
+import open from 'main/project/openProject';
 
 export default function openProject(
   { sender }: IpcMainInvokeEvent,
   projectPath: string
 ): Promise<OpenProjectResult> {
-  return project.open(sender, projectPath);
+  return open(sender, projectPath);
 }

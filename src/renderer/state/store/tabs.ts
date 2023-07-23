@@ -1,5 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
+import logger from 'renderer/logger';
+
 import {
   TabType,
   TabState,
@@ -11,27 +13,16 @@ import {
 import { XTORY_TABS_STATE } from './constants';
 
 type TabId = string;
-type ActiveHistoryId = string | null;
-
-// fake data generator
-const getItems = (count: any): TabState[] =>
-  Array.from({ length: count }, (v, k) => k).map((k) => ({
-    id: `tab-${k}`,
-    title: `Conversation-${k}.xconv`,
-    tabType: TabType.instance,
-    isDirty: false,
-    tabData: 'extra',
-  }));
 
 export const initialState: TabsState = {
-  activeTabId: 'tab-0',
-  tabs: getItems(6),
+  activeTabId: null,
+  tabs: [],
 };
 
 function setStateReducer<Type>() {
   return (state: Type, { payload }: PayloadAction<TabId>) => {
     // TODO
-    console.log('handle loading state from drive here', state, payload);
+    logger.fatal('NOT IMPLEMENTED!!! handle loading state from drive here!');
   };
 }
 

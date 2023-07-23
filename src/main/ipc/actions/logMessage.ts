@@ -4,8 +4,10 @@ import Project from 'main/project';
 export default function logMessage(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   { sender }: IpcEvent,
-  message: string,
-  logLevel: LogLevel
+  logLevel: LogLevel,
+  tags: string[],
+  ...args: unknown[]
 ) {
-  Project.logger.log(message, logLevel);
+  console.log('adjaodjaoidjoiadjaoid')
+  Project.logger.log(logLevel, tags, ...args);
 }

@@ -1,4 +1,8 @@
 import { lua } from 'fengari';
+
+import { LogLevel } from 'shared/types';
+import project from 'main/project';
+
 import LuaState from './luaState';
 
 export default function luaPrint(L: LuaState) {
@@ -8,6 +12,6 @@ export default function luaPrint(L: LuaState) {
     const arg = lua.lua_tojsstring(L, i);
     args.push(arg);
   }
-  console.log('print from lua', ...args);
+  project.logger.log(LogLevel.info, ['Lua'], ...args);
   return 0;
 }

@@ -3,6 +3,7 @@ import LogLevel from './logLevel';
 export default interface LogMessage {
   message: string;
   level: LogLevel;
+  tags: string[];
   date: string;
   id: string;
 }
