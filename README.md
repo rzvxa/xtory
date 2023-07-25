@@ -1,10 +1,8 @@
 # Xtory
+![License](https://img.shields.io/badge/license-GPLv3-blue.svg?style=flat) [![CodeQL](https://github.com/rzvxa/xtory/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/rzvxa/xtory/actions/workflows/codeql-analysis.yml) [![Test](https://github.com/rzvxa/xtory/actions/workflows/test.yml/badge.svg)](https://github.com/rzvxa/xtory/actions/workflows/test.yml) [![Publish](https://github.com/rzvxa/xtory/actions/workflows/publish.yml/badge.svg)](https://github.com/rzvxa/xtory/actions/workflows/publish.yml) ![version](https://img.shields.io/github/v/tag/rzvxa/xtory?color=ebdbb2)
 
 ![Xtory](https://raw.githubusercontent.com/rzvxa/xtory/master/ScreenShots/screenshot1.png)
 
-<p align="center">
-[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-</p>
 
 #### Please note that Xtory is early in the development stages, and it is not recommended to use it for any actual production till it reaches the first stable version release.
 
