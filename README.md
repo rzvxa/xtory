@@ -2,6 +2,10 @@
 
 ![Xtory](https://raw.githubusercontent.com/rzvxa/xtory/master/ScreenShots/screenshot1.png)
 
+<p align="center">
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+</p>
+
 #### Please note that Xtory is early in the development stages, and it is not recommended to use it for any actual production till it reaches the first stable version release.
 
 ## What is Xtory?
