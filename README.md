@@ -1,5 +1,5 @@
 # Xtory
-![License](https://img.shields.io/badge/license-GPLv3-blue.svg?style=flat) [![CodeQL](https://github.com/rzvxa/xtory/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/rzvxa/xtory/actions/workflows/codeql-analysis.yml) [![Test](https://github.com/rzvxa/xtory/actions/workflows/test.yml/badge.svg)](https://github.com/rzvxa/xtory/actions/workflows/test.yml) [![Publish](https://github.com/rzvxa/xtory/actions/workflows/publish.yml/badge.svg)](https://github.com/rzvxa/xtory/actions/workflows/publish.yml) ![version](https://img.shields.io/github/v/tag/rzvxa/xtory?color=ebdbb2)
+![Latest Release by date](https://img.shields.io/github/v/tag/rzvxa/xtory?color=ebdbb2) ![License](https://img.shields.io/badge/license-GPLv3-blue.svg?style=flat) [![CodeQL](https://github.com/rzvxa/xtory/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/rzvxa/xtory/actions/workflows/codeql-analysis.yml) [![Test](https://github.com/rzvxa/xtory/actions/workflows/test.yml/badge.svg)](https://github.com/rzvxa/xtory/actions/workflows/test.yml) [![Publish](https://github.com/rzvxa/xtory/actions/workflows/publish.yml/badge.svg)](https://github.com/rzvxa/xtory/actions/workflows/publish.yml)
 
 ![Xtory](https://raw.githubusercontent.com/rzvxa/xtory/master/ScreenShots/screenshot1.png)
 
