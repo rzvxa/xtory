@@ -15,6 +15,7 @@ module.exports = {
     'no-shadow': 'off',
     '@typescript-eslint/no-shadow': 'warn',
     'no-plusplus': 'off',
+    'no-else-return': 'off',
   },
   parserOptions: {
     ecmaVersion: 2020,

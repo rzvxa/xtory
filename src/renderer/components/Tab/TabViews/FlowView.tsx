@@ -25,7 +25,7 @@ import { FileTabData } from 'renderer/state/types';
 import useUndoRedo from 'renderer/hooks/useUndoRedo';
 import useCenterOnNode from 'renderer/hooks/useCenterOnNode';
 
-import uuidv4 from 'renderer/utils/uuidv4';
+import { uuidv4 } from 'shared/utils';
 import {
   rendererPointToPoint,
   pointToRendererPoint,

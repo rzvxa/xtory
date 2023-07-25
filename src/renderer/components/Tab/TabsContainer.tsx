@@ -64,7 +64,7 @@ const getListStyle = (theme: Theme, isDraggingOver: boolean) => ({
     ? theme.palette.background.paper
     : theme.palette.background.default,
   display: 'flex',
-  overflow: 'auto',
+  overflow: 'overlay',
 });
 
 export default function TabsContainer() {

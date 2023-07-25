@@ -1,3 +1,13 @@
+export function uuidv4() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    /* eslint-disable no-bitwise */
+    const r = (Math.random() * 16) | 0;
+    const v = c === 'x' ? r : (r & 0x3) | 0x8;
+    return v.toString(16);
+    /* eslint-enable no-bitwise */
+  });
+}
+
 export interface TryGetResult<TResult> {
   success: boolean;
   result: TResult | unknown;
@@ -47,4 +57,12 @@ export function delay(duration: number): Promise<void> {
   return new Promise((resolve) => {
     setTimeout(resolve, duration);
   });
+}
+
+export function isMainProcess() {
+  return process !== undefined;
+}
+
+export function isRendererProcess() {
+  return window !== undefined;
 }
