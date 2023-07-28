@@ -30,32 +30,33 @@ class LoggingService implements Logger, IService {
     }
   }
 
-  trace(message: string, tags: string[] = []) {
+  trace(message: unknown | unknown[], tags: string[] = []) {
     this.log(LogLevel.trace, tags, message);
   }
 
-  debug(message: string, tags: string[] = []) {
+  debug(message: unknown | unknown[], tags: string[] = []) {
     this.log(LogLevel.debug, tags, message);
   }
 
-  info(message: string, tags: string[] = []) {
+  info(message: unknown | unknown[], tags: string[] = []) {
     this.log(LogLevel.info, tags, message);
   }
 
-  warning(message: string, tags: string[] = []) {
+  warning(message: unknown | unknown[], tags: string[] = []) {
     this.log(LogLevel.warning, tags, message);
   }
 
-  error(message: string, tags: string[] = []) {
+  error(message: unknown | unknown[], tags: string[] = []) {
     this.log(LogLevel.error, tags, message);
   }
 
-  fatal(message: string, tags: string[] = []) {
+  fatal(message: unknown | unknown[], tags: string[] = []) {
     this.log(LogLevel.fatal, tags, message);
   }
 
   log(logLevel: LogLevel, tags: string[], ...args: unknown[]) {
     const message = args.reduce((a, c) => `${a} ${c}`, '') as string;
+    console.log(message);
     const logMessage = {
       message,
       level: logLevel,

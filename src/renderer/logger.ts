@@ -1,27 +1,27 @@
 import { ChannelsMain, Logger, LogLevel } from 'shared/types';
 
 class RendererLogger implements Logger {
-  trace(message: string, tags: string[] = []) {
+  trace(message: unknown | unknown[], tags: string[] = []) {
     this.log(LogLevel.trace, tags, message);
   }
 
-  debug(message: string, tags: string[] = []) {
+  debug(message: unknown | unknown[], tags: string[] = []) {
     this.log(LogLevel.debug, tags, message);
   }
 
-  info(message: string, tags: string[] = []) {
+  info(message: unknown | unknown[], tags: string[] = []) {
     this.log(LogLevel.info, tags, message);
   }
 
-  warning(message: string, tags: string[] = []) {
+  warning(message: unknown | unknown[], tags: string[] = []) {
     this.log(LogLevel.warning, tags, message);
   }
 
-  error(message: string, tags: string[] = []) {
+  error(message: unknown | unknown[], tags: string[] = []) {
     this.log(LogLevel.error, tags, message);
   }
 
-  fatal(message: string, tags: string[] = []) {
+  fatal(message: unknown | unknown[], tags: string[] = []) {
     this.log(LogLevel.fatal, tags, message);
   }
 
