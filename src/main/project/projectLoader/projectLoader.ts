@@ -1,35 +1,27 @@
-import { WebContents } from 'electron';
-
 import { ensureFile } from 'fs-extra';
 
 import { fsUtils, FileLogger } from 'main/utils';
 
-import {
-  ChannelsRenderer,
-  OpenProjectResult,
-  IpcResultStatus,
-} from 'shared/types';
+import { IpcResultStatus } from 'shared/types';
 
 import LoggingService from 'main/services/loggingService';
 import ProjectWatchService from 'main/services/projectWatchService';
 import PluginsService from 'main/services/pluginsService';
 import ProjectSettingsService from 'main/services/projectSettingsService';
 
-import projectManager from '.';
+import LoadProjectResult from './loadProjectResult';
+import { ProjectMessageBroker } from '../projectMessageBroker';
 
-export default async function openProject(
-  sender: WebContents,
+export default async function defaultLoadStrategy(
+  messageBroker: ProjectMessageBroker,
   projectPath: string
-): Promise<OpenProjectResult> {
+): Promise<LoadProjectResult> {
   if (!(await fsUtils.exists(projectPath))) {
     return {
       status: IpcResultStatus.error,
       errorMessage: `Failed to open "${projectPath}"`,
     };
   }
-
-  const messageBroker = (channel: string, ...args: unknown[]) =>
-    sender.send(channel, ...args);
 
   // console.log('ds', app.getVersion());
   const settingsPath = `${projectPath}/xtory.json`;
@@ -82,8 +74,6 @@ export default async function openProject(
     messageBroker
   );
 
-  await pluginsService.loadPlugins();
-
   const project = {
     projectPath,
     messageBroker,
@@ -93,8 +83,5 @@ export default async function openProject(
     projectSettingsService,
   };
 
-  projectManager.setProject(project);
-
-  sender.send(ChannelsRenderer.onProjectOpened, projectPath);
-  return { status: IpcResultStatus.ok };
+  return { status: IpcResultStatus.ok, project };
 }

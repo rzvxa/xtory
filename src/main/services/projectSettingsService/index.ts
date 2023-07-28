@@ -1,9 +1,12 @@
 import { readFile } from 'fs/promises';
+
+import project from 'main/project';
 import { ProjectMessageBroker } from 'main/project/projectMessageBroker';
 
-import ProjectWatchService from './projectWatchService';
+import IService from '../IService';
+import ProjectWatchService from '../projectWatchService';
 
-class ProjectSettingsService {
+class ProjectSettingsService implements IService {
   #settingsPath: string;
 
   #projectWatchService: ProjectWatchService;
@@ -22,10 +25,18 @@ class ProjectSettingsService {
     this.#messageBroker = messageBroker;
   }
 
-  async init(): Promise<void> {
-    const content = await readFile(this.#settingsPath, 'utf8');
+  async init(): Promise<boolean> {
+    try {
+      const content = await readFile(this.#settingsPath, 'utf8');
 
-    this.#settings = JSON.parse(content);
+      this.#settings = JSON.parse(content);
+      return true;
+    } catch (error) {
+      project.logger.error(`Failed to load project settings, ${error}`, [
+        'ProjectSettingsService',
+      ]);
+      return false;
+    }
   }
 
   get<T>(key: string): T {
