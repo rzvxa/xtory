@@ -7,8 +7,9 @@ import {
 } from 'shared/types';
 import { uuidv4 } from 'shared/utils';
 import { ProjectMessageBroker } from 'main/project/projectMessageBroker';
+import IService from '../IService';
 
-class LoggingService implements Logger {
+class LoggingService implements Logger, IService {
   #logger: Logger;
 
   #messageBroker: ProjectMessageBroker;
@@ -16,6 +17,17 @@ class LoggingService implements Logger {
   constructor(logger: Logger, messageBroker: ProjectMessageBroker) {
     this.#logger = logger;
     this.#messageBroker = messageBroker;
+  }
+
+  async init(): Promise<boolean> {
+    try {
+      this.#logger.trace('Logger Initialized!', ['LoggingService']);
+      return true;
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error(error);
+      return false;
+    }
   }
 
   trace(message: string, tags: string[] = []) {
@@ -43,7 +55,7 @@ class LoggingService implements Logger {
   }
 
   log(logLevel: LogLevel, tags: string[], ...args: unknown[]) {
-    const message = args.reduce((a, c) => `${a} ${c}`) as string;
+    const message = args.reduce((a, c) => `${a} ${c}`, '') as string;
     const logMessage = {
       message,
       level: logLevel,
