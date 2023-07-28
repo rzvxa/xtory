@@ -39,7 +39,7 @@ export default class FileLogger implements Logger {
   }
 
   log(logLevel: LogLevel, tags: string[], ...args: unknown[]) {
-    const message = args.reduce((a, c) => `${a} ${c}`) as string;
+    const message = args.reduce((a, c) => `${a} ${c}`, '') as string;
     if (!this.fileHandle) {
       throw Error('No FileHandle, Cannot write log!');
     }

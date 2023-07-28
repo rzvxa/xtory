@@ -3,6 +3,8 @@ import { watch, FSWatcher } from 'chokidar';
 import { sanitizePath } from 'shared/utils';
 import { ChannelsRenderer, ProjectTree, ProjectTreeNode } from 'shared/types';
 
+import IService from '../IService';
+
 export type ProjectWatchServiceMessageBroker = (
   channel: ChannelsRenderer,
   ...args: any[]
@@ -10,7 +12,7 @@ export type ProjectWatchServiceMessageBroker = (
 
 const FlushInterval = 300;
 
-class ProjectWatchService {
+class ProjectWatchService implements IService {
   #watcher: FSWatcher;
 
   #messageBroker: ProjectWatchServiceMessageBroker;
@@ -53,6 +55,10 @@ class ProjectWatchService {
       });
 
     this.#workerIdentifier = setInterval(() => this.#worker(), FlushInterval);
+  }
+
+  async init(): Promise<boolean> {
+    return true;
   }
 
   #worker() {

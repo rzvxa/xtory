@@ -15,7 +15,11 @@ import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './utils';
 
+import project from './project';
+import projectLoader from './project/projectLoader';
 import './ipc/index';
+
+project.init(projectLoader);
 
 class AppUpdater {
   constructor() {
