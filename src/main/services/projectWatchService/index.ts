@@ -1,7 +1,14 @@
 import path from 'path';
 import { watch, FSWatcher } from 'chokidar';
 import { sanitizePath } from 'shared/utils';
-import { ChannelsRenderer, ProjectTree, ProjectTreeNode } from 'shared/types';
+import {
+  LogLevel,
+  ChannelsRenderer,
+  ProjectTree,
+  ProjectTreeNode,
+} from 'shared/types';
+
+import project from 'main/project';
 
 import IService from '../IService';
 
@@ -13,15 +20,15 @@ export type ProjectWatchServiceMessageBroker = (
 const FlushInterval = 300;
 
 class ProjectWatchService implements IService {
-  #watcher: FSWatcher;
-
   #messageBroker: ProjectWatchServiceMessageBroker;
 
   #projectPath: string;
 
   #projectTree: ProjectTree;
 
-  #workerIdentifier: ReturnType<typeof setInterval>;
+  #watcher: FSWatcher | null = null;
+
+  #workerIdentifier: ReturnType<typeof setInterval> | null = null;
 
   #isDirty: boolean = false;
 
@@ -38,6 +45,9 @@ class ProjectWatchService implements IService {
       isDir: true,
       children: undefined,
     };
+  }
+
+  async init(): Promise<boolean> {
     this.#watcher = watch(this.#projectPath, {
       ignored: /^\./,
       persistent: true,
@@ -51,13 +61,10 @@ class ProjectWatchService implements IService {
       })
       .on('unlink', (_path) => this.#onUnlink(_path))
       .on('error', (error) => {
-        console.error('Error happened', error);
+        project.logger.log(LogLevel.error, ['ProjectWatchService'], error);
       });
 
     this.#workerIdentifier = setInterval(() => this.#worker(), FlushInterval);
-  }
-
-  async init(): Promise<boolean> {
     return true;
   }
 
