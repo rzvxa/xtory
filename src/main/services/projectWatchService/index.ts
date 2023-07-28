@@ -12,6 +12,8 @@ import project from 'main/project';
 
 import IService from '../IService';
 
+import IService from '../IService';
+
 export type ProjectWatchServiceMessageBroker = (
   channel: ChannelsRenderer,
   ...args: any[]
@@ -65,6 +67,10 @@ class ProjectWatchService implements IService {
       });
 
     this.#workerIdentifier = setInterval(() => this.#worker(), FlushInterval);
+    return true;
+  }
+
+  async init(): Promise<boolean> {
     return true;
   }
 
