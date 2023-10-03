@@ -6,6 +6,8 @@ import project from 'main/project';
 import { LogLevel } from 'shared/types';
 import { sanitizePath, tryGetAsync } from 'shared/utils';
 
+import PluginBuilder from './pluginBuilder';
+
 import IService from '../IService';
 
 class PluginsService implements IService {
@@ -13,14 +15,18 @@ class PluginsService implements IService {
 
   #pluginsFolder: string;
 
+  #plugins: any;
+
   constructor(pluginsFolder: string, messageBroker: ProjectMessageBroker) {
     this.#messageBroker = messageBroker;
     this.#pluginsFolder = sanitizePath(pluginsFolder);
   }
 
   async init(): Promise<boolean> {
+    this.#plugins = {};
     try {
       await this.loadPlugins();
+      console.log(this.#plugins);
       return true;
     } catch (error) {
       return false;
@@ -87,6 +93,7 @@ class PluginsService implements IService {
         return `Required ${path}`;
       },
       logger: project.logger,
+      builder: new PluginBuilder(),
     };
     const script = await readFile(scriptPath, 'utf8');
 
@@ -94,6 +101,8 @@ class PluginsService implements IService {
     try {
       // eslint-disable-next-line no-new-func
       new Function(`with(this) { ${script} }`).call(context);
+      const plugin = context.builder.build();
+      this.#plugins[pluginName] = plugin;
     } catch (error) {
       project.logger.log(LogLevel.error, ['plugin', pluginName], error);
     }
