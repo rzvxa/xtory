@@ -132,7 +132,7 @@ export default function Layout() {
   const [primaryToolBoxWidth, setPrimaryToolBoxWidth] =
     React.useState<number>(300);
   const [bottomToolBoxHeight, setBottomToolBoxHeight] =
-    React.useState<number>(0);
+    React.useState<number>(200);
   const [activePrimaryToolIndex, setActivePrimaryToolIndex] = React.useState(0);
   const [activeBottomToolIndex, setActiveBottomToolIndex] = React.useState(0);
 
