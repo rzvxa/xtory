@@ -27,7 +27,6 @@ class PluginsService implements IService {
     this.#plugins = {};
     try {
       await this.loadPlugins();
-      console.log(this.#plugins);
       return true;
     } catch (error) {
       return false;
