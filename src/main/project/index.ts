@@ -1,6 +1,7 @@
 import { WebContents } from 'electron';
 
-import LoggingService from 'main/services/loggingService';
+import type LoggingService from 'main/services/loggingService';
+import type PluginsService from 'main/services/pluginsService';
 
 import {
   ChannelsRenderer,
@@ -33,6 +34,14 @@ export default class ProjectManager {
       throw Error('No Project Is Open!');
     }
     return this.#project.loggingService;
+  }
+
+  static get pluginsService(): PluginsService {
+    this.#throwIfNotInit();
+    if (!this.#project) {
+      throw Error('No Project Is Open!');
+    }
+    return this.#project.pluginsService;
   }
 
   static init(projectLoader: ProjectLoaderType) {

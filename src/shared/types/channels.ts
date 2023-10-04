@@ -2,6 +2,7 @@ export enum ChannelsMain {
   browseFileSystem = 'browseFileSystem',
   createNewProject = 'createNewProject',
   getXtoryTemplates = 'getXtoryTemplates',
+  getFileTypes = 'getFileTypes',
   openProject = 'openProject',
   openFileAsTab = 'openFileAsTab',
   fspExists = 'fspExists',

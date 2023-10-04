@@ -6,7 +6,7 @@ import project from 'main/project';
 import { LogLevel } from 'shared/types';
 import { sanitizePath, tryGetAsync } from 'shared/utils';
 
-import PluginBuilder from './pluginBuilder';
+import PluginApi from './pluginApi';
 
 import IService from '../IService';
 
@@ -26,7 +26,6 @@ class PluginsService implements IService {
     this.#plugins = {};
     try {
       await this.loadPlugins();
-      console.log(this.#plugins);
       return true;
     } catch (error) {
       return false;
@@ -85,6 +84,12 @@ class PluginsService implements IService {
     return true;
   }
 
+  // TODO: consider better naming
+  getFileTypePlugins() {
+    const plugins = this.#plugins;
+    console.log(plugins);
+  }
+
   // eslint-disable-next-line class-methods-use-this
   async #runMainScript(pluginName: string, scriptPath: string): Promise<void> {
     const context = {
@@ -93,7 +98,7 @@ class PluginsService implements IService {
         return `Required ${path}`;
       },
       logger: project.logger,
-      builder: new PluginBuilder(),
+      api: new PluginApi(),
     };
     const script = await readFile(scriptPath, 'utf8');
 
@@ -101,7 +106,7 @@ class PluginsService implements IService {
     try {
       // eslint-disable-next-line no-new-func
       new Function(`with(this) { ${script} }`).call(context);
-      const plugin = context.builder.build();
+      const plugin = context.api.build();
       this.#plugins[pluginName] = plugin;
     } catch (error) {
       project.logger.log(LogLevel.error, ['plugin', pluginName], error);

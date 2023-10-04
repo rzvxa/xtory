@@ -14,6 +14,7 @@ import fspExistsIpcInvoke from './invokes/fspExists';
 import fspMkdirIpcInvoke from './invokes/fspMkdir';
 import fspWriteFileIpcInvoke from './invokes/fspWriteFile';
 import getXtoryTemplatesIpcInvoke from './invokes/getXtoryTemplates';
+import getFileTypesIpcInvoke from './invokes/getFileTypes';
 import openProjectIpcInvoke from './invokes/openProject';
 
 const on = (channel: ChannelsMain, ipcAction: IpcAction): void => {
@@ -36,4 +37,5 @@ handle(ChannelsMain.fspExists, fspExistsIpcInvoke);
 handle(ChannelsMain.fspMkdir, fspMkdirIpcInvoke);
 handle(ChannelsMain.fspWriteFile, fspWriteFileIpcInvoke);
 handle(ChannelsMain.getXtoryTemplates, getXtoryTemplatesIpcInvoke);
+handle(ChannelsMain.getFileTypes, getFileTypesIpcInvoke);
 handle(ChannelsMain.openProject, openProjectIpcInvoke);
