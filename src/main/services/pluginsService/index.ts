@@ -24,7 +24,6 @@ class PluginsService implements IService {
   }
 
   async init(): Promise<boolean> {
-    this.#plugins = {};
     try {
       await this.loadPlugins();
       return true;
