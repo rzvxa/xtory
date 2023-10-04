@@ -6,8 +6,8 @@ export default async function getFileTypes(
   event: IpcMainInvokeEvent,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _: undefined
-): Promise<string[]> {
-  const pluginsService = project.pluginsService;
-  const fileTypes = pluginsService.getFileTypePlugins();
-  return ['ok'];
+): Promise<any[]> {
+  const { pluginsService } = project;
+  const fileTypePlugins = pluginsService.getFileTypePlugins();
+  return fileTypePlugins;
 }

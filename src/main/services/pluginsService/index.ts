@@ -6,7 +6,7 @@ import project from 'main/project';
 import { LogLevel } from 'shared/types';
 import { sanitizePath, tryGetAsync } from 'shared/utils';
 
-import PluginApi from './pluginApi';
+import PluginApi, { PluginConfig } from './pluginApi';
 
 import IService from '../IService';
 
@@ -15,15 +15,15 @@ class PluginsService implements IService {
 
   #pluginsFolder: string;
 
-  #plugins: any;
+  #plugins: { [name: string]: PluginConfig };
 
   constructor(pluginsFolder: string, messageBroker: ProjectMessageBroker) {
     this.#messageBroker = messageBroker;
     this.#pluginsFolder = sanitizePath(pluginsFolder);
+    this.#plugins = {};
   }
 
   async init(): Promise<boolean> {
-    this.#plugins = {};
     try {
       await this.loadPlugins();
       return true;
@@ -87,7 +87,11 @@ class PluginsService implements IService {
   // TODO: consider better naming
   getFileTypePlugins() {
     const plugins = this.#plugins;
-    console.log(plugins);
+    const result = Object.entries(plugins)
+      .filter((kv) => kv[1].flowView.fileType !== null)
+      .map((kv) => kv[0])
+      .map((key) => plugins[key]);
+    return result;
   }
 
   // eslint-disable-next-line class-methods-use-this
