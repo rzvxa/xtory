@@ -20,9 +20,9 @@ jobs:
           node-version: 18
           cache: npm
 
-      - name: npm install
+      - name: npm ci
         run: |
-          npm install
+          npm ci
 
       - name: npm test
         env:
