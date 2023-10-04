@@ -3,6 +3,8 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 
+import { ChannelsMain } from 'shared/types';
+
 import { useAppSelector, useAppDispatch } from 'renderer/state/store/index';
 import {
   setTabData,
@@ -20,6 +22,17 @@ export interface TabViewProps {
 
 export default function TabView({ tabId }: TabViewProps) {
   const dispatch = useAppDispatch();
+  const [fileTypes, setFileTypes] = React.useState<string[]>([]);
+
+  React.useEffect(() => {
+    async function getFileTypes() {
+      const result: string[] = await window.electron.ipcRenderer.invoke(
+        ChannelsMain.getFileTypes
+      );
+      setFileTypes(result);
+    }
+    getFileTypes().catch(e => console.log('eee', e));
+  }, []);
 
   const tabState = useAppSelector(
     (state) => state.tabsState.tabs.find((tab) => tab.id === tabId)!
@@ -32,6 +45,7 @@ export default function TabView({ tabId }: TabViewProps) {
     [dispatch, tabId]
   );
   const dispatchFileView = () => {
+    console.log(fileTypes, 'fileTypes')
     if (tabData.extension === 'xflow') {
       return <FlowView tabId={tabId} setTabIsDirty={setTabIsDirty} />;
     }
