@@ -45,7 +45,8 @@ export default function TabView({ tabId }: TabViewProps) {
     [dispatch, tabId]
   );
   const dispatchFileView = () => {
-    console.log(fileTypes, 'fileTypes')
+    console.log(fileTypes, 'fileTypes');
+    console.log(fileTypes[tabData.extension], '??');
     if (tabData.extension === 'xflow') {
       return <FlowView tabId={tabId} setTabIsDirty={setTabIsDirty} />;
     }
