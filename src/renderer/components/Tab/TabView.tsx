@@ -22,7 +22,8 @@ export interface TabViewProps {
 
 export default function TabView({ tabId }: TabViewProps) {
   const dispatch = useAppDispatch();
-  const [fileTypes, setFileTypes] = React.useState<string[]>([]);
+  // TODO use shard type for the state
+  const [fileTypes, setFileTypes] = React.useState<any>([]);
 
   React.useEffect(() => {
     async function getFileTypes() {
@@ -31,7 +32,7 @@ export default function TabView({ tabId }: TabViewProps) {
       );
       setFileTypes(result);
     }
-    getFileTypes().catch(e => console.log('eee', e));
+    getFileTypes().catch((e) => console.log('eee', e));
   }, []);
 
   const tabState = useAppSelector(
@@ -46,7 +47,7 @@ export default function TabView({ tabId }: TabViewProps) {
   );
   const dispatchFileView = () => {
     console.log(fileTypes, 'fileTypes');
-    console.log(fileTypes[tabData.extension], '??');
+    console.log('gg', fileTypes[tabData.extension], '??');
     if (tabData.extension === 'xflow') {
       return <FlowView tabId={tabId} setTabIsDirty={setTabIsDirty} />;
     }

@@ -1,4 +1,4 @@
-export default interface PluginConfig {
+export default interface PluginManifest {
   name: string;
   version: string | undefined;
   api: number;
