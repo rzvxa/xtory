@@ -185,7 +185,9 @@ function Flow({ tabId, setTabIsDirty }: FlowProps) {
 
         if (flow) {
           const { x = 0, y = 0, zoom = 1 } = flow.viewport;
-          flow.nodes?.forEach((node: any) => (node.data.focusOnInit = false));
+          flow.nodes?.forEach((node: any) => {
+            node.data.focusOnInit = false;
+          });
           setNodes(flow.nodes || []);
           setEdges(flow.edges || []);
           setViewport({ x, y, zoom });
