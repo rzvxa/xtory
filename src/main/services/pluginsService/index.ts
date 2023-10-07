@@ -4,9 +4,10 @@ import { ProjectMessageBroker } from 'main/project/projectMessageBroker';
 import project from 'main/project';
 
 import { LogLevel } from 'shared/types';
+import { PluginConfig } from 'shared/types/plugin';
 import { sanitizePath, tryGetAsync } from 'shared/utils';
 
-import PluginApi, { PluginConfig } from './pluginApi';
+import PluginApi from './pluginApi';
 
 import IService from '../IService';
 
@@ -56,30 +57,30 @@ class PluginsService implements IService {
 
   async loadPlugin(pluginPath: string): Promise<boolean> {
     const directoryName = pluginPath.split('/').pop() || '';
-    const configPath = `${pluginPath}/package.json`;
-    if (!(await fsUtils.exists(configPath))) {
+    const manifestPath = `${pluginPath}/manifest.json`;
+    if (!(await fsUtils.exists(manifestPath))) {
       project.logger.error(
-        `${directoryName} does not contain a "package.json" file at ${configPath}`,
+        `${directoryName} does not contain a "manifest.json" file at ${manifestPath}`,
         ['plugin', directoryName]
       );
       return false;
     }
-    const configWrapped = await tryGetAsync<string>(() =>
-      readFile(configPath, 'utf8')
+    const manifestFileRead = await tryGetAsync<string>(() =>
+      readFile(manifestPath, 'utf8')
     );
-    if (!configWrapped.success) {
+    if (!manifestFileRead.success) {
       return false;
     }
-    const config = JSON.parse(configWrapped.result as string);
-    const name = config.name || directoryName;
-    if (!config.main) {
+    const manifest = JSON.parse(manifestFileRead.result as string);
+    const name = manifest.name || directoryName;
+    if (!manifest.main) {
       project.logger.warning(
-        `${name} plugin, does not have a main file in its "package.json"`,
+        `${name} plugin, does not have a main file in its "manifest.json"`,
         ['plugin', name]
       );
       return false;
     }
-    const mainPath = `${pluginPath}/${config.main}`;
+    const mainPath = `${pluginPath}/${manifest.main}`;
     await this.#runMainScript(name, mainPath);
     return true;
   }
@@ -87,10 +88,11 @@ class PluginsService implements IService {
   // TODO: consider better naming
   getFileTypePlugins() {
     const plugins = this.#plugins;
-    const result = Object.entries(plugins)
-      .filter((kv) => kv[1].flowView.fileType !== null)
-      .map((kv) => kv[0])
-      .map((key) => plugins[key]);
+    const result = Object.fromEntries(
+      Object.entries(plugins)
+        .filter((kv) => kv[1].flowView.fileType !== null)
+        .map((kv) => [kv[1].flowView.fileType, kv[1]])
+    );
     return result;
   }
 

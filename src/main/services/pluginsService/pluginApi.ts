@@ -1,22 +1,10 @@
-export type ConnectionInfo = {
-  in: number;
-  out: number;
-};
+/* eslint-disable max-classes-per-file */
+import { PluginConfig, FlowViewConfig, NodeInfo } from 'shared/types/plugin';
 
-export type NodeInfo = {
-  type: string;
-  connection: ConnectionInfo;
-};
-
-export type FlowViewConfig = {
-  fileType: string;
-  nodes: NodeInfo[];
-};
-
-export type PluginConfig = {
-  flowView: FlowViewConfig;
-};
-
+// example node view creation?
+// builder.flowView.createNode('node-name', () => {
+//    react.
+// })
 // builder.flowView.setFileType('xxx') // *.xxx
 // builder.flowView.setNodes(xxx)
 // builder.globalShortcut.setShortcutAction(yyy)
