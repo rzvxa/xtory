@@ -10,6 +10,7 @@ import { CreateNewProjectResult } from './createNewProjectResult';
 import { BrowseFileSystemResult } from './browseFileSystemResult';
 import { OpenProjectResult } from './openProjectResult';
 import { ProjectTreeNode, ProjectTree } from './projectTree';
+import { FileTypeMap } from './fileTypeMap';
 import Logger from './logger';
 import LogLevel from './logLevel';
 import LogMessage, { formatLog } from './logMessage';
@@ -35,6 +36,7 @@ export type {
   OpenProjectResult,
   ProjectTreeNode,
   ProjectTree,
+  FileTypeMap,
   Logger,
   LogMessage,
 };

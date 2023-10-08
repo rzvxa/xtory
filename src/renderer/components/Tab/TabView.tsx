@@ -3,7 +3,7 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 
-import { ChannelsMain } from 'shared/types';
+import { ChannelsMain, FileTypeMap } from 'shared/types';
 
 import { useAppSelector, useAppDispatch } from 'renderer/state/store/index';
 import {
@@ -23,11 +23,11 @@ export interface TabViewProps {
 export default function TabView({ tabId }: TabViewProps) {
   const dispatch = useAppDispatch();
   // TODO use shard type for the state
-  const [fileTypes, setFileTypes] = React.useState<any | null>(null);
+  const [fileTypes, setFileTypes] = React.useState<FileTypeMap | null>(null);
 
   React.useEffect(() => {
     async function getFileTypes() {
-      const result: string[] = await window.electron.ipcRenderer.invoke(
+      const result: FileTypeMap = await window.electron.ipcRenderer.invoke(
         ChannelsMain.getFileTypes
       );
       setFileTypes(result);
@@ -49,10 +49,18 @@ export default function TabView({ tabId }: TabViewProps) {
     if (fileTypes) {
       const fileTypePlugin = fileTypes[tabData.extension];
       if (fileTypePlugin) {
-        return <FlowView tabId={tabId} setTabIsDirty={setTabIsDirty} />;
+        return (
+          <FlowView
+            tabId={tabId}
+            setTabIsDirty={setTabIsDirty}
+            config={fileTypePlugin.flowView}
+          />
+        );
       } else {
         return <DefaultFileView tabData={tabData} />;
       }
+    } else {
+      return undefined;
     }
   };
 
