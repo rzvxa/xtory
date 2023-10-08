@@ -5,7 +5,7 @@ export type ConnectionInfo = {
 
 export type NodeInfo = {
   type: string;
-  connection: ConnectionInfo;
+  connections: ConnectionInfo;
 };
 
 export type FlowViewConfig = {

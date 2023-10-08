@@ -18,6 +18,7 @@ import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 
 import { ChannelsMain } from 'shared/types';
+import { FlowViewConfig } from 'shared/types/plugin';
 
 import { useAppSelector } from 'renderer/state/store/index';
 import { FileTabData } from 'renderer/state/types';
@@ -39,47 +40,9 @@ import ConversationNode from 'renderer/components/Nodes/ConversationNode';
 
 import 'reactflow/dist/style.css';
 
-const initialNodes = [
-  {
-    id: '1',
-    type: 'Plot',
-    data: { label: 'Node 1' },
-    position: { x: 0, y: 0 },
-  },
-  {
-    id: '2',
-    type: 'Plot',
-    data: { label: 'Node 2' },
-    position: { x: 400, y: 0 },
-  },
-];
-
 const edgeSharedSettings = {
   markerEnd: { type: MarkerType.ArrowClosed, width: 6 },
 };
-
-const initialEdges = [
-  {
-    id: 'e1',
-    source: '1',
-    target: '2',
-    ...edgeSharedSettings,
-  },
-];
-
-const nodeConfigs = [
-  {
-    type: 'Plot',
-    connections: [1, 1],
-  },
-  {
-    type: 'Note',
-  },
-  {
-    type: 'Conversation',
-    connections: [1, 1],
-  },
-];
 
 const nodeTypes = {
   Plot: PlotNode,
@@ -131,9 +94,11 @@ type SetIsDirtyCallbackType = (isDirty: boolean) => void;
 export interface FlowProps {
   tabId: string;
   setTabIsDirty: SetIsDirtyCallbackType;
+  config: FlowViewConfig;
 }
 
-function Flow({ tabId, setTabIsDirty }: FlowProps) {
+function Flow({ tabId, setTabIsDirty, config }: FlowProps) {
+  const nodeConfigs = config.nodes;
   const tabState = useAppSelector((state) =>
     state.tabsState.tabs.find((tab) => tab.id === tabId)
   );
@@ -150,8 +115,9 @@ function Flow({ tabId, setTabIsDirty }: FlowProps) {
     setIsDirty: setTabIsDirty,
     maxHistorySize: 100,
   });
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   const [splash, setSplash] = React.useState<boolean>(true);
   const [contextMenu, setContextMenu] = React.useState<{
@@ -278,6 +244,7 @@ function Flow({ tabId, setTabIsDirty }: FlowProps) {
       }
     },
     [
+      nodeConfigs,
       nodes,
       setNodes,
       setEdges,
@@ -392,6 +359,7 @@ function Flow({ tabId, setTabIsDirty }: FlowProps) {
       if (!rclick) centerOnNode(newNode.id);
     },
     [
+      nodeConfigs,
       contextMenu,
       nodes,
       setNodes,
@@ -473,12 +441,17 @@ function Flow({ tabId, setTabIsDirty }: FlowProps) {
 export interface FlowViewProps {
   tabId: string;
   setTabIsDirty: SetIsDirtyCallbackType;
+  config: FlowViewConfig;
 }
 
-export default function FlowView({ tabId, setTabIsDirty }: FlowViewProps) {
+export default function FlowView({
+  tabId,
+  setTabIsDirty,
+  config,
+}: FlowViewProps) {
   return (
     <ReactFlowProvider>
-      <Flow tabId={tabId} setTabIsDirty={setTabIsDirty} />
+      <Flow tabId={tabId} setTabIsDirty={setTabIsDirty} config={config} />
     </ReactFlowProvider>
   );
 }
