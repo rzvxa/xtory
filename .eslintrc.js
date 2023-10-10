@@ -11,7 +11,10 @@ module.exports = {
     'react/require-default-props': ['error', { functions: 'defaultArguments' }],
     'prettier/prettier': ['error', { endOfLine: 'auto' }],
     'no-unused-vars': 'off',
-    '@typescript-eslint/no-unused-vars': 'warn',
+    '@typescript-eslint/no-unused-vars': [
+      'warn',
+      { destructuredArrayIgnorePattern: '^_' },
+    ],
     'no-shadow': 'off',
     '@typescript-eslint/no-shadow': 'warn',
     'no-plusplus': 'off',
