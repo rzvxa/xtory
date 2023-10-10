@@ -3,7 +3,7 @@ import { fsUtils } from 'main/utils';
 import { ProjectMessageBroker } from 'main/project/projectMessageBroker';
 import project from 'main/project';
 
-import { LogLevel } from 'shared/types';
+import { LogLevel, FileTypeMap } from 'shared/types';
 import { PluginConfig } from 'shared/types/plugin';
 import { sanitizePath, tryGetAsync } from 'shared/utils';
 
@@ -88,11 +88,15 @@ class PluginsService implements IService {
   // TODO: consider better naming
   getFileTypePlugins() {
     const plugins = this.#plugins;
-    const result = Object.fromEntries(
-      Object.entries(plugins)
-        .filter((kv) => kv[1].flowView.fileType !== null)
-        .map((kv) => [kv[1].flowView.fileType, kv[1]])
-    );
+
+    const result: FileTypeMap = {};
+
+    Object.entries(plugins).forEach(([_key, plug]) => {
+      plug.flowViews.forEach((fv) => {
+        result[fv.fileType] = fv;
+      });
+    });
+
     return result;
   }
 

@@ -14,5 +14,5 @@ export type FlowViewConfig = {
 };
 
 export type PluginConfig = {
-  flowView: FlowViewConfig;
+  flowViews: FlowViewConfig[];
 };
