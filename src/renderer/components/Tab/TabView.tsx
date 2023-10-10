@@ -53,7 +53,7 @@ export default function TabView({ tabId }: TabViewProps) {
           <FlowView
             tabId={tabId}
             setTabIsDirty={setTabIsDirty}
-            config={fileTypePlugin.flowView}
+            config={fileTypePlugin}
           />
         );
       } else {

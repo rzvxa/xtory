@@ -33,15 +33,16 @@ export class FlowViewBuilder {
 }
 
 export default class PluginBuilder {
-  flowView: FlowViewBuilder;
+  #flowViews: FlowViewBuilder[] = [];
 
-  constructor() {
-    this.flowView = new FlowViewBuilder();
+  addFlowView(): FlowViewBuilder {
+    const flowView = new FlowViewBuilder();
+    this.#flowViews.push(flowView);
+    return flowView;
   }
 
   build(): PluginConfig {
-    const flowViewBuilder = this.flowView;
-    const flowView = flowViewBuilder.build();
-    return { flowView };
+    const flowViews = this.#flowViews.map((builder) => builder.build());
+    return { flowViews };
   }
 }
