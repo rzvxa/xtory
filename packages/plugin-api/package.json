@@ -1,0 +1,13 @@
+{
+  "name": "@xtory/plugin-api",
+  "version": "0.1.0",
+  "description": "Type definitions for Xtory plugin API",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "author": "Xtory",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch"
+  }
+}

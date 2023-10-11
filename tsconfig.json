@@ -7,7 +7,7 @@
     "jsx": "react-jsx",
     "strict": true,
     "sourceMap": true,
-    "baseUrl": "./src",
+    "baseUrl": ".",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -15,8 +15,16 @@
     "allowJs": true,
     "outDir": ".erb/dll",
     "paths": {
-      "shared/*": ["shared/*"]
+      "@xtory/shared": ["./packages/shared/src"],
+      "@xtory/shared/*": ["./packages/shared/src/*"],
+      "@xtory/main": ["./packages/main/src"],
+      "@xtory/main/*": ["./packages/main/src/*"],
+      "@xtory/renderer": ["./packages/renderer/src"],
+      "@xtory/renderer/*": ["./packages/renderer/src/*"],
+      "shared/*": ["./packages/shared/src/*"],
+      "main/*": ["./packages/main/src/*"],
+      "renderer/*": ["./packages/renderer/src/*"]
     }
   },
-  "exclude": ["test", "release/build", "release/app/dist", ".erb/dll"]
+  "exclude": ["test", "release/build", "release/app/dist", ".erb/dll", "node_modules"]
 }

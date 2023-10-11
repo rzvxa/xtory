@@ -1,0 +1,17 @@
+{
+  "name": "@xtory/plugin-xflow",
+  "version": "0.1.0",
+  "yumeApiVersion": 1,
+  "main": "dist/main.js",
+  "description": "A Xtory plugin for supporting .xflow files",
+  "author": "Ali Rezvani <rzvxa@protonmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "devDependencies": {
+    "@xtory/plugin-api": "*",
+    "typescript": "^5.0.0"
+  }
+}

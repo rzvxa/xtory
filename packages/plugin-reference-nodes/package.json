@@ -1,0 +1,19 @@
+{
+  "name": "@xtory/plugin-reference-nodes",
+  "version": "0.1.0",
+  "yumeApiVersion": 1,
+  "main": "dist/main.js",
+  "rendererMain": "dist/renderer.js",
+  "description": "Xtory plugin adding reference nodes (Image, Note) to xflow flows",
+  "author": "Xtory",
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch"
+  },
+  "devDependencies": {
+    "@xtory/plugin-api": "*",
+    "@types/react": "^18.0.0",
+    "typescript": "^5.0.0"
+  }
+}
