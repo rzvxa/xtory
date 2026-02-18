@@ -17,7 +17,7 @@ interface CharacterCardProps {
 export default function CharacterCard({
   character,
   attributesToShow = [],
-  onClick,
+  onClick = undefined,
   variant = 'normal',
 }: CharacterCardProps) {
   const handleClick = () => {
@@ -52,6 +52,7 @@ export default function CharacterCard({
           component="img"
           sx={{
             height:
+              // eslint-disable-next-line no-nested-ternary
               variant === 'compact' ? 80 : variant === 'expanded' ? 200 : 140,
             width: variant === 'expanded' ? 200 : '100%',
             objectFit: 'cover',

@@ -1,0 +1,62 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "packages": {
+    ".": {
+      "release-type": "node",
+      "changelog-sections": [
+        { "type": "feat", "section": "Features", "hidden": false },
+        { "type": "fix", "section": "Bug Fixes", "hidden": false },
+        {
+          "type": "perf",
+          "section": "Performance Improvements",
+          "hidden": false
+        },
+        { "type": "revert", "section": "Reverts", "hidden": false },
+        { "type": "refactor", "section": "Code Refactoring", "hidden": false },
+        { "type": "docs", "section": "Documentation", "hidden": false },
+        { "type": "style", "section": "Styles", "hidden": true },
+        { "type": "chore", "section": "Chores", "hidden": true },
+        { "type": "test", "section": "Tests", "hidden": true },
+        { "type": "build", "section": "Build System", "hidden": true },
+        { "type": "ci", "section": "Continuous Integration", "hidden": true }
+      ],
+      "include-component-in-tag": false,
+      "include-v-in-tag": true,
+      "bump-minor-pre-major": true,
+      "extra-files": ["release/app/package.json"]
+    },
+    "packages/main": {
+      "release-type": "node",
+      "include-component-in-tag": false
+    },
+    "packages/renderer": {
+      "release-type": "node",
+      "include-component-in-tag": false
+    },
+    "packages/shared": {
+      "release-type": "node",
+      "include-component-in-tag": false
+    },
+    "packages/plugin-api": {
+      "release-type": "node",
+      "include-component-in-tag": false
+    },
+    "packages/plugin-reference-nodes": {
+      "release-type": "node",
+      "include-component-in-tag": false
+    },
+    "packages/plugin-xflow": {
+      "release-type": "node",
+      "include-component-in-tag": false
+    }
+  },
+  "bump-minor-pre-major": true,
+  "bump-patch-for-minor-pre-major": true,
+  "changelog-type": "github",
+  "changelog-host": "https://github.com",
+  "pull-request-title-pattern": "chore: release ${version}",
+  "prerelease": false,
+  "group-pull-request-title-pattern": "chore: release ${version}",
+  "separate-pull-requests": false,
+  "skip-github-release": false
+}

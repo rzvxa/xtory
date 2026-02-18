@@ -1,12 +1,7 @@
 import { readFile, writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import project from 'main/project';
-import type {
-  Character,
-  CharacterMap,
-  CharacterSettings,
-  DEFAULT_CHARACTER_ATTRIBUTES,
-} from '@xtory/shared';
+import type { Character, CharacterMap, CharacterSettings } from '@xtory/shared';
 import { v4 as uuidv4 } from 'uuid';
 
 class CharacterService {

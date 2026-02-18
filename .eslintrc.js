@@ -11,6 +11,7 @@ module.exports = {
     'react/require-default-props': ['error', { functions: 'defaultArguments' }],
     'prettier/prettier': ['error', { endOfLine: 'auto' }],
     'no-unused-vars': 'off',
+    'no-return-await': 'off',
     '@typescript-eslint/no-unused-vars': [
       'error',
       {

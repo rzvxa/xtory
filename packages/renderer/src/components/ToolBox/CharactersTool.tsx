@@ -13,12 +13,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import AddIcon from '@mui/icons-material/Add';
 
 import { ChannelsMain } from '@xtory/shared';
-import type {
-  Character,
-  CharacterMap,
-  CharacterSettings,
-  CharacterAttributeDefinition,
-} from '@xtory/shared';
+import type { Character, CharacterMap, CharacterSettings } from '@xtory/shared';
 import { EzSnackbarRef } from 'renderer/utils/ezSnackbar';
 import { levenshtein } from 'renderer/utils/levenshtein';
 import { useResourceDrawer } from 'renderer/contexts/ResourceDrawerContext';
@@ -310,11 +305,11 @@ export default function CharactersTool() {
                 type={attr.type === 'number' ? 'number' : 'text'}
                 value={formData.attributes[attr.key] ?? ''}
                 onChange={(e) => {
-                  let value: any = e.target.value;
+                  let value = e.target.value as any;
                   if (attr.type === 'number') {
                     value = value ? Number(value) : '';
                   } else if (attr.type === 'boolean') {
-                    value = e.target.value === 'true';
+                    value = value === 'true';
                   }
                   setFormData({
                     ...formData,

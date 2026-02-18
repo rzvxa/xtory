@@ -105,7 +105,7 @@ export default function CharacterSettingsDialog({
         <List>
           {localSettings.requiredAttributes.map((attr, index) => (
             <ListItem
-              key={index}
+              key={attr.key}
               sx={{
                 display: 'flex',
                 gap: 1,
