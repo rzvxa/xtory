@@ -1,0 +1,9 @@
+{
+  ".": "0.2.3",
+  "packages/main": "0.2.3",
+  "packages/renderer": "0.2.3",
+  "packages/shared": "0.2.3",
+  "packages/plugin-api": "0.2.3",
+  "packages/plugin-reference-nodes": "0.2.3",
+  "packages/plugin-xflow": "0.2.3"
+}
