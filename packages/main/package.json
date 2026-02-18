@@ -1,6 +1,7 @@
 {
   "name": "@xtory/main",
   "version": "0.2.3",
+  "private": true,
   "description": "Xtory main process",
   "main": "src/main.ts",
   "license": "GPT-3",

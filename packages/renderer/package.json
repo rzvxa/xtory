@@ -1,6 +1,7 @@
 {
   "name": "@xtory/renderer",
   "version": "0.2.3",
+  "private": true,
   "description": "Xtory renderer process",
   "main": "src/index.tsx",
   "license": "GPT-3",

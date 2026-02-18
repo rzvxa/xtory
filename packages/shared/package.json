@@ -1,6 +1,7 @@
 {
   "name": "@xtory/shared",
   "version": "0.2.3",
+  "private": true,
   "description": "Shared types and utilities for Xtory",
   "main": "src/index.ts",
   "scripts": {},

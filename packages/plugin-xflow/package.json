@@ -6,6 +6,25 @@
   "description": "A Xtory plugin for supporting .xflow files",
   "author": "Ali Rezvani <rzvxa@protonmail.com>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rzvxa/xtory.git",
+    "directory": "packages/plugin-xflow"
+  },
+  "keywords": [
+    "xtory",
+    "plugin",
+    "xflow",
+    "storytelling",
+    "narrative",
+    "flow"
+  ],
+  "files": [
+    "dist/**/*"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc",
     "watch": "tsc --watch"
