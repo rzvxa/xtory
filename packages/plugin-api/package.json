@@ -1,0 +1,33 @@
+{
+  "name": "@xtory/plugin-api",
+  "version": "0.2.3",
+  "description": "Type definitions for Xtory plugin API",
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "author": "Xtory",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rzvxa/xtory.git",
+    "directory": "packages/plugin-api"
+  },
+  "keywords": [
+    "xtory",
+    "plugin",
+    "api",
+    "storytelling",
+    "narrative",
+    "typescript"
+  ],
+  "files": [
+    "index.js",
+    "index.d.ts"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch"
+  }
+}

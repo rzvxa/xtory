@@ -4,15 +4,15 @@ const rootPath = path.join(__dirname, '../..');
 
 const dllPath = path.join(__dirname, '../dll');
 
-const srcPath = path.join(rootPath, 'src');
-const srcMainPath = path.join(srcPath, 'main');
-const srcRendererPath = path.join(srcPath, 'renderer');
+const srcPath = path.join(rootPath, 'packages');
+const srcMainPath = path.join(srcPath, 'main', 'src');
+const srcRendererPath = path.join(srcPath, 'renderer', 'src');
 
 const releasePath = path.join(rootPath, 'release');
 const appPath = path.join(releasePath, 'app');
 const appPackagePath = path.join(appPath, 'package.json');
 const appNodeModulesPath = path.join(appPath, 'node_modules');
-const srcNodeModulesPath = path.join(srcPath, 'node_modules');
+const srcNodeModulesPath = path.join(rootPath, 'node_modules');
 
 const distPath = path.join(appPath, 'dist');
 const distMainPath = path.join(distPath, 'main');

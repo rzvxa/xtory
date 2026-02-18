@@ -1,5 +1,10 @@
 {
   "name": "{PROJECT_NAME}",
   "version": "{XTORY_VERSION}",
-  "logLevel": 2
+  "logLevel": 2,
+  "plugins": {
+    "@xtory/plugin-xflow": "*",
+    "@xtory/plugin-reference-nodes": "*"
+  },
+  "pluginsConfiguration": {}
 }

@@ -1,0 +1,8 @@
+BasedOnStyle: LLVM
+
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
+AlignConsecutiveMacros: true
+AlignTrailingComments: true
+AlignConsecutiveBitFields: true
+# AlignAfterOpenBracket: AlwaysBreak
