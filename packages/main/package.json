@@ -1,6 +1,6 @@
 {
   "name": "@xtory/main",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "private": true,
   "description": "Xtory main process",
   "main": "src/main.ts",
