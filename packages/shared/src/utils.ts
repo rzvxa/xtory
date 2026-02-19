@@ -66,3 +66,31 @@ export function isMainProcess() {
 export function isRendererProcess() {
   return window !== undefined;
 }
+
+export interface FileExtensionInfo {
+  name: string;
+  extension: string;
+}
+
+/**
+ * Extract file name and extension from a file path.
+ * Handles files with multiple dots correctly (e.g., "my.story.xflow" -> name: "my.story", extension: "xflow")
+ * @param path - The file path
+ * @returns Object containing name (without extension) and extension (lowercase, without dot)
+ */
+export function extractFileExtension(path: string): FileExtensionInfo {
+  // Normalize path separators to forward slashes
+  const normalizedPath = path.replaceAll('\\', '/');
+  const filename = normalizedPath.split('/').pop() || normalizedPath;
+  const lastDotIndex = filename.lastIndexOf('.');
+
+  if (lastDotIndex === -1 || lastDotIndex === 0) {
+    // No extension or hidden file
+    return { name: filename, extension: '' };
+  }
+
+  const name = filename.substring(0, lastDotIndex);
+  const extension = filename.substring(lastDotIndex + 1).toLowerCase();
+
+  return { name, extension };
+}

@@ -20,7 +20,8 @@
     "flow"
   ],
   "files": [
-    "dist/**/*"
+    "dist/**/*",
+    "templates/**/*"
   ],
   "publishConfig": {
     "access": "public"
