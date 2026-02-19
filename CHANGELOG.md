@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.6 (2026-02-19)
+
+## What's Changed
+* fix: resolve the issues in plugin publishing and loading by @rzvxa in https://github.com/rzvxa/xtory/pull/46
+* chore: update the README by @rzvxa in https://github.com/rzvxa/xtory/pull/47
+
+
+**Full Changelog**: https://github.com/rzvxa/xtory/compare/v0.2.5...v0.2.6
+
 ## 0.2.5 (2026-02-19)
 
 ## What's Changed
