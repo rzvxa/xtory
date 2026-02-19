@@ -1,4 +1,4 @@
-import { IpcEvent, ChannelsRenderer } from '@xtory/shared';
+import { IpcEvent, ChannelsRenderer, sanitizePath } from '@xtory/shared';
 import fs from 'fs/promises';
 
 export default async function openFileAsTab(
@@ -6,8 +6,9 @@ export default async function openFileAsTab(
   path: string
 ) {
   try {
-    const content = await fs.readFile(path, 'utf-8');
-    sender.send(ChannelsRenderer.onOpenFileAsTab, path, content);
+    const sanitizedPath = sanitizePath(path);
+    const content = await fs.readFile(sanitizedPath, 'utf-8');
+    sender.send(ChannelsRenderer.onOpenFileAsTab, sanitizedPath, content);
   } catch (err) {
     sender.send(
       ChannelsRenderer.toastMessage,

@@ -1,4 +1,4 @@
-import { IpcEvent } from '@xtory/shared';
+import { IpcEvent, extractFileExtension } from '@xtory/shared';
 import { store } from 'renderer/state/store/index';
 
 import { TabType } from 'renderer/state/types/tabs';
@@ -18,7 +18,7 @@ export default function onOpenFileAsTab(
   }
 
   const title = path.split('/').pop(); // get the file name
-  const [name, extension] = title!.split('.');
+  const { name, extension } = extractFileExtension(path);
   store.dispatch(
     addTab({
       id: path,

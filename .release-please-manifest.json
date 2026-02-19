@@ -1,9 +1,3 @@
 {
-  ".": "0.2.5",
-  "packages/main": "0.2.5",
-  "packages/renderer": "0.2.5",
-  "packages/shared": "0.2.5",
-  "packages/plugin-api": "0.2.5",
-  "packages/plugin-reference-nodes": "0.2.5",
-  "packages/plugin-xflow": "0.2.5"
+  ".": "0.2.5"
 }

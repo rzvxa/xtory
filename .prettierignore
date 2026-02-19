@@ -1,0 +1,16 @@
+# Changelog files managed by release-please
+CHANGELOG.md
+**/CHANGELOG.md
+
+# Build artifacts
+dist/
+build/
+release/
+
+# Dependencies
+node_modules/
+
+# Lockfiles
+package-lock.json
+yarn.lock
+pnpm-lock.yaml

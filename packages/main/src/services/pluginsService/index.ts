@@ -43,7 +43,7 @@ class PluginsService implements IService {
     this.#fileTypes = {};
   }
 
-  async init(): Promise<boolean> {
+  async init(skipStartMessage: boolean = false): Promise<boolean> {
     try {
       // Get plugin count
       const pluginCount = Object.keys(
@@ -51,7 +51,12 @@ class PluginsService implements IService {
       ).length;
 
       // Notify renderer that plugins are starting to load
-      this.#messageBroker(ChannelsRenderer.onPluginsLoadingStart, pluginCount);
+      if (!skipStartMessage) {
+        this.#messageBroker(
+          ChannelsRenderer.onPluginsLoadingStart,
+          pluginCount
+        );
+      }
       const loadedCount = await this.loadPlugins();
       // Notify renderer that plugins finished loading with actual loaded count
       this.#messageBroker(

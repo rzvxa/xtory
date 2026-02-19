@@ -114,12 +114,20 @@ export default class ProjectManager {
       await this.#project.characterService.init();
       await this.#project.projectSettingsService.init();
 
-      // Send early project opened event before plugins load
+      // Notify renderer that plugins are starting to load BEFORE sending project opened
+      // This prevents race condition where files could be opened before plugins finish loading
+      const pluginCount = Object.keys(
+        this.#project.projectSettingsService.get('plugins') ?? {}
+      ).length;
+      sender.send(ChannelsRenderer.onPluginsLoadingStart, pluginCount);
+
+      // Send project opened event
       sender.send(ChannelsRenderer.onProjectOpened, projectPath);
       this.logger.trace('Project UI ready, loading plugins in background...');
 
       // Load plugins in background (non-blocking)
-      this.#project.pluginsService.init().catch((error) => {
+      // Pass skipStartMessage=true since we already sent onPluginsLoadingStart above
+      this.#project.pluginsService.init(true).catch((error) => {
         this.logger.error(`Failed to initialize plugins: ${error}`);
       });
     }

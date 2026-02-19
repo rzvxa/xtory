@@ -1,5 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "plugins": ["node-workspace"],
   "packages": {
     ".": {
       "release-type": "node",
@@ -23,31 +24,15 @@
       "include-component-in-tag": false,
       "include-v-in-tag": true,
       "bump-minor-pre-major": true,
-      "extra-files": ["release/app/package.json"]
-    },
-    "packages/main": {
-      "release-type": "node",
-      "include-component-in-tag": false
-    },
-    "packages/renderer": {
-      "release-type": "node",
-      "include-component-in-tag": false
-    },
-    "packages/shared": {
-      "release-type": "node",
-      "include-component-in-tag": false
-    },
-    "packages/plugin-api": {
-      "release-type": "node",
-      "include-component-in-tag": false
-    },
-    "packages/plugin-reference-nodes": {
-      "release-type": "node",
-      "include-component-in-tag": false
-    },
-    "packages/plugin-xflow": {
-      "release-type": "node",
-      "include-component-in-tag": false
+      "extra-files": [
+        "release/app/package.json",
+        "packages/main/package.json",
+        "packages/renderer/package.json",
+        "packages/shared/package.json",
+        "packages/plugin-api/package.json",
+        "packages/plugin-reference-nodes/package.json",
+        "packages/plugin-xflow/package.json"
+      ]
     }
   },
   "bump-minor-pre-major": true,
