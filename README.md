@@ -42,7 +42,7 @@ Feel free to make issues and/or help with the development.
 
 Licensing of this project might not be clear from looking at the Github auto-detected license attribute. The Xtory software itself is licensed under GPL3 for maximizing the openness of the tooling, However all the operational parts such as C runtime, plugins and the plugin API itself are licensed under MIT so you can modify and embed them in your own proprietary engines and workflows without any licensing concerns.
 
-| Proect                        | License |
+| Project                       | License |
 | ----------------------------- | ------- |
 | Xtory Software                | GPL3    |
 | @xtory/plugin-api             | MIT     |
