@@ -92,9 +92,8 @@ jobs:
 
       - name: Build plugin packages
         run: |
-          cd packages/plugin-api && npm run build
-          cd ../plugin-reference-nodes && npm run build
-          cd ../plugin-xflow && npm run build
+          npm run build --workspace @xtory/plugin-reference-nodes
+          npm run build --workspace @xtory/plugin-xflow
 
       - name: Publish to npm
         env:
