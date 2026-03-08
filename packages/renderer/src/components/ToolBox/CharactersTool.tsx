@@ -9,6 +9,8 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
 import SettingsIcon from '@mui/icons-material/Settings';
 import AddIcon from '@mui/icons-material/Add';
 
@@ -57,7 +59,20 @@ export default function CharactersTool() {
           ChannelsMain.getCharacterSettings
         );
       if (loadedSettings) {
-        setSettings(loadedSettings);
+        // Backward compatibility: ensure new fields have defaults
+        const compatibleSettings = {
+          ...loadedSettings,
+          requiredAttributes: loadedSettings.requiredAttributes.map(
+            (attr: any) => ({
+              ...attr,
+              inputType:
+                attr.inputType ||
+                (attr.type === 'boolean' ? 'checkbox' : 'input'),
+              required: attr.required ?? false,
+            })
+          ),
+        };
+        setSettings(compatibleSettings);
       }
     } catch (error: any) {
       EzSnackbarRef.error(
@@ -115,6 +130,21 @@ export default function CharactersTool() {
   const handleSaveCharacter = async () => {
     if (!formData.name.trim()) {
       EzSnackbarRef.warning('Please enter a character name');
+      return;
+    }
+
+    // Validate required attributes
+    const missingRequired = settings.requiredAttributes.filter(
+      (attr) =>
+        attr.required &&
+        (formData.attributes[attr.key] === undefined ||
+          formData.attributes[attr.key] === null ||
+          formData.attributes[attr.key] === '')
+    );
+
+    if (missingRequired.length > 0) {
+      const fieldNames = missingRequired.map((attr) => attr.label).join(', ');
+      EzSnackbarRef.warning(`Please fill in required fields: ${fieldNames}`);
       return;
     }
 
@@ -198,7 +228,7 @@ export default function CharactersTool() {
   );
 
   return (
-    <ToolContainer title="Characters" controls={headerControls}>
+    <ToolContainer title="Characters" headerControls={headerControls}>
       <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         {/* Search Bar */}
         <Box sx={{ p: 2 }}>
@@ -232,9 +262,9 @@ export default function CharactersTool() {
               )}
             </Box>
           ) : (
-            <Grid container spacing={2}>
+            <Grid container spacing={3}>
               {filteredCharacters.map((character) => (
-                <Grid item xs={12} sm={6} md={4} key={character.id}>
+                <Grid item xs={12} md={6} lg={4} xl={3} key={character.id}>
                   <CharacterCard
                     character={character}
                     attributesToShow={settings.requiredAttributes}
@@ -298,40 +328,79 @@ export default function CharactersTool() {
             />
 
             {/* Dynamic Attribute Fields */}
-            {settings.requiredAttributes.map((attr) => (
-              <TextField
-                key={attr.key}
-                label={attr.label}
-                type={attr.type === 'number' ? 'number' : 'text'}
-                value={formData.attributes[attr.key] ?? ''}
-                onChange={(e) => {
-                  let value = e.target.value as any;
-                  if (attr.type === 'number') {
-                    value = value ? Number(value) : '';
-                  } else if (attr.type === 'boolean') {
-                    value = value === 'true';
-                  }
-                  setFormData({
-                    ...formData,
-                    attributes: {
-                      ...formData.attributes,
-                      [attr.key]: value,
-                    },
-                  });
-                }}
-                fullWidth
-                select={attr.type === 'boolean'}
-              >
-                {attr.type === 'boolean' && [
-                  <option key="true" value="true">
-                    Yes
-                  </option>,
-                  <option key="false" value="false">
-                    No
-                  </option>,
-                ]}
-              </TextField>
-            ))}
+            {settings.requiredAttributes.map((attr) => {
+              // Render different input types based on attr.inputType
+              if (attr.inputType === 'checkbox' || attr.type === 'boolean') {
+                return (
+                  <FormControlLabel
+                    key={attr.key}
+                    control={
+                      <Checkbox
+                        checked={!!formData.attributes[attr.key]}
+                        onChange={(e) => {
+                          setFormData({
+                            ...formData,
+                            attributes: {
+                              ...formData.attributes,
+                              [attr.key]: e.target.checked,
+                            },
+                          });
+                        }}
+                      />
+                    }
+                    label={`${attr.label}${attr.required ? ' *' : ''}`}
+                  />
+                );
+              }
+
+              if (attr.inputType === 'textarea') {
+                return (
+                  <TextField
+                    key={attr.key}
+                    label={`${attr.label}${attr.required ? ' *' : ''}`}
+                    value={formData.attributes[attr.key] ?? ''}
+                    onChange={(e) => {
+                      setFormData({
+                        ...formData,
+                        attributes: {
+                          ...formData.attributes,
+                          [attr.key]: e.target.value,
+                        },
+                      });
+                    }}
+                    fullWidth
+                    multiline
+                    rows={4}
+                    required={attr.required}
+                  />
+                );
+              }
+
+              // Default: input type
+              return (
+                <TextField
+                  key={attr.key}
+                  label={`${attr.label}${attr.required ? ' *' : ''}`}
+                  type={attr.type === 'number' ? 'number' : 'text'}
+                  value={formData.attributes[attr.key] ?? ''}
+                  onChange={(e) => {
+                    let value = e.target.value as any;
+                    if (attr.type === 'number') {
+                      value = value ? Number(value) : '';
+                    }
+                    setFormData({
+                      ...formData,
+                      attributes: {
+                        ...formData.attributes,
+                        [attr.key]: value,
+                      },
+                    });
+                  }}
+                  fullWidth
+                  required={attr.required}
+                />
+              );
+            })}
           </Box>
         </DialogContent>
         <DialogActions>

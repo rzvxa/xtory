@@ -1,6 +1,3 @@
-import type ReactType from 'react';
-import type * as ReactFlow from 'reactflow';
-
 /**
  * Current plugin API version
  */
@@ -65,16 +62,29 @@ export interface IFlowViewBuilder extends IFileViewBuilder {
   setNodes(nodes: NodeInfo[]): this;
 }
 
+export type ServiceProvider = (new () => IService) | (() => IService);
+
 /**
  * Main plugin API builder
  */
 export interface IPluginApi {
+  /** The fullpath of the xtory project in which this plugin is loading from */
+  readonly projectPath: string;
+
   /**
    * Add a new file view configuration
    * @param type - The type of file view (currently only 'flow' is supported)
    * @returns FlowView builder for configuration
    */
   addFileView(type: 'flow'): IFlowViewBuilder;
+
+  /**
+   * Add a new foreign services
+   * @param name - The unique name which the service is to be registered under, this name can be used to retrieve the service instance.
+   * @param service - Either a void constructor or a provider function for constructing new, but uninitialized instance of the service.
+   * @returns The same plugin API instance for chaining.
+   */
+  addService(name: string, service: ServiceProvider): this;
 }
 
 /**
@@ -90,68 +100,20 @@ export interface Logger {
 }
 
 /**
- * Options for opening the resource drawer
+ * Unified API for plugin services
  */
-export interface OpenResourceDrawerOptions {
-  /** The type of resource to filter (default: 'image') */
-  filterType?: string;
-  /** Callback invoked when a resource is selected */
-  onSelect: (uuid: string) => void;
+export interface IService {
+  init(): Promise<boolean>;
 }
 
-/**
- * Hook for opening the resource drawer
- */
-export interface UseResourceDrawer {
-  /** Function to open the resource drawer with specified options */
-  openResourceDrawer: (options: OpenResourceDrawerOptions) => void;
-}
-
-/**
- * Modules exposed from xtory to be accessed by the plugins.
- * NOTE: the renderer environment does not allow arbitrary imports
- * and everything should be bundled with in a single file.
- * Renderer files are not allowed to import anything directly and can only access these explictly
- * exposed exports
- */
-export interface XtoryRendererExposedModules {
-  React: typeof ReactType;
-  ReactFlow: typeof ReactFlow;
-}
-
-/**
- * Hooks exposed from xtory renderer
- */
-export interface XtoryRendererExposedHooks {
-  /** Hook to access the global resource drawer */
-  useResourceDrawer: () => UseResourceDrawer;
-}
-
-export type NodeComponent = ReactType.ComponentType<any>;
-
-/**
- * Renderer bindings exposed to the plugin through the window instance
- */
-export interface XtoryRenderer {
-  modules: XtoryRendererExposedModules;
-  hooks: XtoryRendererExposedHooks;
-  registerNodeRenderer: (id: string, component: NodeComponent) => void;
-  getNodeRenderer: (id: string) => NodeComponent | null;
-}
-
-declare global {
+export interface PluginContext {
   /**
    * The plugin API builder used to configure the plugin
    */
-  const api: IPluginApi;
+  readonly api: IPluginApi;
 
   /**
    * Logger instance for this plugin
    */
-  const logger: Logger;
-
-  // renderer extensions
-  interface Window {
-    renderer: XtoryRenderer;
-  }
+  readonly logger: Logger;
 }

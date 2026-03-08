@@ -3,7 +3,7 @@ import { readFile, writeFile } from 'fs/promises';
 import project from 'main/project';
 import { ProjectMessageBroker } from 'main/project/projectMessageBroker';
 
-import IService from '../IService';
+import type { IService } from 'packages/plugin-api';
 import ProjectWatchService from '../projectWatchService';
 
 export interface PluginConfiguration {

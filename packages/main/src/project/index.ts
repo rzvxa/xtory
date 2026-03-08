@@ -1,5 +1,7 @@
 import { WebContents } from 'electron';
 
+import { IService } from '@xtory/plugin-api';
+
 import type LoggingService from 'main/services/loggingService';
 import type PluginsService from 'main/services/pluginsService';
 import type ResourceService from 'main/services/resourceService';
@@ -14,6 +16,7 @@ import {
 import type ProjectSettingsService from 'main/services/projectSettingsService';
 import type Project from './project';
 import type { ProjectLoaderType } from './projectLoader';
+import { BuiltinServices } from '../services/types';
 
 export default class ProjectManager {
   static #isInit: boolean = false;
@@ -32,43 +35,40 @@ export default class ProjectManager {
   }
 
   static get logger(): LoggingService {
-    this.#throwIfNotInit();
-    if (!this.#project) {
-      throw Error('No Project Is Open!');
-    }
-    return this.#project.loggingService;
+    return this.getService('logger');
   }
 
   static get pluginsService(): PluginsService {
-    this.#throwIfNotInit();
-    if (!this.#project) {
-      throw Error('No Project Is Open!');
-    }
-    return this.#project.pluginsService;
+    return this.getService('plugins');
   }
 
   static get settingsService(): ProjectSettingsService {
-    this.#throwIfNotInit();
-    if (!this.#project) {
-      throw Error('No Project Is Open!');
-    }
-    return this.#project.projectSettingsService;
+    return this.getService('settings');
   }
 
   static get resourceService(): ResourceService {
-    this.#throwIfNotInit();
-    if (!this.#project) {
-      throw Error('No Project Is Open!');
-    }
-    return this.#project.resourceService;
+    return this.getService('resources');
   }
 
   static get characterService(): CharacterService {
+    return this.getService('characters');
+  }
+
+  static getService<S extends keyof BuiltinServices>(
+    name: S
+  ): BuiltinServices[S];
+  static getService<S extends string>(name: S): IService | null;
+  static getService(
+    name: string
+  ): BuiltinServices[keyof BuiltinServices] | IService | null {
     this.#throwIfNotInit();
     if (!this.#project) {
       throw Error('No Project Is Open!');
     }
-    return this.#project.characterService;
+    return (
+      this.#project.builtinServices[name as keyof BuiltinServices] ??
+      this.#project.builtinServices.plugins.getForeignService(name)
+    );
   }
 
   static get path(): string {
@@ -106,18 +106,17 @@ export default class ProjectManager {
     );
 
     if (project) {
+      process.chdir(projectPath);
       this.#project = project;
-      // initializing services, this part can be done with type checking
-      await this.#project.projectWatchService.init();
-      await this.#project.loggingService.init();
-      await this.#project.resourceService.init();
-      await this.#project.characterService.init();
-      await this.#project.projectSettingsService.init();
+      // initializing builtin services(excluding the plugin service)
+      Object.entries(this.#project.builtinServices)
+        .filter(([name]) => name !== 'plugins')
+        .forEach(([, svc]) => svc.init());
 
       // Notify renderer that plugins are starting to load BEFORE sending project opened
       // This prevents race condition where files could be opened before plugins finish loading
       const pluginCount = Object.keys(
-        this.#project.projectSettingsService.get('plugins') ?? {}
+        this.#project.builtinServices.settings.get('plugins') ?? {}
       ).length;
       sender.send(ChannelsRenderer.onPluginsLoadingStart, pluginCount);
 
@@ -127,7 +126,7 @@ export default class ProjectManager {
 
       // Load plugins in background (non-blocking)
       // Pass skipStartMessage=true since we already sent onPluginsLoadingStart above
-      this.#project.pluginsService.init(true).catch((error) => {
+      this.#project.builtinServices.plugins.init(true).catch((error) => {
         this.logger.error(`Failed to initialize plugins: ${error}`);
       });
     }

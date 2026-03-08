@@ -15,6 +15,9 @@ import Checkbox from '@mui/material/Checkbox';
 import Box from '@mui/material/Box';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import FormLabel from '@mui/material/FormLabel';
 
 import type {
   CharacterSettings,
@@ -38,7 +41,15 @@ export default function CharacterSettingsDialog({
     React.useState<CharacterSettings>(settings);
 
   React.useEffect(() => {
-    setLocalSettings(settings);
+    // Add temporary IDs for stable React keys
+    const settingsWithIds = {
+      ...settings,
+      requiredAttributes: settings.requiredAttributes.map((attr: any) => ({
+        ...attr,
+        _tempId: attr._tempId || `${Date.now()}-${Math.random()}`,
+      })),
+    };
+    setLocalSettings(settingsWithIds);
   }, [settings]);
 
   const handleAddAttribute = () => {
@@ -46,8 +57,11 @@ export default function CharacterSettingsDialog({
       key: '',
       label: '',
       type: 'text',
+      inputType: 'input',
+      required: false,
       showInCard: false,
-    };
+      _tempId: `${Date.now()}-${Math.random()}`,
+    } as any;
     setLocalSettings({
       ...localSettings,
       requiredAttributes: [...localSettings.requiredAttributes, newAttr],
@@ -63,12 +77,41 @@ export default function CharacterSettingsDialog({
     });
   };
 
+  const handleMoveAttribute = (index: number, direction: 'up' | 'down') => {
+    const newAttrs = [...localSettings.requiredAttributes];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= newAttrs.length) return;
+
+    // Swap elements
+    [newAttrs[index], newAttrs[targetIndex]] = [
+      newAttrs[targetIndex],
+      newAttrs[index],
+    ];
+
+    setLocalSettings({
+      ...localSettings,
+      requiredAttributes: newAttrs,
+    });
+  };
+
   const handleUpdateAttribute = (
     index: number,
     updates: Partial<CharacterAttributeDefinition>
   ) => {
     const newAttrs = [...localSettings.requiredAttributes];
-    newAttrs[index] = { ...newAttrs[index], ...updates };
+    const updatedAttr = { ...newAttrs[index], ...updates };
+
+    // Auto-adjust inputType based on type
+    if (updates.type === 'boolean') {
+      updatedAttr.inputType = 'checkbox';
+    } else if (
+      updates.type === 'number' &&
+      updatedAttr.inputType === 'textarea'
+    ) {
+      updatedAttr.inputType = 'input';
+    }
+
+    newAttrs[index] = updatedAttr;
     setLocalSettings({
       ...localSettings,
       requiredAttributes: newAttrs,
@@ -76,10 +119,13 @@ export default function CharacterSettingsDialog({
   };
 
   const handleSave = () => {
-    // Filter out empty attributes
-    const validAttrs = localSettings.requiredAttributes.filter(
-      (attr) => attr.key.trim() && attr.label.trim()
-    );
+    // Filter out empty attributes and remove temporary IDs
+    const validAttrs = localSettings.requiredAttributes
+      .filter((attr) => attr.key.trim() && attr.label.trim())
+      .map((attr: any) => {
+        const { _tempId, ...attrWithoutTempId } = attr;
+        return attrWithoutTempId;
+      });
     onSave({
       ...localSettings,
       requiredAttributes: validAttrs,
@@ -103,9 +149,9 @@ export default function CharacterSettingsDialog({
         </Box>
 
         <List>
-          {localSettings.requiredAttributes.map((attr, index) => (
+          {localSettings.requiredAttributes.map((attr: any, index) => (
             <ListItem
-              key={attr.key}
+              key={attr._tempId || index}
               sx={{
                 display: 'flex',
                 gap: 1,
@@ -118,7 +164,26 @@ export default function CharacterSettingsDialog({
                 p: 2,
               }}
             >
-              <Box sx={{ display: 'flex', gap: 1 }}>
+              {/* Reorder buttons and Key/Label */}
+              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                <Box sx={{ display: 'flex', flexDirection: 'column' }}>
+                  <IconButton
+                    onClick={() => handleMoveAttribute(index, 'up')}
+                    disabled={index === 0}
+                    size="small"
+                  >
+                    <ArrowUpwardIcon />
+                  </IconButton>
+                  <IconButton
+                    onClick={() => handleMoveAttribute(index, 'down')}
+                    disabled={
+                      index === localSettings.requiredAttributes.length - 1
+                    }
+                    size="small"
+                  >
+                    <ArrowDownwardIcon />
+                  </IconButton>
+                </Box>
                 <TextField
                   label="Key"
                   value={attr.key}
@@ -141,7 +206,9 @@ export default function CharacterSettingsDialog({
                 />
               </Box>
 
+              {/* Type selection */}
               <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                <FormLabel sx={{ minWidth: 80 }}>Data Type:</FormLabel>
                 <Select
                   value={attr.type}
                   onChange={(e) =>
@@ -156,7 +223,50 @@ export default function CharacterSettingsDialog({
                   <MenuItem value="number">Number</MenuItem>
                   <MenuItem value="boolean">Boolean</MenuItem>
                 </Select>
+              </Box>
 
+              {/* Input type selection */}
+              <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
+                <FormLabel sx={{ minWidth: 80 }}>Input Type:</FormLabel>
+                <Select
+                  value={attr.inputType}
+                  onChange={(e) =>
+                    handleUpdateAttribute(index, {
+                      inputType: e.target.value as
+                        | 'input'
+                        | 'textarea'
+                        | 'checkbox',
+                    })
+                  }
+                  size="small"
+                  sx={{ minWidth: 120 }}
+                  disabled={attr.type === 'boolean'}
+                >
+                  <MenuItem value="input">Single Line</MenuItem>
+                  {attr.type === 'text' && (
+                    <MenuItem value="textarea">Multi Line (Textarea)</MenuItem>
+                  )}
+                  {attr.type === 'boolean' && (
+                    <MenuItem value="checkbox">Checkbox</MenuItem>
+                  )}
+                </Select>
+              </Box>
+
+              {/* Options */}
+              <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                <FormControlLabel
+                  control={
+                    <Checkbox
+                      checked={attr.required}
+                      onChange={(e) =>
+                        handleUpdateAttribute(index, {
+                          required: e.target.checked,
+                        })
+                      }
+                    />
+                  }
+                  label="Required"
+                />
                 <FormControlLabel
                   control={
                     <Checkbox

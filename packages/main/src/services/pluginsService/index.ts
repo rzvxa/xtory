@@ -18,11 +18,10 @@ import {
 import { spawn } from 'child_process';
 import { ensureDir } from 'fs-extra';
 import * as NodePath from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
+import type { IService } from 'packages/plugin-api';
 
 import PluginApi, { PLUGIN_API_VERSION } from './pluginApi';
-
-import IService from '../IService';
 
 class PluginsService implements IService {
   #messageBroker: ProjectMessageBroker;
@@ -34,6 +33,12 @@ class PluginsService implements IService {
   #pluginPaths: { [name: string]: string };
 
   #fileTypes: FileTypeMap;
+
+  #foreignServices: Record<string, IService> = {};
+
+  getForeignService(name: string): IService | null {
+    return this.#foreignServices[name] ?? null;
+  }
 
   constructor(pluginsFolder: string, messageBroker: ProjectMessageBroker) {
     this.#messageBroker = messageBroker;
@@ -58,6 +63,9 @@ class PluginsService implements IService {
         );
       }
       const loadedCount = await this.loadPlugins();
+      await Promise.all(
+        Object.values(this.#foreignServices).map((svc) => svc.init())
+      );
       // Notify renderer that plugins finished loading with actual loaded count
       this.#messageBroker(
         ChannelsRenderer.onPluginsLoadingComplete,
@@ -400,25 +408,46 @@ class PluginsService implements IService {
       logger: project.logger,
       api: new PluginApi(),
     };
-    const script = await (scriptPath.startsWith('file:')
-      ? readFile(new URL(scriptPath), 'utf8')
-      : readFile(scriptPath, 'utf8'));
+    const normalizedScriptPath = scriptPath.startsWith('file:')
+      ? fileURLToPath(scriptPath)
+      : scriptPath;
 
-    // execute script in private context
     try {
       project.logger.trace(
-        `improting plugin main ${pluginName}(${scriptPath}) ${script}`
+        `improting plugin main ${pluginName}(${normalizedScriptPath})`
       );
-      // eslint-disable-next-line no-new-func
-      new Function(`with(this) {\n${script}\n}`).call(context);
-      const plugin = context.api.build();
+      const mod: { default?: unknown } = await import(normalizedScriptPath);
+      if (typeof mod.default !== 'function') {
+        throw new Error(
+          `Invalid main script, it does not have a export default function ${normalizedScriptPath}`
+        );
+      }
+      await mod.default(context);
+      const { plugin, services } = context.api.build();
       this.#plugins[pluginName] = plugin;
       this.#pluginPaths[pluginName] = pluginPath;
+      this.#foreignServices = {
+        ...this.#foreignServices,
+        ...Object.fromEntries(
+          Object.entries(services).map(([key, val]) => [
+            key,
+            isClass(val) ? new val() : val(),
+          ])
+        ),
+      };
       this.#makeFileTypePlugins();
     } catch (error) {
       project.logger.log(LogLevel.error, ['plugin', pluginName], error);
     }
   }
+}
+
+function isClass(maybeClass: any): maybeClass is new (...args: any[]) => any {
+  if (typeof maybeClass !== 'function') {
+    return false;
+  }
+  const source = Function.prototype.toString.call(maybeClass);
+  return source.startsWith('class ');
 }
 
 export default PluginsService;
