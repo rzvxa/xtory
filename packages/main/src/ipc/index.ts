@@ -31,6 +31,7 @@ import updateCharacterIpcInvoke from './invokes/updateCharacter';
 import removeCharacterIpcInvoke from './invokes/removeCharacter';
 import getCharacterSettingsIpcInvoke from './invokes/getCharacterSettings';
 import updateCharacterSettingsIpcInvoke from './invokes/updateCharacterSettings';
+import serviceCallIpcInvoke from './invokes/serviceCall';
 
 const on = (channel: ChannelsMain, ipcAction: IpcAction): void => {
   ipcMain.on(channel, ipcAction);
@@ -69,3 +70,4 @@ handle(ChannelsMain.updateCharacter, updateCharacterIpcInvoke);
 handle(ChannelsMain.removeCharacter, removeCharacterIpcInvoke);
 handle(ChannelsMain.getCharacterSettings, getCharacterSettingsIpcInvoke);
 handle(ChannelsMain.updateCharacterSettings, updateCharacterSettingsIpcInvoke);
+handle(ChannelsMain.serviceCall, serviceCallIpcInvoke);

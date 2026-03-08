@@ -10,7 +10,7 @@ import {
 
 import project from 'main/project';
 
-import IService from '../IService';
+import type { IService } from 'packages/plugin-api';
 
 export type ProjectWatchServiceMessageBroker = (
   channel: ChannelsRenderer,

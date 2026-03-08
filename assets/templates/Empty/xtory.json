@@ -4,6 +4,7 @@
   "logLevel": 2,
   "plugins": {
     "@xtory/plugin-xflow": "*",
+    "@xtory/plugin-xconv": "*",
     "@xtory/plugin-reference-nodes": "*"
   },
   "pluginsConfiguration": {}

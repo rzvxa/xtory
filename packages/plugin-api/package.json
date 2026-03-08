@@ -2,8 +2,10 @@
   "name": "@xtory/plugin-api",
   "version": "0.2.5",
   "description": "Type definitions for Xtory plugin API",
-  "main": "./index.js",
-  "types": "./index.d.ts",
+  "exports": {
+    ".":  "./index.js",
+    "renderer":  "./renderer.js"
+  },
   "author": "Xtory",
   "license": "MIT",
   "repository": {
@@ -21,7 +23,9 @@
   ],
   "files": [
     "index.js",
-    "index.d.ts"
+    "index.d.ts",
+    "renderer.js",
+    "renderer.d.ts"
   ],
   "publishConfig": {
     "access": "public"

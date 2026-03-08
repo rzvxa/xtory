@@ -3,8 +3,9 @@ import { join } from 'path';
 import project from 'main/project';
 import type { Character, CharacterMap, CharacterSettings } from '@xtory/shared';
 import { v4 as uuidv4 } from 'uuid';
+import type { IService } from 'packages/plugin-api';
 
-class CharacterService {
+class CharacterService implements IService {
   #charactersPath: string;
 
   #charactersMapPath: string;
@@ -36,7 +37,22 @@ class CharacterService {
       // Load existing settings or create default
       try {
         const settingsContent = await readFile(this.#settingsPath, 'utf8');
-        this.#settings = JSON.parse(settingsContent);
+        const loadedSettings = JSON.parse(settingsContent);
+
+        // Backward compatibility: ensure new fields have defaults
+        this.#settings = {
+          ...loadedSettings,
+          requiredAttributes: loadedSettings.requiredAttributes.map(
+            (attr: any) => ({
+              ...attr,
+              inputType:
+                attr.inputType ||
+                (attr.type === 'boolean' ? 'checkbox' : 'input'),
+              required: attr.required ?? false,
+            })
+          ),
+        };
+
         project.logger.info('Loaded existing character settings', [
           'CharacterService',
         ]);
