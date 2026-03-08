@@ -1,10 +1,9 @@
-/// <reference types="@xtory/plugin-api" />
+/// <reference types="@xtory/plugin-api/renderer" />
 /// <reference types="react" />
-
-// React is available globally via window.React from the main app
 
 const {
   modules: { ReactFlow },
+  ui: { Button, TextArea, NodeContainer },
   hooks: { useResourceDrawer },
   registerNodeRenderer,
 } = window.renderer;
@@ -16,12 +15,7 @@ interface ImageNodeData {
   alt?: string;
 }
 
-interface ImageNodeProps {
-  data: ImageNodeData;
-  id: string;
-}
-
-function ImageNode({ data, id }: ImageNodeProps) {
+function ImageNode({ data, id }: Renderer.NodeProps<ImageNodeData>) {
   const { src, alt } = data || {};
   const [imageSrc, setImageSrc] = React.useState(src);
   const [imageAlt, setImageAlt] = React.useState(alt || '');
@@ -64,17 +58,7 @@ function ImageNode({ data, id }: ImageNodeProps) {
   }, [openResourceDrawer, handleSelectImage]);
 
   return (
-    <div
-      style={{
-        borderRadius: 8,
-        border: '2px solid #888',
-        padding: 8,
-        background: '#222',
-        color: '#eee',
-        minWidth: 200,
-        maxWidth: 300,
-      }}
-    >
+    <NodeContainer title="Image" selected={false}>
       <Handle type="target" position={Position.Left} />
 
       {imageSrc ? (
@@ -101,22 +85,14 @@ function ImageNode({ data, id }: ImageNodeProps) {
         </div>
       )}
 
-      <button
-        type="button"
+      <Button
+        variant="outlined"
+        size="small"
         onClick={handleOpenDrawer}
-        style={{
-          width: '100%',
-          padding: '6px 12px',
-          background: '#444',
-          border: '1px solid #666',
-          borderRadius: 4,
-          color: '#eee',
-          cursor: 'pointer',
-          fontSize: 12,
-        }}
+        fullWidth
       >
         {imageSrc ? 'Change Image' : 'Select Image'}
-      </button>
+      </Button>
 
       {imageAlt && (
         <div style={{ marginTop: 8, fontSize: 11, opacity: 0.8 }}>
@@ -125,7 +101,7 @@ function ImageNode({ data, id }: ImageNodeProps) {
       )}
 
       <Handle type="source" position={Position.Right} />
-    </div>
+    </NodeContainer>
   );
 }
 
@@ -142,7 +118,6 @@ interface NoteNodeProps {
 function NoteNode({ id, data, selected }: NoteNodeProps) {
   const [text, setText] = React.useState(data.text || '');
   const { setNodes } = useReactFlow();
-  const textareaRef = React.useRef<HTMLTextAreaElement>(null);
 
   React.useEffect(() => {
     if (data.text !== text) {
@@ -150,14 +125,8 @@ function NoteNode({ id, data, selected }: NoteNodeProps) {
     }
   }, [data.text, text]);
 
-  React.useEffect(() => {
-    if (selected && textareaRef.current) {
-      textareaRef.current.focus();
-    }
-  }, [selected]);
-
   const handleTextChange = React.useCallback(
-    (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    (e: React.ChangeEvent<HTMLInputElement>) => {
       const newText = e.target.value;
       setText(newText);
 
@@ -173,48 +142,20 @@ function NoteNode({ id, data, selected }: NoteNodeProps) {
   );
 
   return (
-    <div
-      style={{
-        borderRadius: 8,
-        border: selected ? '2px solid #1976d2' : '2px solid #888',
-        padding: 12,
-        background: '#fffde7',
-        minWidth: 200,
-        maxWidth: 400,
-      }}
-    >
+    <NodeContainer title="Note" selected={selected}>
       <Handle type="target" position={Position.Left} />
 
-      <div
-        style={{
-          fontWeight: 'bold',
-          marginBottom: 8,
-          color: '#333',
-        }}
-      >
-        Note
-      </div>
-
-      <textarea
-        ref={textareaRef}
+      <TextArea
+        variant="outlined"
+        multiline
+        minRows="5"
         value={text}
         onChange={handleTextChange}
         placeholder="Enter your note..."
-        style={{
-          width: '100%',
-          minHeight: 100,
-          padding: 8,
-          border: '1px solid #ddd',
-          borderRadius: 4,
-          background: '#fff',
-          resize: 'vertical',
-          fontFamily: 'inherit',
-          fontSize: 14,
-        }}
       />
 
       <Handle type="source" position={Position.Right} />
-    </div>
+    </NodeContainer>
   );
 }
 

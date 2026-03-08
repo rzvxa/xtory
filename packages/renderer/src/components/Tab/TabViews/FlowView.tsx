@@ -37,9 +37,6 @@ import {
 
 import { NodeDrawer } from 'renderer/components/NodeDrawer';
 
-import PlotNode from 'renderer/components/Nodes/PlotNode';
-import ConversationNode from 'renderer/components/Nodes/ConversationNode';
-
 import { getNodeRenderer } from 'renderer/services/plugins/NodeRegistry';
 
 import 'reactflow/dist/style.css';
@@ -135,22 +132,16 @@ function Flow({ tabId, setTabIsDirty, config }: FlowProps) {
   } | null>(null);
 
   const nodeTypes = React.useMemo(() => {
-    const base = {
-      Plot: PlotNode,
-      Conversation: ConversationNode,
-    };
-
-    const dynamic: { [key: string]: React.ComponentType<any> } = {};
-
+    const nodes: { [key: string]: React.ComponentType<any> } = {};
     nodeConfigs.forEach((nodeConfig) => {
       if (!nodeConfig.renderer) return;
       const component = getNodeRenderer(nodeConfig.renderer);
       if (component) {
-        dynamic[nodeConfig.type] = component;
+        nodes[nodeConfig.type] = component;
       }
     });
 
-    return { ...base, ...dynamic };
+    return nodes;
   }, [nodeConfigs]);
 
   const centerOnNode = useCenterOnNode();

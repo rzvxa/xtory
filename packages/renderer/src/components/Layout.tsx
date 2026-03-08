@@ -21,6 +21,7 @@ import ExtensionIcon from '@mui/icons-material/Extension';
 import { useAppSelector } from 'renderer/state/store';
 
 import TabsContainer from './Tab/TabsContainer';
+import ResizeHandle from './ResizeHandle';
 import {
   ToolBox,
   FilesTool,
@@ -133,10 +134,38 @@ function StatusBarItem({
 
 export default function Layout() {
   const quickAccessWidth: number = 50;
-  const [primaryToolBoxWidth, setPrimaryToolBoxWidth] =
-    React.useState<number>(300);
-  const [bottomToolBoxHeight, setBottomToolBoxHeight] =
-    React.useState<number>(200);
+
+  // Resize constraints
+  const MIN_PRIMARY_WIDTH = 200;
+  const MAX_PRIMARY_WIDTH = 800;
+  const MIN_BOTTOM_HEIGHT = 100;
+  const MAX_BOTTOM_HEIGHT = 600;
+
+  // Load saved sizes from localStorage or use defaults
+  const getInitialPrimaryWidth = () => {
+    const saved = localStorage.getItem('primaryToolBoxWidth');
+    if (saved) {
+      const parsed = parseInt(saved, 10);
+      return Math.max(MIN_PRIMARY_WIDTH, Math.min(MAX_PRIMARY_WIDTH, parsed));
+    }
+    return 300;
+  };
+
+  const getInitialBottomHeight = () => {
+    const saved = localStorage.getItem('bottomToolBoxHeight');
+    if (saved) {
+      const parsed = parseInt(saved, 10);
+      return Math.max(MIN_BOTTOM_HEIGHT, Math.min(MAX_BOTTOM_HEIGHT, parsed));
+    }
+    return 200;
+  };
+
+  const [primaryToolBoxWidth, setPrimaryToolBoxWidth] = React.useState<number>(
+    getInitialPrimaryWidth
+  );
+  const [bottomToolBoxHeight, setBottomToolBoxHeight] = React.useState<number>(
+    getInitialBottomHeight
+  );
   const [activePrimaryToolIndex, setActivePrimaryToolIndex] = React.useState(0);
   const [activeBottomToolIndex, setActiveBottomToolIndex] = React.useState(0);
 
@@ -145,22 +174,62 @@ export default function Layout() {
   const displayPrimaryToolBox = primaryToolBoxWidth > 0;
   const displayBottomToolBox = bottomToolBoxHeight > 0;
 
+  // Persist sizes to localStorage
+  React.useEffect(() => {
+    if (primaryToolBoxWidth > 0) {
+      localStorage.setItem(
+        'primaryToolBoxWidth',
+        primaryToolBoxWidth.toString()
+      );
+    }
+  }, [primaryToolBoxWidth]);
+
+  React.useEffect(() => {
+    if (bottomToolBoxHeight > 0) {
+      localStorage.setItem(
+        'bottomToolBoxHeight',
+        bottomToolBoxHeight.toString()
+      );
+    }
+  }, [bottomToolBoxHeight]);
+
+  const handlePrimaryToolBoxResize = (delta: number) => {
+    setPrimaryToolBoxWidth((prev) => {
+      const newWidth = prev + delta;
+      return Math.max(MIN_PRIMARY_WIDTH, Math.min(MAX_PRIMARY_WIDTH, newWidth));
+    });
+  };
+
+  const handleBottomToolBoxResize = (delta: number) => {
+    setBottomToolBoxHeight((prev) => {
+      const newHeight = prev - delta; // Subtract because dragging down increases height
+      return Math.max(
+        MIN_BOTTOM_HEIGHT,
+        Math.min(MAX_BOTTOM_HEIGHT, newHeight)
+      );
+    });
+  };
+
   const handleQuickAccessClick = (index: number) => {
     if (index === activePrimaryToolIndex) {
-      setPrimaryToolBoxWidth(primaryToolBoxWidth > 0 ? 0 : 300);
+      setPrimaryToolBoxWidth(
+        primaryToolBoxWidth > 0 ? 0 : getInitialPrimaryWidth()
+      );
       return;
     }
     setActivePrimaryToolIndex(index);
-    setPrimaryToolBoxWidth(300);
+    setPrimaryToolBoxWidth(getInitialPrimaryWidth());
   };
 
   const handleStatusBarClick = (index: number) => {
     if (index === activeBottomToolIndex) {
-      setBottomToolBoxHeight(bottomToolBoxHeight > 0 ? 0 : 200);
+      setBottomToolBoxHeight(
+        bottomToolBoxHeight > 0 ? 0 : getInitialBottomHeight()
+      );
       return;
     }
     setActiveBottomToolIndex(index);
-    setBottomToolBoxHeight(200);
+    setBottomToolBoxHeight(getInitialBottomHeight());
   };
 
   return (
@@ -206,6 +275,12 @@ export default function Layout() {
           <VariablesTool />
           <PluginsTool />
         </ToolBox>
+        {displayPrimaryToolBox && (
+          <ResizeHandle
+            direction="horizontal"
+            onResize={handlePrimaryToolBoxResize}
+          />
+        )}
         <Box
           sx={{
             width: `calc(100% - ${quickAccessWidth}px - ${primaryToolBoxWidth}px)`,
@@ -214,6 +289,12 @@ export default function Layout() {
           <MainBox height={`calc(100% - ${bottomToolBoxHeight}px)`}>
             <TabsContainer />
           </MainBox>
+          {displayBottomToolBox && (
+            <ResizeHandle
+              direction="vertical"
+              onResize={handleBottomToolBoxResize}
+            />
+          )}
           <ToolBox
             activeIndex={activeBottomToolIndex}
             display={displayBottomToolBox}

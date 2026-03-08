@@ -28,6 +28,7 @@ export enum ChannelsMain {
   removeCharacter = 'removeCharacter',
   getCharacterSettings = 'getCharacterSettings',
   updateCharacterSettings = 'updateCharacterSettings',
+  serviceCall = 'serviceCall',
 }
 
 export enum ChannelsRenderer {

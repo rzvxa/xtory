@@ -8,7 +8,11 @@ import type {
   IFileViewBuilder,
   IFlowViewBuilder,
   IPluginApi,
+  IService,
+  ServiceProvider,
 } from '@xtory/plugin-api';
+
+import project from 'main/project';
 
 export const PLUGIN_API_VERSION = 1;
 
@@ -64,6 +68,11 @@ export class FlowViewBuilder
 
 export default class PluginBuilder implements IPluginApi {
   #flowViews: FlowViewBuilder[] = [];
+  #services: Record<string, ServiceProvider> = {};
+
+  get projectPath(): string {
+    return project.path;
+  }
 
   addFileView(type: 'flow'): FlowViewBuilder {
     if (type !== 'flow') {
@@ -74,8 +83,13 @@ export default class PluginBuilder implements IPluginApi {
     return flowView;
   }
 
-  build(): PluginConfig {
+  addService(name: string, service: ServiceProvider): this {
+    this.#services[name] = service;
+    return this;
+  }
+
+  build(): { plugin: PluginConfig; services: Record<string, ServiceProvider> } {
     const flowViews = this.#flowViews.map((builder) => builder.build());
-    return { flowViews };
+    return { plugin: { flowViews }, services: this.#services };
   }
 }

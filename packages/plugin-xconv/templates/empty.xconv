@@ -1,0 +1,27 @@
+{
+  "nodes": [
+    {
+      "id": "start-node",
+      "type": "StartConversation",
+      "position": { "x": 100, "y": 100 },
+      "data": {
+        "name": "New Conversation",
+        "description": "",
+        "characterIds": [],
+        "conditions": {}
+      }
+    },
+    {
+      "id": "end-node",
+      "type": "EndConversation",
+      "position": { "x": 500, "y": 100 },
+      "data": {}
+    }
+  ],
+  "edges": [],
+  "viewport": {
+    "x": 0,
+    "y": 0,
+    "zoom": 1
+  }
+}
