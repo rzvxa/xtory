@@ -4,7 +4,7 @@
   "description": "Type definitions for Xtory plugin API",
   "exports": {
     ".":  "./index.js",
-    "renderer":  "./renderer.js"
+    "./renderer":  "./renderer.js"
   },
   "author": "Xtory",
   "license": "MIT",

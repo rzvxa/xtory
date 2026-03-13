@@ -6,6 +6,7 @@ import type PluginsService from 'main/services/pluginsService';
 import type ProjectSettingsService from 'main/services/projectSettingsService';
 import type ResourceService from 'main/services/resourceService';
 import type CharacterService from 'main/services/characterService';
+import type VariablesService from 'main/services/variableService';
 
 export interface BuiltinServices {
   watch: ProjectWatchService;
@@ -14,6 +15,7 @@ export interface BuiltinServices {
   settings: ProjectSettingsService;
   resources: ResourceService;
   characters: CharacterService;
+  variables: VariablesService;
 }
 
 export type ServiceType<S extends string> = S extends keyof BuiltinServices

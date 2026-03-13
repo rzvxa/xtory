@@ -6,6 +6,7 @@ import type LoggingService from 'main/services/loggingService';
 import type PluginsService from 'main/services/pluginsService';
 import type ResourceService from 'main/services/resourceService';
 import type CharacterService from 'main/services/characterService';
+import type VariablesService from 'main/services/variableService';
 
 import {
   ChannelsRenderer,
@@ -16,7 +17,7 @@ import {
 import type ProjectSettingsService from 'main/services/projectSettingsService';
 import type Project from './project';
 import type { ProjectLoaderType } from './projectLoader';
-import { BuiltinServices } from '../services/types';
+import type { BuiltinServices } from '../services/types';
 
 export default class ProjectManager {
   static #isInit: boolean = false;
@@ -52,6 +53,10 @@ export default class ProjectManager {
 
   static get characterService(): CharacterService {
     return this.getService('characters');
+  }
+
+  static get variablesService(): VariablesService {
+    return this.getService('variables');
   }
 
   static getService<S extends keyof BuiltinServices>(

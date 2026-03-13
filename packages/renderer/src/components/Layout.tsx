@@ -18,7 +18,7 @@ import TerminalIcon from '@mui/icons-material/Terminal';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ExtensionIcon from '@mui/icons-material/Extension';
 
-import { useAppSelector } from 'renderer/state/store';
+import { useAppSelector, useAppDispatch } from 'renderer/state/store';
 
 import TabsContainer from './Tab/TabsContainer';
 import ResizeHandle from './ResizeHandle';
@@ -31,6 +31,11 @@ import {
   ConsoleTool,
   PluginsTool,
 } from './ToolBox/index';
+import {
+  setActiveToolName,
+  setIsOpen as setPrimaryToolBoxIsOpen,
+} from '../state/store/toolbox';
+import lskeys from '../constants/lskeys';
 
 interface MainBoxProps {
   height: string;
@@ -132,10 +137,51 @@ function StatusBarItem({
   );
 }
 
+const tools = [
+  {
+    name: 'Files',
+    icon: <SnippetFolderIcon />,
+    renderer: <FilesTool key="Files" />,
+  },
+  { name: 'Find', icon: <SearchIcon />, renderer: <FindTool key="Find" /> },
+  {
+    name: 'Characters',
+    icon: <GroupIcon />,
+    renderer: <CharactersTool key="Characters" />,
+  },
+  {
+    name: 'Variables',
+    icon: <DataObjectIcon />,
+    renderer: <VariablesTool key="Variables" />,
+  },
+  {
+    name: 'Plugins',
+    icon: <ExtensionIcon />,
+    renderer: <PluginsTool key="Plugins" />,
+  },
+];
+
 export default function Layout() {
-  const quickAccessWidth: number = 50;
+  const dispatch = useAppDispatch();
+
+  const [activePrimaryToolName, isPrimaryToolboxOpen] = useAppSelector(
+    (state) => [state.toolboxState.activeToolName, state.toolboxState.isOpen]
+  );
+
+  const getToolIndex = (name: string) => {
+    const index = tools.findIndex((t) => t.name === name);
+
+    if (index === -1) {
+      dispatch(setActiveToolName(tools[0].name));
+      return 0;
+    }
+    return index;
+  };
+  const activePrimaryToolIndex = getToolIndex(activePrimaryToolName);
 
   // Resize constraints
+  const quickAccessWidth = 50;
+
   const MIN_PRIMARY_WIDTH = 200;
   const MAX_PRIMARY_WIDTH = 800;
   const MIN_BOTTOM_HEIGHT = 100;
@@ -143,7 +189,7 @@ export default function Layout() {
 
   // Load saved sizes from localStorage or use defaults
   const getInitialPrimaryWidth = () => {
-    const saved = localStorage.getItem('primaryToolBoxWidth');
+    const saved = localStorage.getItem(lskeys.state.toolbox.width);
     if (saved) {
       const parsed = parseInt(saved, 10);
       return Math.max(MIN_PRIMARY_WIDTH, Math.min(MAX_PRIMARY_WIDTH, parsed));
@@ -152,7 +198,7 @@ export default function Layout() {
   };
 
   const getInitialBottomHeight = () => {
-    const saved = localStorage.getItem('bottomToolBoxHeight');
+    const saved = localStorage.getItem(lskeys.state.statusbar.height);
     if (saved) {
       const parsed = parseInt(saved, 10);
       return Math.max(MIN_BOTTOM_HEIGHT, Math.min(MAX_BOTTOM_HEIGHT, parsed));
@@ -166,19 +212,17 @@ export default function Layout() {
   const [bottomToolBoxHeight, setBottomToolBoxHeight] = React.useState<number>(
     getInitialBottomHeight
   );
-  const [activePrimaryToolIndex, setActivePrimaryToolIndex] = React.useState(0);
   const [activeBottomToolIndex, setActiveBottomToolIndex] = React.useState(0);
 
   const pluginsState = useAppSelector((state) => state.pluginsState);
 
-  const displayPrimaryToolBox = primaryToolBoxWidth > 0;
   const displayBottomToolBox = bottomToolBoxHeight > 0;
 
   // Persist sizes to localStorage
   React.useEffect(() => {
     if (primaryToolBoxWidth > 0) {
       localStorage.setItem(
-        'primaryToolBoxWidth',
+        lskeys.state.toolbox.width,
         primaryToolBoxWidth.toString()
       );
     }
@@ -187,7 +231,7 @@ export default function Layout() {
   React.useEffect(() => {
     if (bottomToolBoxHeight > 0) {
       localStorage.setItem(
-        'bottomToolBoxHeight',
+        lskeys.state.statusbar.height,
         bottomToolBoxHeight.toString()
       );
     }
@@ -212,13 +256,11 @@ export default function Layout() {
 
   const handleQuickAccessClick = (index: number) => {
     if (index === activePrimaryToolIndex) {
-      setPrimaryToolBoxWidth(
-        primaryToolBoxWidth > 0 ? 0 : getInitialPrimaryWidth()
-      );
+      dispatch(setPrimaryToolBoxIsOpen(!isPrimaryToolboxOpen));
       return;
     }
-    setActivePrimaryToolIndex(index);
-    setPrimaryToolBoxWidth(getInitialPrimaryWidth());
+    dispatch(setActiveToolName(tools[index].name));
+    // setPrimaryToolBoxWidth(getInitialPrimaryWidth());
   };
 
   const handleStatusBarClick = (index: number) => {
@@ -243,20 +285,14 @@ export default function Layout() {
           }}
         >
           <List sx={{ width: quickAccessWidth }}>
-            {[
-              { text: 'Files', icon: <SnippetFolderIcon /> },
-              { text: 'Find', icon: <SearchIcon /> },
-              { text: 'Characters', icon: <GroupIcon /> },
-              { text: 'Variables', icon: <DataObjectIcon /> },
-              { text: 'Plugins', icon: <ExtensionIcon /> },
-            ].map((item, index) => (
+            {tools.map(({ name, icon }, index) => (
               <QuickAccessItem
-                key={item.text}
-                text={item.text}
-                icon={item.icon}
+                key={name}
+                text={name}
+                icon={icon}
                 onClick={() => handleQuickAccessClick(index)}
                 isActive={
-                  displayPrimaryToolBox && activePrimaryToolIndex === index
+                  isPrimaryToolboxOpen && activePrimaryToolIndex === index
                 }
               />
             ))}
@@ -264,18 +300,14 @@ export default function Layout() {
         </Paper>
         <ToolBox
           activeIndex={activePrimaryToolIndex}
-          display={displayPrimaryToolBox}
+          display={isPrimaryToolboxOpen}
           height="100vh"
           width={primaryToolBoxWidth}
-          onClose={() => setPrimaryToolBoxWidth(0)}
+          onClose={() => dispatch(setPrimaryToolBoxIsOpen(false))}
         >
-          <FilesTool />
-          <FindTool />
-          <CharactersTool />
-          <VariablesTool />
-          <PluginsTool />
+          {tools.map((t) => t.renderer)}
         </ToolBox>
-        {displayPrimaryToolBox && (
+        {isPrimaryToolboxOpen && (
           <ResizeHandle
             direction="horizontal"
             onResize={handlePrimaryToolBoxResize}
@@ -283,7 +315,9 @@ export default function Layout() {
         )}
         <Box
           sx={{
-            width: `calc(100% - ${quickAccessWidth}px - ${primaryToolBoxWidth}px)`,
+            width: `calc(100% - ${quickAccessWidth}px - ${
+              isPrimaryToolboxOpen ? primaryToolBoxWidth : 0
+            }px)`,
           }}
         >
           <MainBox height={`calc(100% - ${bottomToolBoxHeight}px)`}>
