@@ -37,7 +37,7 @@ import {
 
 import { NodeDrawer } from 'renderer/components/NodeDrawer';
 
-import { getNodeRenderer } from 'renderer/services/plugins/NodeRegistry';
+import { getNodeRenderer } from 'renderer/plugins/NodeRegistry';
 
 import 'reactflow/dist/style.css';
 
