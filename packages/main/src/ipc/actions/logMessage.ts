@@ -1,4 +1,5 @@
-import { IpcEvent, LogLevel } from '@xtory/shared';
+import type { IpcEvent } from '@xtory/plugin-api';
+import { LogLevel } from '@xtory/shared';
 import Project from 'main/project';
 
 export default function logMessage(

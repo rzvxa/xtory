@@ -1,4 +1,4 @@
-import { ChannelsMain, Logger, LogLevel } from '@xtory/shared';
+import { Logger, LogLevel } from '@xtory/shared';
 
 class RendererLogger implements Logger {
   trace(message: unknown | unknown[], tags: string[] = []) {
@@ -27,12 +27,7 @@ class RendererLogger implements Logger {
 
   // eslint-disable-next-line class-methods-use-this
   log(level: LogLevel, tags: string[], ...args: unknown[]) {
-    window.electron.ipcRenderer.sendMessage(
-      ChannelsMain.logMessage,
-      level,
-      tags,
-      ...args
-    );
+    window.electron.ipcRenderer.sendMessage('logMessage', level, tags, ...args);
   }
 }
 

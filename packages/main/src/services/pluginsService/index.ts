@@ -4,17 +4,19 @@ import { ProjectMessageBroker } from 'main/project/projectMessageBroker';
 import project from 'main/project';
 
 import {
-  ChannelsRenderer,
   LogLevel,
   FileTypeMap,
   sanitizePath,
   tryGetAsync,
+  isClass,
 } from '@xtory/shared';
-import {
+import type {
+  FileViewConfig,
+  FlowViewConfig,
   PluginConfig,
   PluginEntry,
   PluginManifest,
-} from '@xtory/shared/types/plugin';
+} from '@xtory/shared';
 import { spawn } from 'child_process';
 import { ensureDir } from 'fs-extra';
 import * as NodePath from 'node:path';
@@ -22,6 +24,7 @@ import { fileURLToPath, pathToFileURL } from 'node:url';
 import type { IService } from 'packages/plugin-api';
 
 import PluginApi, { PLUGIN_API_VERSION } from './pluginApi';
+import type LoggingService from '../loggingService';
 
 class PluginsService implements IService {
   #messageBroker: ProjectMessageBroker;
@@ -57,24 +60,18 @@ class PluginsService implements IService {
 
       // Notify renderer that plugins are starting to load
       if (!skipStartMessage) {
-        this.#messageBroker(
-          ChannelsRenderer.onPluginsLoadingStart,
-          pluginCount
-        );
+        this.#messageBroker('onPluginsLoadingStart', pluginCount);
       }
       const loadedCount = await this.loadPlugins();
       await Promise.all(
         Object.values(this.#foreignServices).map((svc) => svc.init())
       );
       // Notify renderer that plugins finished loading with actual loaded count
-      this.#messageBroker(
-        ChannelsRenderer.onPluginsLoadingComplete,
-        loadedCount
-      );
+      this.#messageBroker('onPluginsLoadingComplete', loadedCount);
       return true;
     } catch {
       // Notify renderer even on error with 0 loaded
-      this.#messageBroker(ChannelsRenderer.onPluginsLoadingComplete, 0);
+      this.#messageBroker('onPluginsLoadingComplete', 0);
       return false;
     }
   }
@@ -127,7 +124,7 @@ class PluginsService implements IService {
       .filter(([, , entry]) => !!entry)
       .map(([, , entry]) => entry!);
 
-    this.#messageBroker(ChannelsRenderer.onLoadPlugins, pluginEntries);
+    this.#messageBroker('onLoadPlugins', pluginEntries);
 
     // Return the count of successfully loaded plugins
     return pluginEntries.length;
@@ -156,7 +153,7 @@ class PluginsService implements IService {
     const name = pluginPackageJson.name || directoryName;
 
     // Validate API version
-    const pluginApiVersion = pluginPackageJson.yumeApiVersion;
+    const pluginApiVersion = pluginPackageJson.xtoryApiVersion;
     if (pluginApiVersion !== PLUGIN_API_VERSION) {
       project.logger.warning(
         `Plugin "${name}" uses API version ${pluginApiVersion}, but current API version is ${PLUGIN_API_VERSION}. This may cause compatibility issues.`,
@@ -194,86 +191,76 @@ class PluginsService implements IService {
 
     const result: FileTypeMap = {};
 
-    // Collect all FlowViews with their plugin key
-    const allFlowViews: Array<{ pluginKey: string; fv: any }> = [];
+    // Collect all FileViews with their plugin key
+    const allFileViews: Array<{ pluginKey: string; fv: FileViewConfig }> = [];
     Object.entries(plugins).forEach(([key, plug]) => {
-      plug.flowViews.forEach((fv) => {
-        allFlowViews.push({ pluginKey: key, fv });
+      plug.fileViews.forEach((fv) => {
+        allFileViews.push({ pluginKey: key, fv });
       });
     });
 
-    // Separate non-optional and optional FlowViews
-    const nonOptionalFlowViews = allFlowViews.filter(
+    // Separate non-optional and optional views
+    const nonOptionalFlowViews = allFileViews.filter(
       (item) => !item.fv.optional
     );
-    const optionalFlowViews = allFlowViews.filter((item) => item.fv.optional);
+    const optionalFileViews = allFileViews.filter((item) => item.fv.optional);
 
-    // Process non-optional FlowViews first to register file types
-    const processFlowView = (pluginKey: string, fv: any) => {
+    // Process non-optional views first to register file types
+    const processFileView = (pluginKey: string, fv: FileViewConfig) => {
       const existing = result[fv.fileType];
 
       if (!existing) {
-        result[fv.fileType] = {
-          fileType: fv.fileType,
-          nodes: [...fv.nodes],
-          menuItems: [...fv.menuItems],
-        };
+        result[fv.fileType] = { ...fv };
       } else {
-        // merge nodes by type (last plugin wins on conflict)
-        const mergedNodes = [...existing.nodes];
-        fv.nodes.forEach((node: any) => {
-          const index = mergedNodes.findIndex((n) => n.type === node.type);
-          if (index === -1) {
-            mergedNodes.push(node);
-          } else {
-            mergedNodes[index] = node;
+        const mergedFileView = PluginsService.#mergeFileViewConfigs(
+          existing,
+          fv,
+          {
+            logger: project.logger,
+            rhsPluginName: pluginKey,
           }
-        });
+        );
 
-        const mergedMenuItems = [...existing.menuItems, ...fv.menuItems];
-
-        result[fv.fileType] = {
-          fileType: fv.fileType,
-          nodes: mergedNodes,
-          menuItems: mergedMenuItems,
-        };
+        if (mergedFileView) {
+          result[fv.fileType] = mergedFileView;
+        }
       }
 
       fv.menuItems.forEach((menuItem: any) => {
         const pluginPath = this.#pluginPaths[pluginKey];
         const absoluteTemplatePath = NodePath.join(pluginPath, menuItem.data);
         this.#messageBroker(
-          ChannelsRenderer.addFileMenuItem,
+          'addFileMenuItem',
           menuItem.title,
           absoluteTemplatePath
         );
       });
     };
 
-    // First, process all non-optional FlowViews
+    // First, process all non-optional views
     nonOptionalFlowViews.forEach(({ pluginKey, fv }) => {
-      processFlowView(pluginKey, fv);
+      processFileView(pluginKey, fv);
     });
 
-    // Process optional FlowViews in multiple passes to handle dependency chains
+    // Process optional views in multiple passes to handle dependency chains
     // Keep processing until no more optional plugins can be registered
-    let remainingOptionalFlowViews = [...optionalFlowViews];
+    let remainingOptionalFlowViews = [...optionalFileViews];
     let previousCount = remainingOptionalFlowViews.length;
     let maxIterations = 10; // Safety limit to prevent infinite loops
 
     while (remainingOptionalFlowViews.length > 0 && maxIterations > 0) {
-      const stillPending: typeof optionalFlowViews = [];
+      const stillPending: typeof optionalFileViews = [];
 
       remainingOptionalFlowViews.forEach(({ pluginKey, fv }) => {
         const existing = result[fv.fileType];
 
-        // Skip optional FlowViews if the fileType doesn't exist yet
+        // Skip optional view if the fileType doesn't exist yet
         if (!existing) {
           stillPending.push({ pluginKey, fv });
           return;
         }
 
-        processFlowView(pluginKey, fv);
+        processFileView(pluginKey, fv);
       });
 
       // If we didn't make any progress, break to avoid infinite loop
@@ -431,7 +418,9 @@ class PluginsService implements IService {
         ...Object.fromEntries(
           Object.entries(services).map(([key, val]) => [
             key,
-            isClass(val) ? new val() : val(),
+            isClass(val)
+              ? new val() // eslint-disable-line new-cap
+              : val(),
           ])
         ),
       };
@@ -440,14 +429,69 @@ class PluginsService implements IService {
       project.logger.log(LogLevel.error, ['plugin', pluginName], error);
     }
   }
-}
 
-function isClass(maybeClass: any): maybeClass is new (...args: any[]) => any {
-  if (typeof maybeClass !== 'function') {
-    return false;
+  /**
+   * @returns the merge result or null if merger bails
+   */
+  static #mergeFileViewConfigs(
+    lhs: FileViewConfig,
+    rhs: FileViewConfig,
+    diagnostic: {
+      logger: LoggingService;
+      rhsPluginName: string;
+    }
+  ): FileViewConfig | null {
+    if (lhs.fileType !== rhs.fileType) {
+      diagnostic.logger.error(
+        `Unexpected attempt at registering 2 different file views for the same file type(${lhs.fileType}), view types ${lhs.viewType} and ${rhs.viewType} are not compatible, skipping the addition of ${diagnostic.rhsPluginName}(${rhs.viewType})`,
+        ['plugin', diagnostic.rhsPluginName]
+      );
+
+      return null;
+    }
+    if (lhs.viewType !== rhs.viewType) {
+      project.logger.warning(
+        `Unexpected attempt at registering 2 different file views for the same file type(${lhs.fileType}), view types ${lhs.viewType} and ${rhs.viewType} are not compatible`,
+        ['plugin', diagnostic.rhsPluginName]
+      );
+      return null;
+    }
+    // TODO: replace me with lodash merge or a more generalized helper to avoid view specific code here
+    switch (lhs.viewType) {
+      case 'flow': {
+        // merge nodes by type (last one wins on conflict)
+        let mergeNodeIndex = 0;
+        const mergedNodes = Object.fromEntries(
+          (lhs as FlowViewConfig).nodes.map((node) => [
+            node.type,
+            [node, ++mergeNodeIndex] as const,
+          ])
+        );
+        (rhs as FlowViewConfig).nodes.forEach((node) => {
+          const existing = mergedNodes[node.type];
+          if (existing) {
+            mergedNodes[node.type] = [node, existing[1]];
+          } else {
+            mergedNodes[node.type] = [node, ++mergeNodeIndex];
+          }
+        });
+
+        const mergedMenuItems = [...rhs.menuItems, ...lhs.menuItems];
+
+        return <FlowViewConfig>{
+          fileType: rhs.fileType,
+          viewType: 'flow',
+          nodes: Object.values(mergedNodes)
+            .sort((a, b) => a[1] - b[1])
+            .map((it) => it[0]),
+          menuItems: mergedMenuItems,
+        };
+      }
+
+      default:
+        throw new Error(`Invalid view type: ${lhs.viewType}`);
+    }
   }
-  const source = Function.prototype.toString.call(maybeClass);
-  return source.startsWith('class ');
 }
 
 export default PluginsService;

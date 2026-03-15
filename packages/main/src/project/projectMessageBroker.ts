@@ -1,4 +1,4 @@
-import { ChannelsRenderer } from '@xtory/shared';
+import type { ChannelsRenderer } from '@xtory/plugin-api';
 
 export type ProjectMessageBroker = (
   channel: ChannelsRenderer,

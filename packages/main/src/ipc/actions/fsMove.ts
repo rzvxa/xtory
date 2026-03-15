@@ -1,4 +1,4 @@
-import { IpcEvent, ChannelsRenderer } from '@xtory/shared';
+import type { IpcEvent } from '@xtory/plugin-api';
 import fs from 'fs-extra';
 
 export default function moveOnFileSystem(
@@ -9,7 +9,7 @@ export default function moveOnFileSystem(
   fs.move(src, dest, (err) => {
     if (!err) return;
     sender.send(
-      ChannelsRenderer.toastMessage,
+      'toastMessage',
       `Failed to move file from ${src} to ${dest} with Error: "${err}"`,
       'error'
     );

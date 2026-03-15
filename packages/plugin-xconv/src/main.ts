@@ -13,42 +13,42 @@ export default function ({ logger, api }: PluginContext) {
     .setNodes([
       {
         type: 'StartConversation',
-        connections: { in: 0, out: -1 },
+        connections: { in: 0, out: undefined },
         renderer: 'xconv/StartConversationNode',
       },
       {
         type: 'Text',
-        connections: { in: -1, out: 1 },
+        connections: { in: undefined, out: undefined },
         renderer: 'xconv/TextNode',
       },
       {
         type: 'Choice',
-        connections: { in: -1, out: 1 },
+        connections: { in: undefined, out: undefined },
         renderer: 'xconv/ChoiceNode',
       },
       {
         type: 'Set',
-        connections: { in: -1, out: 1 },
+        connections: { in: undefined, out: undefined },
         renderer: 'xconv/SetNode',
       },
       {
         type: 'Branch',
-        connections: { in: -1, out: -1 },
+        connections: { in: undefined, out: undefined },
         renderer: 'xconv/BranchNode',
       },
       {
         type: 'Random',
-        connections: { in: -1, out: -1 },
+        connections: { in: undefined, out: undefined },
         renderer: 'xconv/RandomNode',
       },
       {
         type: 'Function',
-        connections: { in: -1, out: 1 },
+        connections: { in: undefined, out: undefined },
         renderer: 'xconv/FunctionNode',
       },
       {
         type: 'EndConversation',
-        connections: { in: -1, out: 0 },
+        connections: { in: undefined, out: undefined },
         renderer: 'xconv/EndConversationNode',
       },
     ]);

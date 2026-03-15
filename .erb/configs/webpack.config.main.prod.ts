@@ -2,8 +2,9 @@
  * Webpack config for production electron main process
  */
 
-import path from 'path';
-import webpack from 'webpack';
+import { join } from 'path';
+import { readFileSync } from 'fs';
+import { Configuration, DefinePlugin, EnvironmentPlugin } from 'webpack';
 import { merge } from 'webpack-merge';
 import TerserPlugin from 'terser-webpack-plugin';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
@@ -15,7 +16,13 @@ import deleteSourceMaps from '../scripts/delete-source-maps';
 checkNodeEnv('production');
 deleteSourceMaps();
 
-const configuration: webpack.Configuration = {
+const packageJson = JSON.parse(
+  readFileSync(webpackPaths.appPackagePath, {
+    encoding: 'utf8',
+  })
+);
+
+const configuration: Configuration = {
   devtool: 'source-map',
 
   mode: 'production',
@@ -23,8 +30,8 @@ const configuration: webpack.Configuration = {
   target: 'electron-main',
 
   entry: {
-    main: path.join(webpackPaths.srcMainPath, 'main.ts'),
-    preload: path.join(webpackPaths.srcMainPath, 'preload.ts'),
+    main: join(webpackPaths.srcMainPath, 'main.ts'),
+    preload: join(webpackPaths.srcMainPath, 'preload.ts'),
   },
 
   output: {
@@ -58,13 +65,15 @@ const configuration: webpack.Configuration = {
      * NODE_ENV should be production so that modules do not perform certain
      * development checks
      */
-    new webpack.EnvironmentPlugin({
+    new EnvironmentPlugin({
       NODE_ENV: 'production',
       DEBUG_PROD: false,
       START_MINIMIZED: false,
+      XTORY_PACKAGED: true,
+      XTORY_VERSION: packageJson.version,
     }),
 
-    new webpack.DefinePlugin({
+    new DefinePlugin({
       'process.type': '"browser"',
     }),
   ],

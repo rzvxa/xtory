@@ -1,5 +1,5 @@
-import { FlowViewConfig } from './plugin';
-// import { PluginConfig } from './plugin';
+import type { FileViewConfig } from './plugin';
 
-export type FileTypeMap = { [name: string]: FlowViewConfig };
-// export type FileTypeMap = { [name: string]: PluginConfig };
+export interface FileTypeMap {
+  [name: string]: FileViewConfig;
+}

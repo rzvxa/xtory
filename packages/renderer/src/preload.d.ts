@@ -1,13 +1,14 @@
 import { Platform } from '@xtory/shared';
-import { ElectronHandler } from 'main/preload';
-import type { XtoryRenderer } from '@xtory/plugin-api';
+import type { ElectronHandler } from 'main/preload';
+
+import type { XtoryRenderer } from '@xtory/plugin-api/renderer';
 
 declare global {
   // eslint-disable-next-line no-unused-vars
   interface Window {
-    electron: ElectronHandler;
-    platform: Platform;
-    renderer: XtoryRenderer;
+    readonly electron: ElectronHandler;
+    readonly platform: Platform;
+    readonly renderer: XtoryRenderer;
   }
 }
 

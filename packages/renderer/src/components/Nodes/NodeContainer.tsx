@@ -41,7 +41,11 @@ export default React.memo(
 
     return (
       <NodeView selected={selected}>
-        <Paper sx={{ padding: 1 }}>
+        <Paper
+          id="drag-handle"
+          sx={{ padding: 1 }}
+          onClick={() => console.log('HERE')}
+        >
           <Typography
             variant="body2"
             sx={{
@@ -54,7 +58,7 @@ export default React.memo(
             {title}
           </Typography>
         </Paper>
-        <Box sx={{ padding: 1 }}>{children}</Box>
+        <Box className="nodrag" sx={{ padding: 1 }}>{children}</Box>
       </NodeView>
     );
   }

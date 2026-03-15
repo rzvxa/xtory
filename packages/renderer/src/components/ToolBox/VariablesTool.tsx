@@ -30,29 +30,15 @@ import SaveIcon from '@mui/icons-material/Save';
 import DeleteIcon from '@mui/icons-material/Delete';
 import Tooltip from '@mui/material/Tooltip';
 import { type VariableInfo, VariableType } from '@xtory/plugin-api';
-import { ChannelsMain } from '@xtory/shared';
 import { useEzSnackbar } from '@xtory/renderer/utils/ezSnackbar';
-
-import { useAppSelector } from 'renderer/state/store';
-
-import ToolContainer from './ToolContainer';
-import TextArea from '../Nodes/ContextualComponents/TextArea';
 import { levenshtein } from '@xtory/renderer/utils/levenshtein';
+import useVariables from '@xtory/renderer/hooks/useVariables';
+import { setVariables } from '@xtory/renderer/state/store/variables';
 
-function variableTypeName(type: VariableType): string {
-  switch (type) {
-    case VariableType.Bool:
-      return 'Boolean';
-    case VariableType.Int:
-      return 'Int';
-    case VariableType.Float:
-      return 'Float';
-    case VariableType.String:
-      return 'String';
-    default:
-      throw new Error(`Invalid VariableType: ${type}`);
-  }
-}
+import { useAppDispatch, useAppSelector } from 'renderer/state/store';
+
+import TextArea from '../Nodes/ContextualComponents/TextArea';
+import ToolContainer from './ToolContainer';
 
 /**
  * @param coercion - If this parameter is passed in, it does a simple coercion between numeric and boolean types.
@@ -325,7 +311,7 @@ function VariableRow({
             onChange={(type) => setDraft({ ...draft, type })}
           />
         ) : (
-          variableTypeName(row.type)
+          VariableType[row.type]
         )}
       </TableCell>
       <TableCell>
@@ -456,10 +442,16 @@ function VariablesTable({
 }
 
 export default function VariablesTool() {
+  const dispatch = useAppDispatch();
   const { toaster } = useEzSnackbar();
 
+  const vars = useVariables();
+  const setVars = React.useCallback(
+    (vars: Record<string, VariableInfo>) => dispatch(setVariables(vars)),
+    [dispatch]
+  );
+
   const [filter, setFilter] = React.useState<string>('');
-  const [vars, setVars] = React.useState<Record<string, VariableInfo>>({});
   const [filtered, setFiltered] = React.useState(Object.values(vars));
   const [addVar, setAddVar] = React.useState(false);
   const [oneMore, setOneMore] = React.useState(false);
@@ -483,14 +475,14 @@ export default function VariablesTool() {
   React.useEffect(() => {
     async function getVars() {
       const vars = await window.electron.ipcRenderer.invoke(
-        ChannelsMain.serviceCall,
+        'serviceCall',
         'variables',
         'getVariables'
       );
       setVars(vars);
     }
     getVars();
-  }, []);
+  }, [setVars]);
 
   React.useEffect(() => {
     if (filter.length) {
@@ -525,7 +517,7 @@ export default function VariablesTool() {
 
     try {
       const newVars = await window.electron.ipcRenderer.invoke(
-        ChannelsMain.serviceCall,
+        'serviceCall',
         'variables',
         'addVariable',
         [draft]
@@ -547,7 +539,7 @@ export default function VariablesTool() {
   ) => {
     try {
       const newVars = await window.electron.ipcRenderer.invoke(
-        ChannelsMain.serviceCall,
+        'serviceCall',
         'variables',
         'updateVariable',
         [info, oldName]
@@ -561,7 +553,7 @@ export default function VariablesTool() {
   const onRemoveVar = async (name: VariableInfo['name']) => {
     try {
       const newVars = await window.electron.ipcRenderer.invoke(
-        ChannelsMain.serviceCall,
+        'serviceCall',
         'variables',
         'removeVariable',
         [name]

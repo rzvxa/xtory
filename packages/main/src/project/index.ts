@@ -1,6 +1,6 @@
 import { WebContents } from 'electron';
 
-import { IService } from '@xtory/plugin-api';
+import type { IService } from '@xtory/plugin-api';
 
 import type LoggingService from 'main/services/loggingService';
 import type PluginsService from 'main/services/pluginsService';
@@ -8,11 +8,7 @@ import type ResourceService from 'main/services/resourceService';
 import type CharacterService from 'main/services/characterService';
 import type VariablesService from 'main/services/variableService';
 
-import {
-  ChannelsRenderer,
-  OpenProjectResult,
-  IpcResultStatus,
-} from '@xtory/shared';
+import { OpenProjectResult } from '@xtory/shared';
 
 import type ProjectSettingsService from 'main/services/projectSettingsService';
 import type Project from './project';
@@ -123,10 +119,10 @@ export default class ProjectManager {
       const pluginCount = Object.keys(
         this.#project.builtinServices.settings.get('plugins') ?? {}
       ).length;
-      sender.send(ChannelsRenderer.onPluginsLoadingStart, pluginCount);
+      sender.send('onPluginsLoadingStart', pluginCount);
 
       // Send project opened event
-      sender.send(ChannelsRenderer.onProjectOpened, projectPath);
+      sender.send('onProjectOpened', projectPath);
       this.logger.trace('Project UI ready, loading plugins in background...');
 
       // Load plugins in background (non-blocking)
@@ -136,7 +132,7 @@ export default class ProjectManager {
       });
     }
 
-    if (status === IpcResultStatus.ok) {
+    if (status === 'OK') {
       this.logger.trace('Project loaded successfully');
     }
 

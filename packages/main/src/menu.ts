@@ -4,6 +4,7 @@ import {
   shell,
   BrowserWindow,
   MenuItemConstructorOptions,
+  dialog,
 } from 'electron';
 
 export default class MenuBuilder {
@@ -48,7 +49,7 @@ export default class MenuBuilder {
       label: 'Xtory',
       submenu: [
         {
-          label: 'About Xtory',
+          label: 'About',
         },
         { type: 'separator' },
         {
@@ -113,6 +114,12 @@ export default class MenuBuilder {
               { type: 'separator' as const },
               {
                 label: 'About',
+                click: () => {
+                  dialog.showMessageBoxSync(this.mainWindow, {
+                    title: 'About Xtory',
+                    message: `Xtory ${XTORY_VERSION}\nLicensed under GPLv3\nGPL License: https://github.com/rzvxa/xtory/blob/master/LICENSE\nThird Party Licenses: https://github.com/rzvxa/xtory/blob/master/Third_Party_Licenses\nIf your license is missing please create an issue on the Github!`,
+                  });
+                },
               },
             ]),
       ],

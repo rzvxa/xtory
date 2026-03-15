@@ -1,14 +1,15 @@
 // Disable no-unused-vars, broken for spread args
 /* eslint no-unused-vars: off */
 import { contextBridge, ipcRenderer } from 'electron';
-import {
-  ChannelsMain,
-  ChannelsRenderer,
+import type {
   IpcAction,
   IpcResult,
-} from '@xtory/shared';
+  ChannelsMain,
+  ChannelsRenderer,
+} from '@xtory/plugin-api';
+import type { ElectronHandler } from '@xtory/plugin-api/renderer';
 
-const electronHandler = {
+const electronHandler: ElectronHandler = {
   ipcRenderer: {
     on(channel: ChannelsRenderer, ipcAction: IpcAction) {
       ipcRenderer.on(channel, ipcAction);
@@ -34,5 +35,3 @@ const electronHandler = {
 
 contextBridge.exposeInMainWorld('electron', electronHandler);
 contextBridge.exposeInMainWorld('platform', process.platform);
-
-export type ElectronHandler = typeof electronHandler;

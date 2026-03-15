@@ -1,10 +1,6 @@
 import { spawn } from 'child_process';
-import {
-  IpcEvent,
-  ChannelsRenderer,
-  Platform,
-  sanitizePath,
-} from '@xtory/shared';
+import type { IpcEvent } from '@xtory/plugin-api';
+import { Platform, sanitizePath } from '@xtory/shared';
 import { dirname } from 'path';
 import { fsUtils } from 'main/utils';
 
@@ -87,7 +83,7 @@ export default function revealPathInOS({ sender }: IpcEvent, path: string) {
       revealPathInWindows(path, (err: unknown) => {
         if (!err) return;
         sender.send(
-          ChannelsRenderer.toastMessage,
+          'toastMessage',
           `Failed to reveal "${path}" in File Explorer, Error: "${err}"`,
           'error'
         );
@@ -97,7 +93,7 @@ export default function revealPathInOS({ sender }: IpcEvent, path: string) {
       revealPathInMac(path, (err: unknown) => {
         if (!err) return;
         sender.send(
-          ChannelsRenderer.toastMessage,
+          'toastMessage',
           `Failed to Reveal "${path}" in Finder, Error: "${err}"`,
           'error'
         );
@@ -107,7 +103,7 @@ export default function revealPathInOS({ sender }: IpcEvent, path: string) {
       revealPathInLinux(path, (err: unknown) => {
         if (!err) return;
         sender.send(
-          ChannelsRenderer.toastMessage,
+          'toastMessage',
           `Failed to Open Containing Folder of "${path}", Error: "${err}"`,
           'error'
         );
@@ -115,7 +111,7 @@ export default function revealPathInOS({ sender }: IpcEvent, path: string) {
       break;
     default:
       sender.send(
-        ChannelsRenderer.toastMessage,
+        'toastMessage',
         `Can not reveal "${path}", OS(${process.platform}) is not supported`,
         'error'
       );

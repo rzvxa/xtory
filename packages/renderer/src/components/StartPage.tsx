@@ -7,8 +7,6 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
 import {
-  ChannelsMain,
-  IpcResultStatus,
   sanitizePath,
   NewProjectModel,
   CreateNewProjectResult,
@@ -34,10 +32,10 @@ export default function StartPage() {
 
   const openProject = async (path: string) => {
     const result = await window.electron.ipcRenderer.invoke(
-      ChannelsMain.openProject,
+      'openProject',
       path
     );
-    if (result.status === IpcResultStatus.error) {
+    if (result.status === 'ERROR') {
       toaster.error(result.errorMessage);
     }
   };
@@ -48,7 +46,7 @@ export default function StartPage() {
 
   const onOpenProjectButtonClick = async () => {
     const result: BrowseFileSystemResult =
-      await window.electron.ipcRenderer.invoke(ChannelsMain.browseFileSystem, {
+      await window.electron.ipcRenderer.invoke('browseFileSystem', {
         properties: ['openDirectory'],
       });
 
@@ -68,12 +66,9 @@ export default function StartPage() {
     model: NewProjectModel
   ): Promise<NewProjectCreateResult> => {
     const result: CreateNewProjectResult =
-      await window.electron.ipcRenderer.invoke(
-        ChannelsMain.createNewProject,
-        model
-      );
+      await window.electron.ipcRenderer.invoke('createNewProject', model);
 
-    if (result.status === IpcResultStatus.error) {
+    if (result.status === 'ERROR') {
       return { created: false, errorMessage: result.errorMessage };
     }
 
@@ -135,7 +130,7 @@ export default function StartPage() {
           </Box>
         </Box>
         <Box sx={{ display: 'flex', width: '100%' }} mt="auto" mr="auto">
-          <Typography variant="caption">Version: 0.3pre-alpha</Typography>
+          <Typography variant="caption">Version: {window.XTORY_VERSION}</Typography>
           <Link
             target="_blank"
             href="https://github.com/rzvxa/xtory"

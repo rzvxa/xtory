@@ -3,7 +3,7 @@ import React from 'react';
 import Box from '@mui/material/Box';
 import TextField from '@mui/material/TextField';
 
-import { ChannelsMain, FileTypeMap } from '@xtory/shared';
+import { FileTypeMap } from '@xtory/shared';
 
 import { useAppSelector, useAppDispatch } from 'renderer/state/store/index';
 import {
@@ -28,7 +28,7 @@ export default function TabView({ tabId }: TabViewProps) {
   React.useEffect(() => {
     async function getFileTypes() {
       const result: FileTypeMap = await window.electron.ipcRenderer.invoke(
-        ChannelsMain.getFileTypes
+        'getFileTypes'
       );
       setFileTypes(result);
     }
@@ -48,7 +48,7 @@ export default function TabView({ tabId }: TabViewProps) {
   const dispatchFileView = () => {
     if (fileTypes) {
       const fileTypePlugin = fileTypes[tabData.extension];
-      if (fileTypePlugin) {
+      if (fileTypePlugin?.viewType === 'flow') {
         return (
           <FlowView
             tabId={tabId}

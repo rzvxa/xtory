@@ -3,8 +3,14 @@
   "version": "0.2.5",
   "private": true,
   "description": "Shared types and utilities for Xtory",
-  "main": "src/index.ts",
-  "scripts": {},
+  "main": "dist/index.js",
+  "files": [
+    "dist/**/*"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit"
+  },
   "dependencies": {},
   "devDependencies": {
     "typescript": "^4.9.5"

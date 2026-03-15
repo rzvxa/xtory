@@ -14,7 +14,6 @@ import Checkbox from '@mui/material/Checkbox';
 import SettingsIcon from '@mui/icons-material/Settings';
 import AddIcon from '@mui/icons-material/Add';
 
-import { ChannelsMain } from '@xtory/shared';
 import type { Character, CharacterMap, CharacterSettings } from '@xtory/shared';
 import { EzSnackbarRef } from 'renderer/utils/ezSnackbar';
 import { levenshtein } from 'renderer/utils/levenshtein';
@@ -43,7 +42,7 @@ export default function CharactersTool() {
   const loadCharacters = React.useCallback(async () => {
     try {
       const characterMap: CharacterMap =
-        await window.electron.ipcRenderer.invoke(ChannelsMain.getCharacters);
+        await window.electron.ipcRenderer.invoke('getCharacters');
       setCharacters(Object.values(characterMap));
     } catch (error: any) {
       EzSnackbarRef.error(
@@ -55,9 +54,7 @@ export default function CharactersTool() {
   const loadSettings = React.useCallback(async () => {
     try {
       const loadedSettings: CharacterSettings | null =
-        await window.electron.ipcRenderer.invoke(
-          ChannelsMain.getCharacterSettings
-        );
+        await window.electron.ipcRenderer.invoke('getCharacterSettings');
       if (loadedSettings) {
         // Backward compatibility: ensure new fields have defaults
         const compatibleSettings = {
@@ -152,7 +149,7 @@ export default function CharactersTool() {
       if (currentCharacter) {
         // Update existing character
         await window.electron.ipcRenderer.invoke(
-          ChannelsMain.updateCharacter,
+          'updateCharacter',
           currentCharacter.id,
           {
             name: formData.name,
@@ -164,7 +161,7 @@ export default function CharactersTool() {
       } else {
         // Create new character
         await window.electron.ipcRenderer.invoke(
-          ChannelsMain.createCharacter,
+          'createCharacter',
           formData.name,
           formData.avatarUuid || undefined,
           formData.attributes
@@ -188,10 +185,7 @@ export default function CharactersTool() {
     }
 
     try {
-      await window.electron.ipcRenderer.invoke(
-        ChannelsMain.removeCharacter,
-        character.id
-      );
+      await window.electron.ipcRenderer.invoke('removeCharacter', character.id);
       EzSnackbarRef.success('Character deleted');
       loadCharacters();
     } catch (error: any) {
@@ -204,7 +198,7 @@ export default function CharactersTool() {
   const handleSaveSettings = async (newSettings: CharacterSettings) => {
     try {
       await window.electron.ipcRenderer.invoke(
-        ChannelsMain.updateCharacterSettings,
+        'updateCharacterSettings',
         newSettings
       );
       setSettings(newSettings);

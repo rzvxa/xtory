@@ -1,4 +1,4 @@
-import { IpcEvent, ChannelsRenderer } from '@xtory/shared';
+import type { IpcEvent } from '@xtory/plugin-api';
 import { rimraf } from 'rimraf';
 
 export default async function remove({ sender }: IpcEvent, path: string) {
@@ -6,7 +6,7 @@ export default async function remove({ sender }: IpcEvent, path: string) {
     await rimraf(path);
   } catch (exception) {
     sender.send(
-      ChannelsRenderer.toastMessage,
+      'toastMessage',
       `Failed to delete "${path}" Reason: ${exception}`,
       'error'
     );

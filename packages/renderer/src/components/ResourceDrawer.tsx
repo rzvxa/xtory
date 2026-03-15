@@ -28,7 +28,6 @@ import {
   Search as SearchIcon,
 } from '@mui/icons-material';
 import type { ResourceMetadata, ResourceMap } from '@xtory/shared';
-import { ChannelsMain } from '@xtory/shared';
 import { levenshtein } from '../utils/levenshtein';
 import logger from '../logger';
 import { Z_INDEX } from '../constants/zIndex';
@@ -58,7 +57,7 @@ export default function ResourceDrawer({
 
   const loadResources = async () => {
     const allResources = await window.electron.ipcRenderer.invoke(
-      ChannelsMain.getResources
+      'getResources'
     );
     setResources(allResources);
   };
@@ -72,7 +71,7 @@ export default function ResourceDrawer({
   const handleImport = async () => {
     try {
       const result = await window.electron.ipcRenderer.invoke(
-        ChannelsMain.browseFileSystem,
+        'browseFileSystem',
         {
           properties: ['openFile'],
           filters: [
@@ -87,7 +86,7 @@ export default function ResourceDrawer({
 
       if (result.status === 'OK' && !result.canceled && result.filePaths?.[0]) {
         const uuid = await window.electron.ipcRenderer.invoke(
-          ChannelsMain.importResource,
+          'importResource',
           result.filePaths[0],
           filterType
         );
@@ -105,13 +104,9 @@ export default function ResourceDrawer({
   };
 
   const handleSaveDescription = async (uuid: string) => {
-    await window.electron.ipcRenderer.invoke(
-      ChannelsMain.updateResourceMetadata,
-      uuid,
-      {
-        description: editDescription,
-      }
-    );
+    await window.electron.ipcRenderer.invoke('updateResourceMetadata', uuid, {
+      description: editDescription,
+    });
     await loadResources();
     setEditingUuid(null);
     setEditDescription('');
@@ -124,13 +119,9 @@ export default function ResourceDrawer({
 
   const handleSaveRename = async (uuid: string) => {
     if (renameValue.trim()) {
-      await window.electron.ipcRenderer.invoke(
-        ChannelsMain.updateResourceMetadata,
-        uuid,
-        {
-          originalName: renameValue,
-        }
-      );
+      await window.electron.ipcRenderer.invoke('updateResourceMetadata', uuid, {
+        originalName: renameValue,
+      });
       await loadResources();
     }
     setRenamingUuid(null);
@@ -140,7 +131,7 @@ export default function ResourceDrawer({
   const handleDeleteConfirm = async () => {
     if (deleteConfirmUuid) {
       await window.electron.ipcRenderer.invoke(
-        ChannelsMain.removeResource,
+        'removeResource',
         deleteConfirmUuid
       );
       await loadResources();

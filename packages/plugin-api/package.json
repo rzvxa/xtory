@@ -25,7 +25,9 @@
     "index.js",
     "index.d.ts",
     "renderer.js",
-    "renderer.d.ts"
+    "renderer.d.ts",
+    "common.js",
+    "common.d.ts"
   ],
   "publishConfig": {
     "access": "public"

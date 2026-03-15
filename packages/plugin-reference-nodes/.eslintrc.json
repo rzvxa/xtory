@@ -1,7 +1,5 @@
 {
   "globals": {
-    "api": "readonly",
-    "logger": "readonly",
     "React": "readonly",
     "Renderer": "readonly"
   }

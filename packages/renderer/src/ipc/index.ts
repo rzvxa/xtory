@@ -1,4 +1,5 @@
-import { ChannelsRenderer, IpcAction } from '@xtory/shared';
+import type { ChannelsRenderer, IpcAction } from '@xtory/plugin-api';
+
 import addFileMenuItemAction from './actions/addFileMenuItem';
 import onProjectOpenedIpcAction from './actions/onProjectOpened';
 import onOpenFileAsTabAction from './actions/onOpenFileAsTab';
@@ -13,12 +14,12 @@ const on = (channel: ChannelsRenderer, ipcAction: IpcAction): void => {
   window.electron.ipcRenderer.on(channel, ipcAction);
 };
 
-on(ChannelsRenderer.addFileMenuItem, addFileMenuItemAction);
-on(ChannelsRenderer.onProjectOpened, onProjectOpenedIpcAction);
-on(ChannelsRenderer.onOpenFileAsTab, onOpenFileAsTabAction);
-on(ChannelsRenderer.onProjectTreeUpdated, onProjectTreeUpdatedIpcAction);
-on(ChannelsRenderer.toastMessage, toastMessageIpcAction);
-on(ChannelsRenderer.broadcastLogMessage, broadcastLogMessageIpcAction);
-on(ChannelsRenderer.onLoadPlugins, onLoadPlugins);
-on(ChannelsRenderer.onPluginsLoadingStart, onPluginsLoadingStart);
-on(ChannelsRenderer.onPluginsLoadingComplete, onPluginsLoadingComplete);
+on('addFileMenuItem', addFileMenuItemAction);
+on('onProjectOpened', onProjectOpenedIpcAction);
+on('onOpenFileAsTab', onOpenFileAsTabAction);
+on('onProjectTreeUpdated', onProjectTreeUpdatedIpcAction);
+on('toastMessage', toastMessageIpcAction);
+on('broadcastLogMessage', broadcastLogMessageIpcAction);
+on('onLoadPlugins', onLoadPlugins);
+on('onPluginsLoadingStart', onPluginsLoadingStart);
+on('onPluginsLoadingComplete', onPluginsLoadingComplete);

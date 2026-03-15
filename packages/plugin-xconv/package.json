@@ -1,7 +1,7 @@
 {
   "name": "@xtory/plugin-xconv",
   "version": "0.2.5",
-  "yumeApiVersion": 1,
+  "xtoryApiVersion": 1,
   "main": "dist/main.js",
   "rendererMain": "dist/renderer.js",
   "description": "A Xtory plugin for supporting .xconv conversation files",
@@ -30,10 +30,11 @@
   },
   "scripts": {
     "build": "tsc",
+    "typecheck": "tsc --noEmit",
     "watch": "tsc --watch"
   },
   "devDependencies": {
     "@xtory/plugin-api": "*",
-    "typescript": "^5.0.0"
+    "typescript": "^4.9.5"
   }
 }

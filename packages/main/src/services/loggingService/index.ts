@@ -1,13 +1,6 @@
-import {
-  ChannelsRenderer,
-  Logger,
-  LogLevel,
-  LogMessage,
-  formatLog,
-  uuidv4,
-} from '@xtory/shared';
+import { Logger, LogLevel, LogMessage, formatLog, uuidv4 } from '@xtory/shared';
 import { ProjectMessageBroker } from 'main/project/projectMessageBroker';
-import IService from '../IService';
+import type { IService } from '@xtory/plugin-api';
 
 class LoggingService implements Logger, IService {
   #logger: Logger;
@@ -71,7 +64,7 @@ class LoggingService implements Logger, IService {
   }
 
   #broadcast(logMessage: LogMessage) {
-    this.#messageBroker(ChannelsRenderer.broadcastLogMessage, logMessage);
+    this.#messageBroker('broadcastLogMessage', logMessage);
   }
 }
 

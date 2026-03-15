@@ -15,13 +15,15 @@ import ReactFlow, {
   EdgeChange,
   applyNodeChanges,
   applyEdgeChanges,
+  Connection,
+  SelectionMode,
 } from 'reactflow';
 
 import { styled } from '@mui/material/styles';
 import Box from '@mui/material/Box';
 
-import { ChannelsMain, uuidv4 } from '@xtory/shared';
-import { FlowViewConfig } from '@xtory/shared/types/plugin';
+import { uuidv4, FlowViewConfig } from '@xtory/shared';
+import type { NodeInfo } from '@xtory/plugin-api';
 
 import { useAppSelector, useAppDispatch } from 'renderer/state/store/index';
 import { setFlowState } from 'renderer/state/store/tabs';
@@ -92,8 +94,85 @@ export interface FlowProps {
   config: FlowViewConfig;
 }
 
+function getConnectionCountConfig(
+  config: NodeInfo,
+  port: 'in' | 'out'
+): number {
+  const portInfo = config.connections[port];
+  if (!portInfo) {
+    return Number.MAX_SAFE_INTEGER;
+  } else if (typeof portInfo === 'number') {
+    return portInfo;
+  } else {
+    return portInfo.count ?? Number.MAX_SAFE_INTEGER;
+  }
+}
+
+function checkConnectionAllowEdgeConfig(
+  config: NodeInfo,
+  port: 'in' | 'out',
+  targetType: NodeInfo['type']
+): boolean {
+  const portInfo = config.connections[port];
+  return (
+    portInfo === undefined ||
+    typeof portInfo === 'number' ||
+    portInfo.types === undefined ||
+    portInfo.types.includes(targetType)
+  );
+}
+
+function canConnect(
+  connection: Connection,
+  nodes: Node[],
+  edges: Edge[],
+  configs: Record<string, NodeInfo>
+): boolean {
+  const sourceNode = connection.source
+    ? nodes.find((node) => node.id === connection.source)
+    : undefined;
+  const targetNode = connection.target
+    ? nodes.find((node) => node.id === connection.target)
+    : undefined;
+
+  const sourceType = sourceNode?.type;
+  const targetType = targetNode?.type;
+  if (sourceType && targetType) {
+    const sourceConfig = configs[sourceType];
+    const targetConfig = configs[targetType];
+
+    const sourceMaxConnection = getConnectionCountConfig(sourceConfig, 'out');
+    const targetMaxConnection = getConnectionCountConfig(targetConfig, 'in');
+    const sourceEdges = edges.filter((edge) => edge.source === sourceNode.id);
+    const targetEdges = edges.filter((edge) => edge.target === targetNode.id);
+
+    // either side have exhausted port
+    if (
+      sourceEdges.length >= sourceMaxConnection ||
+      targetEdges.length >= targetMaxConnection
+    ) {
+      return false;
+    }
+
+    // target doesn't accept the connection
+    if (!checkConnectionAllowEdgeConfig(targetConfig, 'in', sourceType)) {
+      return false;
+    }
+
+    // source doesn't add the support for the connection
+    if (!checkConnectionAllowEdgeConfig(sourceConfig, 'out', targetType)) {
+      return false;
+    }
+  }
+  return true;
+}
+
 function Flow({ tabId, setTabIsDirty, config }: FlowProps) {
-  const nodeConfigs = config.nodes;
+  const nodeConfigs = React.useMemo(() => {
+    return Object.fromEntries(
+      config.nodes.map((node) => [node.type, node] as const)
+    );
+  }, [config.nodes]);
   const dispatch = useAppDispatch();
   const tabState = useAppSelector((state) =>
     state.tabsState.tabs.find((tab) => tab.id === tabId)
@@ -124,6 +203,10 @@ function Flow({ tabId, setTabIsDirty, config }: FlowProps) {
     setEdges((eds) => applyEdgeChanges(changes, eds));
   }, []);
 
+  const addNode = React.useCallback((node: Node) => {
+    setNodes((nds) => nds.concat(node));
+  }, []);
+
   const [splash, setSplash] = React.useState<boolean>(true);
   const [contextMenu, setContextMenu] = React.useState<{
     x: number;
@@ -133,7 +216,7 @@ function Flow({ tabId, setTabIsDirty, config }: FlowProps) {
 
   const nodeTypes = React.useMemo(() => {
     const nodes: { [key: string]: React.ComponentType<any> } = {};
-    nodeConfigs.forEach((nodeConfig) => {
+    Object.values(nodeConfigs).forEach((nodeConfig) => {
       if (!nodeConfig.renderer) return;
       const component = getNodeRenderer(nodeConfig.renderer);
       if (component) {
@@ -150,11 +233,7 @@ function Flow({ tabId, setTabIsDirty, config }: FlowProps) {
     if (reactFlowInstance) {
       const flow = reactFlowInstance.toObject();
       const json = JSON.stringify(flow);
-      window.electron.ipcRenderer.invoke(
-        ChannelsMain.fspWriteFile,
-        tabState?.id,
-        json
-      );
+      window.electron.ipcRenderer.invoke('fspWriteFile', tabState?.id, json);
     }
   }, [reactFlowInstance, tabState]);
 
@@ -174,7 +253,7 @@ function Flow({ tabId, setTabIsDirty, config }: FlowProps) {
           } = tabState.flowState;
           // Clone nodes to avoid mutating Redux state
           const clonedNodes =
-            flowNodes?.map((node: any) => ({
+            flowNodes?.map((node) => ({
               ...node,
               data: { ...node.data, focusOnInit: false },
             })) || [];
@@ -191,7 +270,8 @@ function Flow({ tabId, setTabIsDirty, config }: FlowProps) {
             flow.nodes?.forEach((node: any) => {
               node.data.focusOnInit = false;
             });
-            setNodes(flow.nodes || []);
+            const nodes: Node[] = flow.nodes || [];
+            setNodes(nodes);
             setEdges(flow.edges || []);
             setViewport({ x, y, zoom });
             setSplash(false);
@@ -246,7 +326,8 @@ function Flow({ tabId, setTabIsDirty, config }: FlowProps) {
           flow.nodes?.forEach((node: any) => {
             node.data.focusOnInit = false;
           });
-          setNodes(flow.nodes || []);
+          const nodes: Node[] = flow.nodes || [];
+          setNodes(nodes);
           setEdges(flow.edges || []);
           reactFlowInstance.setViewport({ x, y, zoom });
           setSplash(false);
@@ -312,13 +393,10 @@ function Flow({ tabId, setTabIsDirty, config }: FlowProps) {
             type: 'extend',
           });
         } else if (selected) {
-          const connections = nodeConfigs.find(
-            (node) => node.type === selected.type
+          const selectedNodeConnections = (
+            selected.type ? nodeConfigs[selected.type] : undefined
           )?.connections;
-          const selectedNodeConnections = nodeConfigs.find(
-            (node) => node.type === selected.type
-          )?.connections;
-          const newNode = {
+          const newNode: Node = {
             id: uuidv4(),
             type: selected.type,
             data: { label: 'node cusds', focusOnInit: true },
@@ -327,8 +405,8 @@ function Flow({ tabId, setTabIsDirty, config }: FlowProps) {
           };
           selected.selected = false;
           takeSnapshot();
-          setNodes((nds) => nds.concat(newNode));
-          if (connections && selectedNodeConnections) {
+          addNode(newNode);
+          if (selectedNodeConnections) {
             setEdges((eds) =>
               eds.concat({
                 id: uuidv4(),
@@ -347,7 +425,7 @@ function Flow({ tabId, setTabIsDirty, config }: FlowProps) {
     [
       nodeConfigs,
       nodes,
-      setNodes,
+      addNode,
       setEdges,
       viewport,
       takeSnapshot,
@@ -369,8 +447,13 @@ function Flow({ tabId, setTabIsDirty, config }: FlowProps) {
   }, [handleKeyPress]);
 
   const onConnect = React.useCallback(
-    (params: any) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges]
+    (connection: Connection) => {
+      if (canConnect(connection, nodes, edges, nodeConfigs)) {
+        takeSnapshot();
+        setEdges((eds) => addEdge(connection, eds));
+      }
+    },
+    [setEdges, takeSnapshot, nodeConfigs, nodes, edges]
   );
 
   const onConnectStart = React.useCallback(
@@ -414,11 +497,9 @@ function Flow({ tabId, setTabIsDirty, config }: FlowProps) {
       const prevNode = selectedNodes.length === 1 ? selectedNodes[0] : null;
       const connectionSource = prevNode?.id || connectingNodeId;
       const rclick = contextMenu.type === 'rclick';
-      const connections = nodeConfigs.find(
-        (node) => node.type === item
-      )?.connections;
-      const prevNodeConnections = nodeConfigs.find(
-        (node) => node.type === prevNode?.type
+      const connections = nodeConfigs[item]?.connections;
+      const prevNodeConnections = (
+        prevNode?.type ? nodeConfigs[prevNode.type] : undefined
       )?.connections;
       const { top, left } = reactFlowRef.current!.getBoundingClientRect();
       const { x, y, zoom } = viewport;
@@ -435,7 +516,7 @@ function Flow({ tabId, setTabIsDirty, config }: FlowProps) {
       if (!rclick && prevNode) {
         position.x += 400;
       }
-      const newNode = {
+      const newNode: Node = {
         id: uuidv4(),
         type: item,
         data: { label: 'node cusds', focusOnInit: !rclick },
@@ -446,7 +527,7 @@ function Flow({ tabId, setTabIsDirty, config }: FlowProps) {
         node.selected = false;
       });
       takeSnapshot();
-      setNodes((nds) => nds.concat(newNode));
+      addNode(newNode);
       if (!rclick && connectionSource && connections && prevNodeConnections) {
         setEdges((eds) =>
           eds.concat({
@@ -463,7 +544,7 @@ function Flow({ tabId, setTabIsDirty, config }: FlowProps) {
       nodeConfigs,
       contextMenu,
       nodes,
-      setNodes,
+      addNode,
       setEdges,
       viewport,
       connectingNodeId,
@@ -473,7 +554,7 @@ function Flow({ tabId, setTabIsDirty, config }: FlowProps) {
   );
 
   const items = React.useMemo(
-    () => nodeConfigs.map((node) => node.type),
+    () => Object.values(nodeConfigs).map((node) => node.type),
     [nodeConfigs]
   );
 
@@ -493,7 +574,9 @@ function Flow({ tabId, setTabIsDirty, config }: FlowProps) {
         onSelectionDragStart={onSelectionDragStart}
         onNodesDelete={onNodesDelete}
         onEdgesDelete={onEdgesDelete}
+        connectionRadius={50}
         nodeTypes={nodeTypes}
+        selectionMode={SelectionMode.Partial}
         proOptions={{ hideAttribution: true }}
         maxZoom={6}
         minZoom={0.1}

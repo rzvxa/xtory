@@ -59,8 +59,6 @@ function ImageNode({ data, id }: Renderer.NodeProps<ImageNodeData>) {
 
   return (
     <NodeContainer title="Image" selected={false}>
-      <Handle type="target" position={Position.Left} />
-
       {imageSrc ? (
         <img
           src={imageSrc}
@@ -143,8 +141,6 @@ function NoteNode({ id, data, selected }: NoteNodeProps) {
 
   return (
     <NodeContainer title="Note" selected={selected}>
-      <Handle type="target" position={Position.Left} />
-
       <TextArea
         variant="outlined"
         multiline

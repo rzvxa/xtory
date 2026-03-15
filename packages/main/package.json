@@ -5,8 +5,12 @@
   "description": "Xtory main process",
   "main": "src/main.ts",
   "license": "GPT-3",
-  "scripts": {},
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
   "dependencies": {
+    "@xtory/shared": "*",
+    "@xtory/plugin-api": "*",
     "uuid": "^9.0.0",
     "fs-extra": "^11.1.1",
     "fengari": "^0.1.4"
