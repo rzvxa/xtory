@@ -32,6 +32,9 @@ module.exports = {
     'lines-between-class-members': 'off',
     'promise/no-callback-in-promise': 'off',
   },
+  globals: {
+    XTORY_VERSION: 'readonly',
+  },
   parserOptions: {
     ecmaVersion: 2020,
     sourceType: 'module',

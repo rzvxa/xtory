@@ -1,4 +1,4 @@
-export { ProjectState } from './project';
+export { ProjectState, VariablesState } from './project';
 export {
   FilesToolState,
   ProjectTreeNodeState,

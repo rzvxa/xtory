@@ -1,14 +1,14 @@
 /* eslint-disable max-classes-per-file */
-import {
+import type {
   PluginConfig,
   FlowViewConfig,
-  NodeInfo,
-} from '@xtory/shared/types/plugin';
+  FileViewConfig,
+} from '@xtory/shared';
 import type {
   IFileViewBuilder,
   IFlowViewBuilder,
   IPluginApi,
-  IService,
+  NodeInfo,
   ServiceProvider,
 } from '@xtory/plugin-api';
 
@@ -16,7 +16,9 @@ import project from 'main/project';
 
 export const PLUGIN_API_VERSION = 1;
 
-export class FileViewBuilder implements IFileViewBuilder {
+export abstract class FileViewBuilder<T extends FileViewConfig = FlowViewConfig>
+  implements IFileViewBuilder
+{
   protected fileTypes: string[] = [];
 
   protected optional: boolean = false;
@@ -34,10 +36,12 @@ export class FileViewBuilder implements IFileViewBuilder {
     this.optional = optional;
     return this;
   }
+
+  abstract build(): T;
 }
 
 export class FlowViewBuilder
-  extends FileViewBuilder
+  extends FileViewBuilder<FlowViewConfig>
   implements IFlowViewBuilder
 {
   protected nodes: NodeInfo[] | null = null;
@@ -62,25 +66,36 @@ export class FlowViewBuilder
     const { optional } = this;
     // For backward compatibility, use first fileType as primary
     const fileType = fileTypes.length > 0 ? fileTypes[0] : '';
-    return { fileType, nodes: nodes || [], menuItems, optional };
+    return {
+      fileType,
+      viewType: 'flow',
+      nodes: nodes || [],
+      menuItems,
+      optional,
+    };
   }
 }
 
 export default class PluginBuilder implements IPluginApi {
-  #flowViews: FlowViewBuilder[] = [];
+  #fileViews: FileViewBuilder[] = [];
   #services: Record<string, ServiceProvider> = {};
 
+  // eslint-disable-next-line class-methods-use-this
   get projectPath(): string {
     return project.path;
   }
 
   addFileView(type: 'flow'): FlowViewBuilder {
-    if (type !== 'flow') {
-      throw new Error(`Unsupported file view type: ${type}`);
+    switch (type) {
+      case 'flow': {
+        const flowView = new FlowViewBuilder();
+        this.#fileViews.push(flowView);
+        return flowView;
+      }
+
+      default:
+        throw new Error(`Unsupported file view type: ${type}`);
     }
-    const flowView = new FlowViewBuilder();
-    this.#flowViews.push(flowView);
-    return flowView;
   }
 
   addService(name: string, service: ServiceProvider): this {
@@ -89,7 +104,7 @@ export default class PluginBuilder implements IPluginApi {
   }
 
   build(): { plugin: PluginConfig; services: Record<string, ServiceProvider> } {
-    const flowViews = this.#flowViews.map((builder) => builder.build());
-    return { plugin: { flowViews }, services: this.#services };
+    const fileViews = this.#fileViews.map((builder) => builder.build());
+    return { plugin: { fileViews }, services: this.#services };
   }
 }

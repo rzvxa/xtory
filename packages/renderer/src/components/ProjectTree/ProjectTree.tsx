@@ -11,7 +11,6 @@ import ConvIcon from '@mui/icons-material/Forum';
 
 import {
   Platform,
-  ChannelsMain,
   ProjectTree as ProjectTreeState,
   ProjectTreeNode,
   uuidv4,
@@ -65,7 +64,7 @@ function TreeNode({ treeData }: TreeNodeProps) {
   );
 
   const onOpen = () => {
-    window.electron.ipcRenderer.sendMessage(ChannelsMain.openFileAsTab, path);
+    window.electron.ipcRenderer.sendMessage('openFileAsTab', path);
   };
 
   const onExpandToggle = () => {
@@ -82,16 +81,8 @@ function TreeNode({ treeData }: TreeNodeProps) {
     while (newCount >= 0) {
       /* eslint-disable no-await-in-loop */
       newPath = basePath + (newCount === 0 ? '' : ` ${newCount}`);
-      if (
-        !(await window.electron.ipcRenderer.invoke(
-          ChannelsMain.fspExists,
-          newPath
-        ))
-      ) {
-        await window.electron.ipcRenderer.invoke(
-          ChannelsMain.fspMkdir,
-          newPath
-        );
+      if (!(await window.electron.ipcRenderer.invoke('fspExists', newPath))) {
+        await window.electron.ipcRenderer.invoke('fspMkdir', newPath);
         newCount = -1;
         break;
       }
@@ -132,14 +123,9 @@ function TreeNode({ treeData }: TreeNodeProps) {
       newPath = `${basePath}${
         newCount === 0 ? '' : ` ${newCount}`
       }.${extension}`;
-      if (
-        !(await window.electron.ipcRenderer.invoke(
-          ChannelsMain.fspExists,
-          newPath
-        ))
-      ) {
+      if (!(await window.electron.ipcRenderer.invoke('fspExists', newPath))) {
         await window.electron.ipcRenderer.invoke(
-          ChannelsMain.fspWriteFile,
+          'fspWriteFile',
           newPath,
           templateContent
         );
@@ -155,11 +141,11 @@ function TreeNode({ treeData }: TreeNodeProps) {
   };
 
   const onReveal = () => {
-    window.electron.ipcRenderer.sendMessage(ChannelsMain.revealPathInOS, path);
+    window.electron.ipcRenderer.sendMessage('revealPathInOS', path);
   };
 
   const onDelete = () => {
-    window.electron.ipcRenderer.sendMessage(ChannelsMain.fsRemove, path);
+    window.electron.ipcRenderer.sendMessage('fsRemove', path);
   };
 
   const onRename = () => {
@@ -181,7 +167,7 @@ function TreeNode({ treeData }: TreeNodeProps) {
     dispatch(setProjectTreeNodeState({ nodeId, isRename: false }));
     if (name === newName) return;
     const newPath = path.split('/').slice(0, -1).join('/').concat('/', newName);
-    window.electron.ipcRenderer.sendMessage(ChannelsMain.fsMove, path, newPath);
+    window.electron.ipcRenderer.sendMessage('fsMove', path, newPath);
   };
 
   const onCollapse = () => {

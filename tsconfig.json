@@ -15,8 +15,6 @@
     "allowJs": true,
     "outDir": ".erb/dll",
     "paths": {
-      "@xtory/shared": ["./packages/shared/src"],
-      "@xtory/shared/*": ["./packages/shared/src/*"],
       "@xtory/main": ["./packages/main/src"],
       "@xtory/main/*": ["./packages/main/src/*"],
       "@xtory/renderer": ["./packages/renderer/src"],
@@ -33,6 +31,7 @@
     ".erb/dll",
     "dist",
     "node_modules",
+    "packages/**/node_modules",
     "src/**/*.test.ts",
     "src/**/*.test.tsx"
   ]

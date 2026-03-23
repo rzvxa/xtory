@@ -1,4 +1,4 @@
-import type { PluginContext } from 'packages/plugin-api';
+import type { PluginContext } from '@xtory/plugin-api';
 
 export default function ({ api }: PluginContext) {
   api
@@ -8,12 +8,12 @@ export default function ({ api }: PluginContext) {
     .setNodes([
       {
         type: 'Image',
-        connections: { in: 1, out: 1 },
+        connections: { in: 0, out: { types: ['Plot'] } },
         renderer: 'reference-nodes/ImageNode',
       },
       {
         type: 'Note',
-        connections: { in: 1, out: 1 },
+        connections: { in: 0, out: { types: ['Plot'] } },
         renderer: 'reference-nodes/NoteNode',
       },
     ]);

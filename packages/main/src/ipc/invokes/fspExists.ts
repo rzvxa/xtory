@@ -1,4 +1,4 @@
-import { IpcInvokeEvent } from '@xtory/shared';
+import type { IpcInvokeEvent } from '@xtory/plugin-api';
 import { constants } from 'fs/promises';
 import { fsUtils } from 'main/utils';
 

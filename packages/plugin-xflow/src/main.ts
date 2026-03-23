@@ -8,7 +8,7 @@ export default function ({ api }: PluginContext) {
     .setNodes([
       {
         type: 'Plot',
-        connections: { in: 1, out: 1 },
+        connections: { in: { types: ['Plot'] }, out: { types: ['Plot'] } },
         renderer: 'xflow/PlotNode',
       },
     ]);

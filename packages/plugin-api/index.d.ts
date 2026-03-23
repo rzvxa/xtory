@@ -1,16 +1,53 @@
+import type { Logger } from './common';
+
+export * from './common';
+
 /**
  * Current plugin API version
  */
 export const PLUGIN_API_VERSION = 1;
 
 /**
+ * Unified API for plugin services
+ */
+export interface IService {
+  init(): Promise<boolean>;
+}
+
+/**
+ * Either a service constructor, or a provider function
+ */
+export type ServiceProvider = (new () => IService) | (() => IService);
+
+/**
+ * Undefined means unrestricted number of connection with all possible node types
+ * A number means a maximum of that many connections with all possible node types
+ * A configuration object can be used to provide the restriction on the node types
+ */
+export type ConnectionPortInfo =
+  | undefined
+  | number
+  | {
+      /**
+       * Maximum number of connections
+       * Undefined means no restrictions
+       */
+      count?: number;
+      /**
+       * Valid nodes to make connection with
+       * Undefined means no restrictions
+       */
+      types?: string[];
+    };
+
+/**
  * Connection information for a node in the flow graph
  */
 export interface ConnectionInfo {
-  /** Number of input connections */
-  in: number;
-  /** Number of output connections */
-  out: number;
+  /** Information about input connections */
+  in: ConnectionPortInfo;
+  /** Information about output connections */
+  out: ConnectionPortInfo;
 }
 
 /**
@@ -62,8 +99,6 @@ export interface IFlowViewBuilder extends IFileViewBuilder {
   setNodes(nodes: NodeInfo[]): this;
 }
 
-export type ServiceProvider = (new () => IService) | (() => IService);
-
 /**
  * Main plugin API builder
  */
@@ -87,59 +122,6 @@ export interface IPluginApi {
   addService(name: string, service: ServiceProvider): this;
 }
 
-/**
- * Logger interface for plugin logging
- */
-export interface Logger {
-  debug(message: unknown | unknown[], tags: string[]): void;
-  info(message: unknown | unknown[], tags: string[]): void;
-  warning(message: unknown | unknown[], tags: string[]): void;
-  error(message: unknown | unknown[], tags: string[]): void;
-  fatal(message: unknown | unknown[], tags: string[]): void;
-  trace(message: unknown | unknown[], tags: string[]): void;
-}
-
-/**
- * Unified API for plugin services
- */
-export interface IService {
-  init(): Promise<boolean>;
-}
-
-/**
- * The variable type of a variable.
- *
- * NOTE: zero is used as uninitialized canary in the C runtime, and can NOT be a valid value.
- */
-export declare enum VariableType {
-  Bool = 1,
-  Int = 2,
-  Float = 3,
-  String = 4,
-}
-
-declare const unknownVariableTypeSymbol: unique symbol;
-type UnknownVariableType = typeof unknownVariableTypeSymbol;
-interface VariableInfoTypeMap {
-  [unknownVariableTypeSymbol]: unknown;
-  [VariableType.Bool]: boolean;
-  [VariableType.Int]: number;
-  [VariableType.Float]: number;
-  [VariableType.String]: string;
-}
-
-/**
- * A variable record from the variables table, containing the variable's details
- */
-export interface VariableInfo<
-  T extends VariableType | UnknownVariableType = UnknownVariableType
-> {
-  name: string;
-  type: T extends UnknownVariableType ? VariableType : T;
-  init: VariableInfoTypeMap[T];
-  comment?: string;
-}
-
 export interface PluginContext {
   /**
    * The plugin API builder used to configure the plugin
@@ -150,4 +132,8 @@ export interface PluginContext {
    * Logger instance for this plugin
    */
   readonly logger: Logger;
+}
+
+declare global {
+  const XTORY_VERSION: string;
 }

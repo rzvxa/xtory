@@ -5,7 +5,6 @@ import {
   tryGetAsync,
   NewProjectModel,
   CreateNewProjectResult,
-  IpcResultStatus,
 } from '@xtory/shared';
 
 import path from 'path';
@@ -19,7 +18,7 @@ export default async function createNewProject(
 
   if (projectRoot === '' || projectPath === '' || projectTemplate === '') {
     return {
-      status: IpcResultStatus.error,
+      status: 'ERROR',
       errorMessage: 'Something went wrong, Invalid Input!',
     };
   }
@@ -34,7 +33,7 @@ export default async function createNewProject(
   // validation begin
   if (!projectRootExists) {
     return {
-      status: IpcResultStatus.error,
+      status: 'ERROR',
       errorMessage: `Path "${projectRoot}" does not exists or Xtory don't have access to it!`,
     };
   }
@@ -44,7 +43,7 @@ export default async function createNewProject(
       await mkdir(projectPath);
     } catch {
       return {
-        status: IpcResultStatus.error,
+        status: 'ERROR',
         errorMessage: `Failed to create ${projectPath} directory.`,
       };
     }
@@ -54,13 +53,13 @@ export default async function createNewProject(
     const projectPathFiles = await readdir(projectPath);
     if (projectPathFiles.length > 0) {
       return {
-        status: IpcResultStatus.error,
+        status: 'ERROR',
         errorMessage: `"${projectPath}" is not empty.`,
       };
     }
   } catch {
     return {
-      status: IpcResultStatus.error,
+      status: 'ERROR',
       errorMessage: `Failed to access "${projectPath}".`,
     };
   }
@@ -72,7 +71,7 @@ export default async function createNewProject(
 
   if (!readConfigResult.success) {
     return {
-      status: IpcResultStatus.error,
+      status: 'ERROR',
       errorMessage: `Failed to load template from "${templatePath}"`,
     };
   }
@@ -87,7 +86,7 @@ export default async function createNewProject(
     });
   } catch (exception) {
     return {
-      status: IpcResultStatus.error,
+      status: 'ERROR',
       errorMessage: `Failed to copy template from "${templatePath}" to "${projectPath}" "${exception}"`,
     };
   }
@@ -96,10 +95,10 @@ export default async function createNewProject(
     await writeFile(projectConfigPath, projectConfig);
   } catch {
     return {
-      status: IpcResultStatus.error,
+      status: 'ERROR',
       errorMessage: `Failed to write onto file "${projectConfigPath}"`,
     };
   }
 
-  return { status: IpcResultStatus.ok };
+  return { status: 'OK' };
 }

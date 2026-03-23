@@ -1,22 +1,28 @@
-export type ConnectionInfo = {
-  in: number;
-  out: number;
-};
+import type { NodeInfo } from '@xtory/plugin-api';
 
-export type NodeInfo = {
-  type: string;
-  connections: ConnectionInfo;
-  renderer?: string;
-};
+export type FileViewType = 'flow' | 'simple-text';
 
-export type FlowViewConfig = {
+export interface BaseFileViewConfig {
   fileType: string;
-  nodes: NodeInfo[];
+  viewType: FileViewType | (string & {});
   menuItems: { title: string; data: string }[];
-  optional?: boolean; // If true, only register if fileType already exists
-};
+  /** If true, only register if fileType already exists */
+  optional?: boolean;
+}
 
-export type PluginConfig = {
-  flowViews: FlowViewConfig[];
-  dependencies?: string[]; // Plugin dependencies
-};
+export interface FlowViewConfig extends BaseFileViewConfig {
+  viewType: 'flow';
+  nodes: NodeInfo[];
+}
+
+export interface SimpleTextViewConfig extends BaseFileViewConfig {
+  viewType: 'simple-text';
+}
+
+export type FileViewConfig = FlowViewConfig | SimpleTextViewConfig;
+
+export interface PluginConfig {
+  fileViews: FileViewConfig[];
+  /** Plugin dependencies */
+  dependencies?: string[];
+}

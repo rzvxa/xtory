@@ -14,7 +14,6 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import AddIcon from '@mui/icons-material/Add';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 
-import { ChannelsMain } from '@xtory/shared';
 import { EzSnackbarRef } from 'renderer/utils/ezSnackbar';
 
 import ToolContainer from './ToolContainer';
@@ -36,9 +35,7 @@ export default function PluginsTool() {
       const config: {
         plugins: { [name: string]: string };
         pluginsConfiguration: { [name: string]: { enabled?: boolean } };
-      } = await window.electron.ipcRenderer.invoke(
-        ChannelsMain.getPluginConfig
-      );
+      } = await window.electron.ipcRenderer.invoke('getPluginConfig');
       const pluginList: Plugin[] = Object.entries(config.plugins || {}).map(
         ([name, version]) => ({
           name,
@@ -70,7 +67,7 @@ export default function PluginsTool() {
 
     try {
       await window.electron.ipcRenderer.invoke(
-        ChannelsMain.updatePluginEnabled,
+        'updatePluginEnabled',
         pluginName,
         plugin.enabled
       );
@@ -107,7 +104,7 @@ export default function PluginsTool() {
 
     try {
       await window.electron.ipcRenderer.invoke(
-        ChannelsMain.updatePluginConfig,
+        'updatePluginConfig',
         pluginConfig
       );
       EzSnackbarRef.success('Plugin added');
@@ -129,7 +126,7 @@ export default function PluginsTool() {
 
     try {
       await window.electron.ipcRenderer.invoke(
-        ChannelsMain.updatePluginConfig,
+        'updatePluginConfig',
         pluginConfig
       );
       EzSnackbarRef.success('Plugin removed');
@@ -156,7 +153,7 @@ export default function PluginsTool() {
 
     try {
       await window.electron.ipcRenderer.invoke(
-        ChannelsMain.updatePluginConfig,
+        'updatePluginConfig',
         pluginConfig
       );
     } catch (error: any) {
@@ -169,7 +166,7 @@ export default function PluginsTool() {
 
   const handleRestart = async () => {
     try {
-      await window.electron.ipcRenderer.invoke(ChannelsMain.restartApp);
+      await window.electron.ipcRenderer.invoke('restartApp');
     } catch (error: any) {
       EzSnackbarRef.error(
         `Failed to restart application: ${error.message ?? error}`

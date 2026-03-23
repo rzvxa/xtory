@@ -2,15 +2,13 @@ import path from 'path';
 import { watch, FSWatcher } from 'chokidar';
 import {
   LogLevel,
-  ChannelsRenderer,
   ProjectTree,
   ProjectTreeNode,
   sanitizePath,
 } from '@xtory/shared';
+import type { ChannelsRenderer, IService } from '@xtory/plugin-api';
 
 import project from 'main/project';
-
-import type { IService } from 'packages/plugin-api';
 
 export type ProjectWatchServiceMessageBroker = (
   channel: ChannelsRenderer,
@@ -71,10 +69,7 @@ class ProjectWatchService implements IService {
   #worker() {
     if (!this.#isDirty) return;
 
-    this.#messageBroker(
-      ChannelsRenderer.onProjectTreeUpdated,
-      this.#projectTree
-    );
+    this.#messageBroker('onProjectTreeUpdated', this.#projectTree);
 
     this.#isDirty = false;
   }

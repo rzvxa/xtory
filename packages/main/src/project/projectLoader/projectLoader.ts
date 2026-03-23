@@ -2,8 +2,6 @@ import { ensureFile } from 'fs-extra';
 
 import { fsUtils, FileLogger } from 'main/utils';
 
-import { IpcResultStatus } from '@xtory/shared';
-
 import LoggingService from 'main/services/loggingService';
 import ProjectWatchService from 'main/services/projectWatchService';
 import PluginsService from 'main/services/pluginsService';
@@ -22,7 +20,7 @@ export default async function defaultLoadStrategy(
 ): Promise<LoadProjectResult> {
   if (!(await fsUtils.exists(projectPath))) {
     return {
-      status: IpcResultStatus.error,
+      status: 'ERROR',
       errorMessage: `Failed to open "${projectPath}"`,
     };
   }
@@ -32,7 +30,7 @@ export default async function defaultLoadStrategy(
 
   if (!settingsExists) {
     return {
-      status: IpcResultStatus.error,
+      status: 'ERROR',
       errorMessage: `Given path don't contain a "xtory.json" file!`,
     };
   }
@@ -52,7 +50,7 @@ export default async function defaultLoadStrategy(
     projectSettingsService.init();
   } catch (error) {
     return {
-      status: IpcResultStatus.error,
+      status: 'ERROR',
       errorMessage: `Failed to load ${settingsPath}, Error: ${error}`,
     };
   }
@@ -65,7 +63,7 @@ export default async function defaultLoadStrategy(
     await logger.init();
   } catch (error) {
     return {
-      status: IpcResultStatus.error,
+      status: 'ERROR',
       errorMessage: `Failed not initialize FileLogger, Xtory can't write logs to file! Error: ${error}`,
     };
   }
@@ -97,5 +95,5 @@ export default async function defaultLoadStrategy(
     },
   };
 
-  return { status: IpcResultStatus.ok, project };
+  return { status: 'OK', project };
 }

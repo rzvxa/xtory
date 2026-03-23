@@ -94,3 +94,13 @@ export function extractFileExtension(path: string): FileExtensionInfo {
 
   return { name, extension };
 }
+
+export function isClass(
+  maybeClass: any
+): maybeClass is new (...args: any[]) => any {
+  if (typeof maybeClass !== 'function') {
+    return false;
+  }
+  const source = Function.prototype.toString.call(maybeClass);
+  return source.startsWith('class ');
+}

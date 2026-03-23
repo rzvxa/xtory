@@ -1,7 +1,7 @@
 export interface PluginManifest {
   name: string;
   version: string | undefined;
-  yumeApiVersion: number;
+  xtoryApiVersion: number;
   license: string | undefined;
   main: string | undefined;
   rendererMain?: string | undefined;

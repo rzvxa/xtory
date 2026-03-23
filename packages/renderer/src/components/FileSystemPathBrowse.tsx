@@ -7,11 +7,7 @@ import IconButton from '@mui/material/IconButton';
 
 import FolderIcon from '@mui/icons-material/Folder';
 
-import {
-  ChannelsMain,
-  BrowseFileSystemResult,
-  sanitizePath,
-} from '@xtory/shared';
+import { BrowseFileSystemResult, sanitizePath } from '@xtory/shared';
 
 interface FileSystemPathBrowseProps {
   label: string;
@@ -32,7 +28,7 @@ export default function FileSystemPathBrowse({
 }: FileSystemPathBrowseProps) {
   const onBrowseClick = async () => {
     const result: BrowseFileSystemResult =
-      await window.electron.ipcRenderer.invoke(ChannelsMain.browseFileSystem, {
+      await window.electron.ipcRenderer.invoke('browseFileSystem', {
         properties: ['openDirectory'],
       });
     if (result.canceled) {

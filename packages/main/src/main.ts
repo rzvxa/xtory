@@ -10,8 +10,12 @@
  */
 import path from 'path';
 import { app, BrowserWindow, shell, ipcMain, protocol } from 'electron';
+import '@xtory/plugin-api';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
+
+// import { version as packageVersion } from 'package.json';
+//
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './utils';
 import { setMainWindow } from './windowManager';
@@ -19,6 +23,7 @@ import { setMainWindow } from './windowManager';
 import project from './project';
 import projectLoader from './project/projectLoader';
 import './ipc/index';
+import { readFileSync } from 'fs';
 
 // Register privileged scheme for plugins and assets
 protocol.registerSchemesAsPrivileged([
@@ -44,8 +49,6 @@ protocol.registerSchemesAsPrivileged([
   },
 ]);
 
-project.init(projectLoader);
-
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -54,7 +57,19 @@ class AppUpdater {
   }
 }
 
+if (process.env.XTORY_PACKAGED) {
+  (global as any).XTORY_VERSION = process.env.XTORY_VERSION;
+} else {
+  (global as any).XTORY_VERSION = JSON.parse(
+    readFileSync(path.resolve(__dirname, '../package.json'), {
+      encoding: 'utf8',
+    })
+  ).version;
+}
+
 let mainWindow: BrowserWindow | null = null;
+
+project.init(projectLoader);
 
 // eslint-disable-next-line import/prefer-default-export
 export const getMainWindow = () => mainWindow;
@@ -117,7 +132,7 @@ const createWindow = async () => {
 
   setMainWindow(mainWindow);
 
-  mainWindow.loadURL(resolveHtmlPath('index.html'));
+  mainWindow.loadURL(resolveHtmlPath('index.html', { v: XTORY_VERSION }));
 
   mainWindow.on('ready-to-show', () => {
     if (!mainWindow) {

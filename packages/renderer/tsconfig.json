@@ -5,6 +5,6 @@
     "rootDir": "./src",
     "jsx": "react-jsx"
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "../main/src/preload.ts"],
   "references": [{ "path": "../shared" }]
 }

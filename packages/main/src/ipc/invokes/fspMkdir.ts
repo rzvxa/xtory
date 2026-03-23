@@ -1,4 +1,4 @@
-import { IpcInvokeEvent, ChannelsRenderer } from '@xtory/shared';
+import type { IpcInvokeEvent } from '@xtory/plugin-api';
 import fs from 'fs/promises';
 
 export default async function mkdirAsync(
@@ -10,7 +10,7 @@ export default async function mkdirAsync(
     return true;
   } catch (err) {
     sender.send(
-      ChannelsRenderer.toastMessage,
+      'toastMessage',
       `Failed to create folder from ${path} with Error: "${err}"`,
       'error'
     );

@@ -6,6 +6,11 @@
       http-equiv="Content-Security-Policy"
       content="script-src 'self' 'unsafe-inline'"
     />
+    <script>
+      // TODO: this is a hacky way for exposing constants from the main into the loaded html page.
+      // ideally this should happen through the preload.
+      window.XTORY_VERSION = new URL(window.location.href).searchParams.get('v');
+    </script>
     <title>Xtory</title>
   </head>
   <body>

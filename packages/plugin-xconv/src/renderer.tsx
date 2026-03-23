@@ -1,5 +1,6 @@
 /// <reference types="@xtory/plugin-api/renderer" />
 
+import type { VariableInfo, VariableType } from 'packages/plugin-api';
 import type { Conversation } from './types';
 
 const {
@@ -7,7 +8,7 @@ const {
     ReactFlow: { Handle, Position, useReactFlow },
   },
   ui: {
-    icons: { OpenInBrowser },
+    icons: { OpenInBrowser, Add },
     TextField,
     NodeContainer,
     Autocomplete,
@@ -19,7 +20,15 @@ const {
     DialogContent,
     DialogActions,
     Button,
+    PickVariable,
+    Typography,
+    Select,
+    Tooltip,
+    InputAdornment,
+    MenuItem,
   },
+  uuidv4,
+  VariableType: VariableTypeEnum,
   registerNodeRenderer,
 } = window.renderer;
 
@@ -40,12 +49,50 @@ interface ChoiceNodeData {
 }
 
 interface SetNodeData {
-  variableKey?: string;
+  variableName?: string;
   value?: string;
 }
 
+const generalBranchMatchers = ['is'] as const;
+const stringBranchMatchers = [
+  ...generalBranchMatchers,
+  'contains',
+  'startswith',
+  'endswith',
+] as const;
+const numberBranchMatchers = [
+  ...generalBranchMatchers,
+  'lt',
+  'gt',
+  'lte',
+  'gte',
+] as const;
+const boolBranchMatchers = [...generalBranchMatchers] as const;
+
+type BranchCaseMatchType =
+  | (typeof stringBranchMatchers)[number]
+  | (typeof numberBranchMatchers)[number];
+
+const matcherNames = {
+  is: 'Is',
+  contains: 'Contains',
+  startswith: 'Starts With',
+  endswith: 'Ends With',
+  lt: 'Less Than',
+  gt: 'Greater Than',
+  lte: 'Less Than Equal',
+  gte: 'Greater Than Equal',
+} as const satisfies Record<BranchCaseMatchType, string>;
+
+interface BranchCaseData {
+  id: string;
+  matcher: BranchCaseMatchType;
+  value: string | number | boolean;
+}
+
 interface BranchNodeData {
-  variableKey?: string;
+  variableName?: string;
+  cases?: BranchCaseData[];
 }
 
 interface FunctionNodeData {
@@ -68,7 +115,7 @@ function StartConversationNode({
     // Fetch all characters
     window.electron.ipcRenderer
       .invoke('serviceCall', 'characters', 'getAllCharacters')
-      .then((chars: any) => setAllCharacters(chars || {}))
+      .then((chars) => setAllCharacters(chars || {}))
       .catch((err: any) =>
         window.renderer.logger.error(`Failed to fetch characters: ${err}`, [
           'StartConversationNode',
@@ -83,7 +130,7 @@ function StartConversationNode({
 
   const handleAddCharacter = (character: any) => {
     if (!character || !data.characterIds) {
-      setNodes((nds: any[]) =>
+      setNodes((nds) =>
         nds.map((node) =>
           node.id === id
             ? {
@@ -100,7 +147,7 @@ function StartConversationNode({
     }
 
     if (!data.characterIds.includes(character.id)) {
-      setNodes((nds: any[]) =>
+      setNodes((nds) =>
         nds.map((node) =>
           node.id === id
             ? {
@@ -117,7 +164,7 @@ function StartConversationNode({
   };
 
   const handleRemoveCharacter = (characterId: string) => {
-    setNodes((nds: any[]) =>
+    setNodes((nds) =>
       nds.map((node) =>
         node.id === id
           ? {
@@ -146,7 +193,7 @@ function StartConversationNode({
         placeholder="Conversation name"
         value={data.name || ''}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          setNodes((nds: any[]) =>
+          setNodes((nds) =>
             nds.map((node) =>
               node.id === id
                 ? { ...node, data: { ...node.data, name: e.target.value } }
@@ -287,14 +334,14 @@ function SetNode({ id, data, selected }: Renderer.NodeProps<SetNodeData>) {
       <TextField
         size="small"
         placeholder="Variable key"
-        value={data.variableKey || ''}
+        value={data.variableName || ''}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
           setNodes((nds: any[]) =>
             nds.map((node) =>
               node.id === id
                 ? {
                     ...node,
-                    data: { ...node.data, variableKey: e.target.value },
+                    data: { ...node.data, variableName: e.target.value },
                   }
                 : node
             )
@@ -322,35 +369,250 @@ function SetNode({ id, data, selected }: Renderer.NodeProps<SetNodeData>) {
   );
 }
 
+function BranchCase({
+  key,
+  data,
+  type,
+  onChange,
+}: {
+  key: string;
+  data: BranchCaseData;
+  type: VariableType;
+  onChange: (newValue: BranchCaseData) => void;
+}) {
+  const [caseSensitive, setCaseSensitive] = React.useState(true);
+
+  let matchers: readonly BranchCaseMatchType[];
+  switch (type) {
+    case VariableTypeEnum.Bool:
+      matchers = boolBranchMatchers;
+      break;
+    case VariableTypeEnum.Int:
+    case VariableTypeEnum.Float:
+      matchers = numberBranchMatchers;
+      break;
+    case VariableTypeEnum.String:
+      matchers = stringBranchMatchers;
+      break;
+    default:
+      throw new Error(`Invalid variable type ${type}`);
+  }
+
+  return (
+    <Box key={key} sx={{ display: 'flex', flexDirection: 'row' }}>
+      <Select
+        id="branch-str-match-mode"
+        size="small"
+        value={data.matcher}
+        onChange={(e) =>
+          onChange({
+            ...data,
+            matcher: e.target.value as BranchCaseMatchType,
+          })
+        }
+      >
+        {matchers.map((matcher) => (
+          <MenuItem value={matcher}>{matcherNames[matcher]}</MenuItem>
+        ))}
+      </Select>
+      <TextField
+        size="small"
+        sx={{ width: '100%' }}
+        value={data.value || ''}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          onChange({ ...data, value: e.target.value })
+        }
+        InputProps={{
+          endAdornment: (
+            <InputAdornment position="end">
+              <Tooltip
+                title={`Case-Sensitive: ${
+                  caseSensitive ? 'Enable' : 'Disable'
+                }`}
+                onClick={() => setCaseSensitive(!caseSensitive)}
+              >
+                <IconButton
+                  color="primary"
+                  sx={{
+                    width: '25px',
+                    height: '25px',
+                    border: caseSensitive ? 1 : 0,
+                    padding: caseSensitive ? '7px' : '8px',
+                  }}
+                >
+                  <Typography fontSize={10}>Aa</Typography>
+                </IconButton>
+              </Tooltip>
+            </InputAdornment>
+          ),
+        }}
+      />
+      <Box sx={{ position: 'relative' }}>
+        <Handle type="source" position={Position.Right} id={data.id} />
+      </Box>
+    </Box>
+  );
+}
+
 function BranchNode({
   id,
   data,
   selected,
 }: Renderer.NodeProps<BranchNodeData>) {
+  const [variable, setVariable] = React.useState<VariableInfo | null>(null);
   const { setNodes } = useReactFlow();
 
   return (
     <NodeContainer title="Branch" selected={selected}>
       <Handle type="target" position={Position.Left} />
-      <TextField
-        size="small"
-        placeholder="Variable to check"
-        value={data.variableKey || ''}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          setNodes((nds: any[]) =>
-            nds.map((node) =>
-              node.id === id
-                ? {
-                    ...node,
-                    data: { ...node.data, variableKey: e.target.value },
-                  }
-                : node
-            )
-          )
-        }
-        sx={{ width: '100%' }}
-      />
-      <Handle type="source" position={Position.Right} id="default" />
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px',
+          minWidth: '400px',
+        }}
+      >
+        <Typography fontSize={12}>When</Typography>
+        <PickVariable
+          selected={data.variableName ?? null}
+          onChange={(_, newValue) => {
+            setVariable(newValue);
+            if (!newValue) {
+              // Cleared selection
+              setNodes((nds) =>
+                nds.map((node) =>
+                  node.id === id
+                    ? {
+                        ...node,
+                        data: {
+                          ...node.data,
+                          variableName: undefined,
+                          cases: [],
+                        } satisfies BranchNodeData,
+                      }
+                    : node
+                )
+              );
+            } else {
+              // Selected a variable
+              setNodes((nds) =>
+                nds.map((node) =>
+                  node.id === id
+                    ? {
+                        ...node,
+                        data: {
+                          ...node.data,
+                          variableName: newValue.name,
+                        } satisfies BranchNodeData,
+                      }
+                    : node
+                )
+              );
+            }
+          }}
+          filter={(vars, inputText) => {
+            const inputValue = inputText.toLowerCase();
+            if (!inputValue) {
+              return vars;
+            }
+
+            return vars.filter(
+              (info) =>
+                info.name.toLowerCase().includes(inputValue) ||
+                String(info.init).toLowerCase().includes(inputValue) ||
+                VariableTypeEnum[info.type].toLowerCase().includes(inputValue)
+            );
+          }}
+          sx={{ width: '100%' }}
+        />
+
+        {variable &&
+          (data.cases ?? []).map((kase) => (
+            <BranchCase
+              key={kase.id}
+              data={kase}
+              type={variable.type}
+              onChange={(kase) => {
+                setNodes((nds) =>
+                  nds.map((node) =>
+                    node.id === id
+                      ? {
+                          ...node,
+                          data: {
+                            ...node.data,
+                            cases: (
+                              (node.data as BranchNodeData).cases ?? []
+                            ).map((it) => (it.id === kase.id ? kase : it)),
+                          } satisfies BranchNodeData,
+                        }
+                      : node
+                  )
+                );
+              }}
+            />
+          ))}
+        <Box>
+          <IconButton
+            disabled={!variable}
+            sx={{ width: '100%', borderRadius: 0 }}
+            onClick={() => {
+              if (!variable) {
+                window.renderer.logger.error(
+                  'Can not add branch cases when no variable is selected',
+                  []
+                );
+                return;
+              }
+              setNodes((nds) =>
+                nds.map((node) =>
+                  node.id === id
+                    ? {
+                        ...node,
+                        data: {
+                          ...node.data,
+                          cases: [
+                            ...((node.data as BranchNodeData).cases ?? []),
+                            {
+                              id: uuidv4(),
+                              matcher: 'is',
+                              value: () => {
+                                switch (variable.type) {
+                                  case VariableTypeEnum.Bool:
+                                    return false;
+                                  case VariableTypeEnum.Int:
+                                  case VariableTypeEnum.Float:
+                                    return 0;
+                                  case VariableTypeEnum.String:
+                                    return '';
+                                  default:
+                                    throw new Error(
+                                      `Invalid variable type ${variable.type}`
+                                    );
+                                }
+                              },
+                            },
+                          ],
+                        } satisfies BranchNodeData,
+                      }
+                    : node
+                )
+              );
+            }}
+          >
+            <Add />
+          </IconButton>
+        </Box>
+      </Box>
+
+      <Box sx={{ display: 'flex' }}>
+        <Handle
+          type="source"
+          position={Position.Right}
+          id="default"
+          style={{ top: '40%' }}
+        />
+      </Box>
     </NodeContainer>
   );
 }
@@ -380,7 +642,7 @@ function FunctionNode({
         placeholder="Function name"
         value={data.functionName || ''}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          setNodes((nds: any[]) =>
+          setNodes((nds) =>
             nds.map((node) =>
               node.id === id
                 ? {
@@ -424,7 +686,7 @@ function ConversationNode({
   const loadConversations = () => {
     window.electron.ipcRenderer
       .invoke('serviceCall', 'conversations', 'getIndex')
-      .then((index: any[]) => {
+      .then((index) => {
         setConversations(index || []);
         window.renderer.logger.info(
           // eslint-disable-next-line promise/always-return
@@ -470,7 +732,7 @@ function ConversationNode({
       );
 
       // Update node data with new conversation ID
-      setNodes((nds: any[]) =>
+      setNodes((nds) =>
         nds.map((node) =>
           node.id === id
             ? { ...node, data: { ...node.data, conversationId: newConv.id } }
@@ -542,12 +804,12 @@ function ConversationNode({
 
         <Autocomplete
           options={options}
-          getOptionLabel={(option: any) => option?.name || ''}
+          getOptionLabel={(option) => option?.name || ''}
           value={selectedConversation || null}
-          onChange={(_: any, newValue: any) => {
+          onChange={(_, newValue) => {
             if (!newValue) {
               // Cleared selection
-              setNodes((nds: any[]) =>
+              setNodes((nds) =>
                 nds.map((node) =>
                   node.id === id
                     ? { ...node, data: { ...node.data, conversationId: '' } }
@@ -559,7 +821,7 @@ function ConversationNode({
               handleOpenCreateDialog();
             } else {
               // Selected existing conversation
-              setNodes((nds: any[]) =>
+              setNodes((nds) =>
                 nds.map((node) =>
                   node.id === id
                     ? {
@@ -571,19 +833,19 @@ function ConversationNode({
               );
             }
           }}
-          filterOptions={(options: any[], state: any) => {
+          filterOptions={(options, state) => {
             const inputValue = state.inputValue.toLowerCase();
             if (!inputValue) return options;
 
             // Always show "Create New..." option and filter conversations by name or path
             return options.filter(
-              (option: any) =>
+              (option) =>
                 option.id === '__create_new__' ||
                 option.name.toLowerCase().includes(inputValue) ||
                 option.filePath?.toLowerCase().includes(inputValue)
             );
           }}
-          renderOption={(props: any, option: any) => (
+          renderOption={(props, option) => (
             <li
               // eslint-disable-next-line react/jsx-props-no-spreading
               {...props}
@@ -605,7 +867,7 @@ function ConversationNode({
               )}
             </li>
           )}
-          renderInput={(params: any) => (
+          renderInput={(params) => (
             <TextField
               // eslint-disable-next-line react/jsx-props-no-spreading
               {...params}
