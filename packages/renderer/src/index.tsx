@@ -20,10 +20,7 @@ import * as Icons from '@mui/icons-material';
 
 // Shared UI components
 import NodeContainer from './components/Nodes/NodeContainer';
-import {
-  registerNodeRenderer,
-  getNodeRenderer,
-} from './services/plugins/NodeRegistry';
+import { registerNodeRenderer, getNodeRenderer } from './plugins/NodeRegistry';
 import { useResourceDrawer } from './contexts/ResourceDrawerContext';
 import logger from './logger';
 

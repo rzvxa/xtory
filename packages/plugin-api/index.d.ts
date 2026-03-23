@@ -106,6 +106,40 @@ export interface IService {
   init(): Promise<boolean>;
 }
 
+/**
+ * The variable type of a variable.
+ *
+ * NOTE: zero is used as uninitialized canary in the C runtime, and can NOT be a valid value.
+ */
+export declare enum VariableType {
+  Bool = 1,
+  Int = 2,
+  Float = 3,
+  String = 4,
+}
+
+declare const unknownVariableTypeSymbol: unique symbol;
+type UnknownVariableType = typeof unknownVariableTypeSymbol;
+interface VariableInfoTypeMap {
+  [unknownVariableTypeSymbol]: unknown;
+  [VariableType.Bool]: boolean;
+  [VariableType.Int]: number;
+  [VariableType.Float]: number;
+  [VariableType.String]: string;
+}
+
+/**
+ * A variable record from the variables table, containing the variable's details
+ */
+export interface VariableInfo<
+  T extends VariableType | UnknownVariableType = UnknownVariableType
+> {
+  name: string;
+  type: T extends UnknownVariableType ? VariableType : T;
+  init: VariableInfoTypeMap[T];
+  comment?: string;
+}
+
 export interface PluginContext {
   /**
    * The plugin API builder used to configure the plugin

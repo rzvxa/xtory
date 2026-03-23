@@ -10,6 +10,7 @@ import PluginsService from 'main/services/pluginsService';
 import ProjectSettingsService from 'main/services/projectSettingsService';
 import ResourceService from 'main/services/resourceService';
 import CharacterService from 'main/services/characterService';
+import VariablesService from 'main/services/variableService';
 
 import LoadProjectResult from './loadProjectResult';
 import { ProjectMessageBroker } from '../projectMessageBroker';
@@ -80,6 +81,8 @@ export default async function defaultLoadStrategy(
 
   const characterService = new CharacterService(projectPath);
 
+  const variablesService = new VariablesService(projectPath);
+
   const project: Project = {
     projectPath,
     messageBroker,
@@ -90,6 +93,7 @@ export default async function defaultLoadStrategy(
       settings: projectSettingsService,
       resources: resourceService,
       characters: characterService,
+      variables: variablesService,
     },
   };
 
