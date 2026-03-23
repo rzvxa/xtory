@@ -51,27 +51,32 @@ export default function CharacterCard({
         <CardMedia
           component="img"
           sx={{
-            height:
-              // eslint-disable-next-line no-nested-ternary
-              variant === 'compact' ? 80 : variant === 'expanded' ? 200 : 140,
+            aspectRatio: '1 / 1',
             width: variant === 'expanded' ? 200 : '100%',
-            objectFit: 'cover',
+            maxHeight: variant === 'compact' ? 80 : undefined,
+            objectFit: 'contain',
+            backgroundColor: (theme) => theme.palette.background.default,
           }}
           image={avatarSrc}
           alt={character.name}
         />
       )}
-      <CardContent sx={{ flexGrow: 1 }}>
+      <CardContent sx={{ flexGrow: 1, p: 2 }}>
         <Typography
           gutterBottom
           variant={variant === 'compact' ? 'body1' : 'h6'}
           component="div"
+          sx={{
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            wordBreak: 'break-word',
+          }}
         >
           {character.name}
         </Typography>
 
         {variant !== 'compact' && displayAttributes.length > 0 && (
-          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 1 }}>
+          <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 1.5 }}>
             {displayAttributes.map((attr) => {
               const value = character.attributes[attr.key];
               if (value === undefined || value === null || value === '') {
@@ -89,6 +94,13 @@ export default function CharacterCard({
                   label={`${attr.label}: ${displayValue}`}
                   size="small"
                   variant="outlined"
+                  sx={{
+                    maxWidth: '100%',
+                    '& .MuiChip-label': {
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    },
+                  }}
                 />
               );
             })}

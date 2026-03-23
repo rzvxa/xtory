@@ -13,6 +13,7 @@ import CharacterService from 'main/services/characterService';
 
 import LoadProjectResult from './loadProjectResult';
 import { ProjectMessageBroker } from '../projectMessageBroker';
+import Project from '../project';
 
 export default async function defaultLoadStrategy(
   messageBroker: ProjectMessageBroker,
@@ -79,15 +80,17 @@ export default async function defaultLoadStrategy(
 
   const characterService = new CharacterService(projectPath);
 
-  const project = {
+  const project: Project = {
     projectPath,
     messageBroker,
-    projectWatchService,
-    loggingService,
-    pluginsService,
-    projectSettingsService,
-    resourceService,
-    characterService,
+    builtinServices: {
+      watch: projectWatchService,
+      logger: loggingService,
+      plugins: pluginsService,
+      settings: projectSettingsService,
+      resources: resourceService,
+      characters: characterService,
+    },
   };
 
   return { status: IpcResultStatus.ok, project };

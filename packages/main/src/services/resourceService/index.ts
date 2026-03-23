@@ -3,8 +3,9 @@ import { join, extname, basename } from 'path';
 import project from 'main/project';
 import type { ResourceMetadata, ResourceMap } from '@xtory/shared';
 import { v4 as uuidv4 } from 'uuid';
+import { IService } from 'packages/plugin-api';
 
-class ResourceService {
+class ResourceService implements IService {
   #resourcesPath: string;
 
   #resourcesMapPath: string;

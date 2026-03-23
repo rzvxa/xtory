@@ -1,24 +1,25 @@
 {
-  "name": "@xtory/plugin-xflow",
+  "name": "@xtory/plugin-xconv",
   "version": "0.2.5",
   "yumeApiVersion": 1,
   "main": "dist/main.js",
   "rendererMain": "dist/renderer.js",
-  "description": "A Xtory plugin for supporting .xflow files",
+  "description": "A Xtory plugin for supporting .xconv conversation files",
   "author": "Ali Rezvani <rzvxa@protonmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/rzvxa/xtory.git",
-    "directory": "packages/plugin-xflow"
+    "directory": "packages/plugin-xconv"
   },
   "keywords": [
     "xtory",
     "plugin",
-    "xflow",
+    "xconv",
+    "conversation",
+    "dialogue",
     "storytelling",
-    "narrative",
-    "flow"
+    "narrative"
   ],
   "files": [
     "dist/**/*",

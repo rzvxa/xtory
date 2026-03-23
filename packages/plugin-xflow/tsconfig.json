@@ -9,9 +9,10 @@
     "removeComments": true,
     "module": "ESNext",
     "target": "ES2020",
-    "lib": ["ES2020"],
+    "lib": ["ES2020", "DOM"],
+    "jsx": "react",
     "skipLibCheck": true,
-    "strict": false
+    "strict": true
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]
